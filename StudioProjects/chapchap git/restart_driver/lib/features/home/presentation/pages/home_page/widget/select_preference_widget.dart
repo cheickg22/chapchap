@@ -1,0 +1,144 @@
+
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:restart_user/core/utils/custom_button.dart';
+import 'package:restart_user/features/home/application/home_bloc.dart';
+import 'package:restart_user/l10n/app_localizations.dart';
+import '../../../../../../../core/utils/custom_text.dart';
+
+class SelectPreferenceWidget extends StatefulWidget {
+  final BuildContext cont;
+  final dynamic thisValue;
+  const SelectPreferenceWidget({super.key, required this.cont, this.thisValue,});
+
+  @override
+  State<SelectPreferenceWidget> createState() => _SelectPreferenceWidgetState();
+}
+
+class _SelectPreferenceWidgetState extends State<SelectPreferenceWidget> {
+  @override
+  void initState() {
+    super.initState();
+    final bloc = widget.cont.read<HomeBloc>();
+    bloc.tempSelectPreference = List<int>.from(bloc.selectedPreferenceDetailsList);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return BlocProvider.value(
+      value: widget.cont.read<HomeBloc>(),
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          final homeBloc = context.read<HomeBloc>();
+          return SafeArea(
+            child: Container(
+              width: size.width,
+              padding: EdgeInsets.all(size.width * 0.05),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      MyText(
+                        text: AppLocalizations.of(context)!.preferences,
+                        textStyle: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .copyWith(
+                              color: Theme.of(context).primaryColorDark,
+                            ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          context.read<HomeBloc>().add(ClearTempPreferenceEvent());
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.cancel_outlined),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          if (homeBloc.preferenceDetailsList != null)
+                    Column(
+                      children: List.generate(
+                        homeBloc.preferenceDetailsList!.length,
+                        (index) {
+                          final prefId =
+                              homeBloc.preferenceDetailsList![index].id;
+                          final isSelected =
+                              homeBloc.tempSelectPreference.contains(prefId);
+                //           final isSelected = homeBloc.tempSelectPreference.contains(prefId) ||
+                //  homeBloc.preferenceDetailsList![index].driverSelected == true;
+              
+                          return Theme(
+                            data: ThemeData(
+                              unselectedWidgetColor:
+                                  Theme.of(context).primaryColorDark,
+                            ),
+                            child: CheckboxListTile(
+                              value: isSelected,
+                              activeColor: Theme.of(context).primaryColor,
+                              onChanged: (value) {
+                                homeBloc.add(
+                                  SelectedPreferenceEvent(
+                                    prefId: prefId,
+                                    isSelected: value ?? false,
+                                  ),
+                                );
+                              },
+                              title: MyText(
+                                text: homeBloc
+                                    .preferenceDetailsList![index].name,
+                                textStyle: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomButton(
+                        buttonName: AppLocalizations.of(context)!.confirm,
+                        onTap: () {
+                          context.read<HomeBloc>().add(ConfirmPreferenceEvent());
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+
