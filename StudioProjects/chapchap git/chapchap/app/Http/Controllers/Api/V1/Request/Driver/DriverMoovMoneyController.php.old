@@ -1,0 +1,771 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\Request\Driver;
+
+use App\Http\Controllers\ApiController;
+use App\Models\Request\Request;
+use App\Models\MoovMoney\MoovMoneyTransaction;
+use App\Services\MoovMoney\MoovMoneyService;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class DriverMoovMoneyController extends ApiController
+{
+    protected $moovMoneyService;
+    protected $database;
+
+    public function __construct(MoovMoneyService $moovMoneyService)
+    {
+        $this->moovMoneyService = $moovMoneyService;
+        $this->database = app('firebase.database');
+    }
+
+    /**
+     * Driver processes a Moov Money deposit
+     * 
+     * @param HttpRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function processDeposit(HttpRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'request_id' => 'required|uuid',
+            'security_code' => 'required|string|size:6',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest('Validation failed', $validator->errors());
+        }
+
+        $driver = auth()->user()->driver;
+        $requestId = $request->request_id;
+        $securityCode = $request->security_code;
+
+        // Vérifier que la requête existe et est assignée au driver
+        $moovRequest = Request::where('id', $requestId)
+            ->where('driver_id', $driver->id)
+            ->where('is_moov_money', 1)
+            ->where('moov_money_type', 'deposit')
+            ->first();
+
+        if (!$moovRequest) {
+            return $this->respondNotFound('Requête non trouvée ou non assignée à ce driver');
+        }
+
+        if ($moovRequest->moov_money_status === 'completed') {
+            return $this->respondBadRequest('Cette transaction a déjà été traitée');
+        }
+
+        // Vérifier le code de sécurité
+        if ($moovRequest->moov_money_security_code !== $securityCode) {
+            Log::warning('Invalid security code attempt', [
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+                'expected' => $moovRequest->moov_money_security_code,
+                'provided' => $securityCode,
+            ]);
+            return $this->respondBadRequest('Code de sécurité incorrect');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Mettre à jour le statut en "processing"
+            $moovRequest->moov_money_status = 'processing';
+            $moovRequest->is_driver_started = 1;
+            $moovRequest->trip_start_time = Carbon::now();  // Pour que ça apparaisse dans les earnings
+            $moovRequest->save();
+            
+            // Mettre à jour Firebase avec statut "processing"
+            $this->updateMoovMoneyFirebaseStatus($moovRequest, 'processing', 'Transaction en cours de traitement');
+
+            // Vérifier si on utilise le mode mock
+            $useMock = config('moovmoney.mock', env('MOOV_MONEY_MOCK', false));
+            
+            if ($useMock) {
+                // Mode mock pour tests
+                Log::info('Driver Moov Money: Using mock mode for deposit');
+                $apiResponse = [
+                    'success' => true,
+                    'response_code' => '0',
+                    'response_desc' => 'Mock deposit processed successfully',
+                    'conversation_id' => 'CONV_DEPOSIT_' . time(),
+                    'transaction_id' => 'MOCK_DEP_' . strtoupper(uniqid()),
+                ];
+            } else {
+                // Appeler l'API Moov Money pour effectuer le dépôt
+                $apiResponse = $this->moovMoneyService->initiateCashIn(
+                    $moovRequest->moov_money_phone,
+                    $moovRequest->moov_money_amount,
+                    'XOF',
+                    'CHAPIN_' . $moovRequest->id
+                );
+            }
+
+            // Mettre à jour la transaction Moov Money
+            $moovTransaction = $moovRequest->moovMoneyTransaction;
+            $moovTransaction->api_response = json_encode($apiResponse);
+            $moovTransaction->conversation_id = $apiResponse['conversation_id'] ?? null;
+            $moovTransaction->transaction_id = $apiResponse['transaction_id'] ?? null;
+
+            if ($apiResponse['success'])  {
+                // Succès de la transaction Moov Money
+                $moovTransaction->status = 'completed';
+                $moovTransaction->save();
+
+                // Mettre en attente de confirmation de paiement par l'utilisateur
+                $moovRequest->moov_money_status = 'waiting_payment';
+                $moovRequest->moov_money_processed_at = Carbon::now();
+                $moovRequest->is_driver_completed = 1;
+                $moovRequest->trip_end_time = Carbon::now();  // Heure de fin
+                $moovRequest->save();
+                
+                DB::commit();
+                
+                // Notifier le user qu'il doit confirmer le paiement
+                $this->notifyUserStatusChange($moovRequest, 'waiting_payment', 'Veuillez confirmer le paiement');
+
+                Log::info('Driver processed Moov Money deposit, waiting for user confirmation', [
+                    'request_id' => $requestId,
+                    'driver_id' => $driver->id,
+                    'amount' => $moovRequest->moov_money_amount,
+                ]);
+
+                return $this->respondSuccess([
+                    'request' => $moovRequest,
+                    'transaction' => $moovTransaction,
+                ], 'Transaction effectuée, en attente de confirmation du client');
+
+            } else {
+                // Échec
+                $moovTransaction->status = 'failed';
+                $moovTransaction->error_message = $apiResponse['response_desc'] ?? $apiResponse['error'] ?? 'Erreur API Moov Money';
+                $moovTransaction->save();
+
+                $moovRequest->moov_money_status = 'failed';
+                $moovRequest->save();
+                
+                // Notifier le user de l'échec
+                $this->notifyUserStatusChange($moovRequest, 'failed', 'Échec du dépôt: ' . $moovTransaction->error_message);
+
+                DB::commit();
+
+                return $this->respondBadRequest('Échec du dépôt Moov Money', [
+                    'error' => $moovTransaction->error_message,
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Driver failed to process Moov Money deposit', [
+                'error' => $e->getMessage(),
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+            ]);
+
+            return $this->respondInternalError('Erreur lors du traitement du dépôt: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Driver validates voucher and processes withdrawal
+     * 
+     * @param HttpRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function processWithdrawal(HttpRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'request_id' => 'required|uuid',
+            'security_code' => 'required|string|size:6',
+            'validation_code' => 'required|string|size:4',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest('Validation failed', $validator->errors());
+        }
+
+        $driver = auth()->user()->driver;
+        $requestId = $id;
+        $securityCode = $request->security_code;
+        $validationCode = $request->validation_code;
+
+        // Vérifier que la requête existe et est assignée au driver
+        $moovRequest = Request::where('id', $requestId)
+            ->where('driver_id', $driver->id)
+            ->where('is_moov_money', 1)
+            ->where('moov_money_type', 'withdrawal')
+            ->first();
+
+        if (!$moovRequest) {
+            return $this->respondNotFound('Requête non trouvée ou non assignée à ce driver');
+        }
+
+        if ($moovRequest->moov_money_status === 'completed') {
+            return $this->respondBadRequest('Cette transaction a déjà été traitée');
+        }
+
+        // Vérifier le code de sécurité
+        if ($moovRequest->moov_money_security_code !== $securityCode) {
+            Log::warning('Invalid security code attempt', [
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+                'expected' => $moovRequest->moov_money_security_code,
+                'provided' => $securityCode,
+            ]);
+            return $this->respondBadRequest('Code de sécurité incorrect');
+        }
+
+        // Vérifier le code de validation (4 derniers chiffres du téléphone)
+        if ($moovRequest->moov_money_validation_code !== $validationCode) {
+            Log::warning('Invalid validation code attempt', [
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+                'expected' => $moovRequest->moov_money_validation_code,
+                'provided' => $validationCode,
+                'phone_number' => $moovRequest->moov_money_phone,
+            ]);
+            return $this->respondBadRequest('Code de validation incorrect');
+        }
+
+        DB::beginTransaction();
+        try {
+            // ✅ Mettre à jour le statut en "processing" au début
+            $moovRequest->moov_money_status = 'processing';
+            $moovRequest->save();
+            
+            // Mettre à jour Firebase
+            $this->updateMoovMoneyFirebaseStatus($moovRequest, 'processing', 'Transaction en cours de traitement');
+            
+            // Vérifier si on utilise le mode mock
+            $useMock = config('moovmoney.mock', env('MOOV_MONEY_MOCK', false));
+            
+            if ($useMock) {
+                Log::info('Driver Moov Money: Using mock mode for withdrawal');
+            }
+            
+            // Marquer comme complété (le voucher a déjà été généré côté user)
+            $moovRequest->moov_money_status = 'completed';
+            $moovRequest->moov_money_processed_at = Carbon::now();
+            $moovRequest->is_completed = 1;
+            $moovRequest->completed_at = Carbon::now();
+            $moovRequest->trip_start_time = $moovRequest->trip_start_time ?? Carbon::now();  // Si pas déjà défini
+            $moovRequest->save();
+
+            // Mettre à jour la transaction Moov Money
+            $moovTransaction = $moovRequest->moovMoneyTransaction;
+            $moovTransaction->status = 'completed';
+            $moovTransaction->save();
+            
+            // Mettre en attente de confirmation de paiement par l'utilisateur
+            $moovRequest->moov_money_status = 'waiting_payment';
+            $moovRequest->moov_money_processed_at = Carbon::now();
+            $moovRequest->is_driver_completed = 1;
+            $moovRequest->trip_end_time = Carbon::now();  // Heure de fin
+            $moovRequest->save();
+            
+            DB::commit();
+            
+            // Notifier le user qu'il doit confirmer le paiement
+            $this->notifyUserStatusChange($moovRequest, 'waiting_payment', 'Veuillez confirmer le paiement');
+
+            Log::info('Driver processed Moov Money withdrawal, waiting for user confirmation', [
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+                'amount' => $moovRequest->moov_money_amount,
+                'voucher_code' => $moovRequest->moov_money_voucher_code,
+            ]);
+
+            return $this->respondSuccess([
+                'request' => $moovRequest,
+                'transaction' => $moovTransaction,
+            ], 'Transaction effectuée, en attente de confirmation du client');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Driver failed to process Moov Money withdrawal', [
+                'error' => $e->getMessage(),
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+            ]);
+
+            return $this->respondInternalError('Erreur lors du traitement du retrait: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Driver accepts a Moov Money request
+     * 
+     * @param HttpRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function acceptRequest(HttpRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'request_id' => 'required|uuid',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest('Validation failed', $validator->errors());
+        }
+
+        $driver = auth()->user()->driver;
+        $requestId = $request->request_id;
+
+        $moovRequest = Request::where('id', $requestId)
+            ->where('driver_id', $driver->id)
+            ->where('is_moov_money', 1)
+            ->first();
+
+        if (!$moovRequest) {
+            return $this->respondNotFound('Requête non trouvée ou non assignée à ce driver');
+        }
+
+        try {
+            // Mettre à jour le statut
+            $moovRequest->is_accepted = 1;
+            $moovRequest->accepted_at = Carbon::now();
+            $moovRequest->moov_money_status = 'accepted'; // ✅ Mettre à jour le statut Moov Money
+            $moovRequest->save();
+            
+            // Mettre à jour Firebase
+            $this->updateMoovMoneyFirebaseStatus($moovRequest, 'accepted', 'Un agent a accepté votre demande');
+
+            Log::info('Driver accepted Moov Money request', [
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+                'type' => $moovRequest->moov_money_type,
+            ]);
+
+            return $this->respondSuccess([
+                'request' => $moovRequest,
+            ], 'Demande acceptée avec succès');
+
+        } catch (\Exception $e) {
+            Log::error('Failed to accept Moov Money request', [
+                'error' => $e->getMessage(),
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+            ]);
+
+            return $this->respondInternalError('Erreur lors de l\'acceptation');
+        }
+    }
+    
+    /**
+     * Driver arrived at customer location
+     * 
+     * @param HttpRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function arrivedAtLocation(HttpRequest $request)
+    {
+       $validator = Validator::make($request->all(), [
+        'reason' => 'required|string|max:255',
+    ]);
+    if ($validator->fails()) {
+        return $this->respondBadRequest('Validation failed', $validator->errors());
+    }
+    $driver = auth()->user()->driver;
+    $requestId = $id;
+        $moovRequest = Request::where('id', $requestId)
+            ->where('driver_id', $driver->id)
+            ->where('is_moov_money', 1)
+            ->first();
+
+        if (!$moovRequest) {
+            return $this->respondNotFound('Requête non trouvée ou non assignée à ce driver');
+        }
+
+        try {
+            // Mettre à jour le statut
+            $moovRequest->is_driver_arrived = 1;
+            $moovRequest->arrived_at = Carbon::now();
+            $moovRequest->moov_money_status = 'arrived'; // ✅ Mettre à jour le statut Moov Money
+            $moovRequest->save();
+            
+            // Mettre à jour Firebase
+            $this->updateMoovMoneyFirebaseStatus($moovRequest, 'arrived', 'L\'agent est arrivé');
+
+            Log::info('Driver arrived at Moov Money location', [
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+                'type' => $moovRequest->moov_money_type,
+            ]);
+
+            return $this->respondSuccess([
+                'request' => $moovRequest,
+            ], 'Arrivée confirmée');
+
+        } catch (\Exception $e) {
+            Log::error('Failed to confirm arrival for Moov Money', [
+                'error' => $e->getMessage(),
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+            ]);
+
+            return $this->respondInternalError('Erreur lors de la confirmation d\'arrivée');
+        }
+    }
+    
+    /**
+     * Get Moov Money request details for driver
+     * 
+     * @param string $requestId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRequestDetails($requestId)
+    {
+        $driver = auth()->user()->driver;
+
+        $moovRequest = Request::with(['moovMoneyTransaction', 'requestPlace', 'userDetail'])
+            ->where('id', $requestId)
+            ->where('driver_id', $driver->id)
+            ->where('is_moov_money', 1)
+            ->first();
+
+        if (!$moovRequest) {
+            return $this->respondNotFound('Requête non trouvée');
+        }
+
+        return $this->respondSuccess([
+            'request' => $moovRequest,
+            'transaction' => $moovRequest->moovMoneyTransaction,
+            'user' => $moovRequest->userDetail,
+            'location' => $moovRequest->requestPlace,
+        ], 'Détails de la requête Moov Money');
+    }
+    
+    /**
+     * Driver cancels a Moov Money request
+     * 
+     * @param HttpRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancelRequest(HttpRequest $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'request_id' => 'required|uuid',
+            'reason' => 'required|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondBadRequest('Validation failed', $validator->errors());
+        }
+
+        $driver = auth()->user()->driver;
+        $requestId = $request->request_id;
+        $reason = $request->reason;
+
+        // Vérifier que la requête existe et est assignée au driver
+        $moovRequest = Request::where('id', $requestId)
+            ->where('driver_id', $driver->id)
+            ->where('is_moov_money', 1)
+            ->first();
+
+        if (!$moovRequest) {
+            return $this->respondNotFound('Requête non trouvée ou non assignée à ce driver');
+        }
+
+        if ($moovRequest->moov_money_status === 'completed') {
+            return $this->respondBadRequest('Cette transaction a déjà été complétée');
+        }
+
+        if ($moovRequest->moov_money_status === 'cancelled') {
+            return $this->respondBadRequest('Cette transaction a déjà été annulée');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Mettre à jour le statut
+            $moovRequest->moov_money_status = 'cancelled';
+            $moovRequest->is_cancelled = 1;
+            $moovRequest->cancel_reason = $reason;
+            $moovRequest->cancelled_at = Carbon::now();
+            $moovRequest->save();
+
+            // Mettre à jour la transaction Moov Money
+            $moovTransaction = $moovRequest->moovMoneyTransaction;
+            $moovTransaction->status = 'cancelled';
+            $moovTransaction->error_message = 'Annulée par le driver: ' . $reason;
+            $moovTransaction->save();
+            
+            // Notifier le user de l'annulation
+            $this->notifyUserStatusChange(
+                $moovRequest, 
+                'cancelled', 
+                'Transaction annulée par le driver: ' . $reason
+            );
+            
+            // Supprimer la requête de Firebase
+            $this->removeRequestFromFirebase($moovRequest);
+
+            DB::commit();
+
+            Log::info('Driver cancelled Moov Money request', [
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+                'reason' => $reason,
+                'type' => $moovRequest->moov_money_type,
+            ]);
+
+            return $this->respondSuccess([
+                'request' => $moovRequest,
+            ], 'Transaction annulée avec succès');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Driver failed to cancel Moov Money request', [
+                'error' => $e->getMessage(),
+                'request_id' => $requestId,
+                'driver_id' => $driver->id,
+            ]);
+
+            return $this->respondInternalError('Erreur lors de l\'annulation: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Mettre à jour le statut Firebase pour une requête Moov Money
+     * 
+     * @param Request $request
+     * @param string $status
+     * @param string $message
+     * @return void
+     */
+    private function updateMoovMoneyFirebaseStatus($request, $status, $message)
+    {
+        try {
+            $updateData = [
+                'status' => $status,
+                'moov_money_status' => $status,
+                'updated_at' => now()->timestamp,
+                
+                // ✅ Toujours inclure le montant et les infos Moov Money
+                'moov_money_amount' => $request->moov_money_amount,
+                'moov_money_type' => $request->moov_money_type,
+                'moov_money_phone' => $request->moov_money_phone,
+            ];
+            
+            // Ajouter les infos du driver si assigné
+            if ($request->driver_id && $request->driverDetail) {
+                $updateData['driver_id'] = $request->driver_id;
+                $updateData['driver_name'] = $request->driverDetail->user->name ?? 'Agent';
+                $updateData['driver_phone'] = $request->driverDetail->user->mobile ?? '';
+            }
+            
+            // Ajouter des champs spécifiques selon le statut
+            switch ($status) {
+                case 'accepted':
+                    $updateData['is_accepted'] = 1;
+                    $updateData['accepted_at'] = now()->timestamp;
+                    break;
+                    
+                case 'arrived':
+                    $updateData['is_driver_arrived'] = 1;
+                    $updateData['arrived_at'] = now()->timestamp;
+                    break;
+                    
+                case 'processing':
+                    $updateData['is_driver_started'] = 1;
+                    break;
+            }
+            
+            // Mettre à jour Firebase
+            $this->database->getReference('requests/' . $request->id)->update($updateData);
+            
+            // Envoyer notification push au user
+            $user = $request->userDetail;
+            if ($user && $user->fcm_token) {
+                $this->sendPushNotification(
+                    $user->fcm_token,
+                    'Moov Money - ' . ucfirst($request->moov_money_type),
+                    $message,
+                    [
+                        'notification_type' => 'moov_money_status_update',
+                        'request_id' => $request->id,
+                        'status' => $status,
+                        'message' => $message,
+                    ]
+                );
+            }
+            
+            Log::info('✅ Moov Money Firebase status updated', [
+                'request_id' => $request->id,
+                'status' => $status,
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('❌ Failed to update Moov Money Firebase status', [
+                'error' => $e->getMessage(),
+                'request_id' => $request->id,
+                'status' => $status,
+            ]);
+        }
+    }
+    
+    /**
+     * Notifier le user du changement de statut via Firebase
+     * 
+     * @param Request $request
+     * @param string $status
+     * @param string $message
+     * @return void
+     */
+    private function notifyUserStatusChange($request, $status, $message)
+    {
+        try {
+            $user = $request->userDetail;
+            
+            if (!$user || !$user->fcm_token) {
+                Log::warning('Cannot send notification: user or FCM token missing', [
+                    'request_id' => $request->id,
+                    'user_id' => $request->user_id,
+                ]);
+                return;
+            }
+            
+            $notificationData = [
+                'notification_type' => 'moov_money_status_update',
+                'request_id' => $request->id,
+                'request_number' => $request->request_number,
+                'moov_money_type' => $request->moov_money_type,
+                'moov_money_status' => $status,
+                'moov_money_amount' => $request->moov_money_amount,
+                'message' => $message,
+                'timestamp' => now()->toIso8601String(),
+            ];
+            
+            // Mettre à jour Firebase avec les deux champs de statut
+            $this->database->getReference('requests/' . $request->id)
+                ->update([
+                    'moov_money_status' => $status,
+                    'status' => $status, // Pour compatibilité avec l'app driver
+                    'is_completed' => $status === 'completed' ? 1 : 0,
+                    'is_cancelled' => $status === 'cancelled' ? 1 : 0,
+                    'updated_at' => now()->timestamp,
+                    
+                    // ✅ Toujours inclure le montant
+                    'moov_money_amount' => $request->moov_money_amount,
+                    'moov_money_type' => $request->moov_money_type,
+                    'moov_money_phone' => $request->moov_money_phone,
+                ]);
+            
+            // Envoyer la notification push
+            $this->sendPushNotification(
+                $user->fcm_token,
+                'Moov Money - ' . ucfirst($request->moov_money_type),
+                $message,
+                $notificationData
+            );
+            
+            Log::info('Moov Money status notification sent', [
+                'request_id' => $request->id,
+                'user_id' => $user->id,
+                'status' => $status,
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to send Moov Money status notification', [
+                'error' => $e->getMessage(),
+                'request_id' => $request->id,
+            ]);
+        }
+    }
+    
+    /**
+     * Envoyer une notification push via FCM
+     * 
+     * @param string $fcmToken
+     * @param string $title
+     * @param string $body
+     * @param array $data
+     * @return void
+     */
+    private function sendPushNotification($fcmToken, $title, $body, $data = [])
+    {
+        try {
+            $messaging = app('firebase.messaging');
+            
+            $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $fcmToken)
+                ->withNotification([
+                    'title' => $title,
+                    'body' => $body,
+                ])
+                ->withData($data);
+            
+            $messaging->send($message);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to send FCM notification', [
+                'error' => $e->getMessage(),
+                'fcm_token' => substr($fcmToken, 0, 20) . '...',
+            ]);
+        }
+    }
+    
+    /**
+     * Récupérer les détails d'une requête MoovMoney (pour polling)
+     * 
+     * @param string $requestId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getRequest($requestId)
+    {
+        $driver = auth()->user()->driver;
+
+        // Vérifier que la requête existe et est assignée au driver
+        $moovRequest = Request::where('id', $requestId)
+            ->where('driver_id', $driver->id)
+            ->where('is_moov_money', 1)
+            ->first();
+
+        if (!$moovRequest) {
+            return $this->respondNotFound('Requête non trouvée ou non assignée à ce driver');
+        }
+
+        return $this->respondSuccess([
+            'id' => $moovRequest->id,
+            'status' => $moovRequest->is_completed ? 'completed' : ($moovRequest->is_cancelled ? 'cancelled' : 'pending'),
+            'moov_money_status' => $moovRequest->moov_money_status,
+            'moov_money_type' => $moovRequest->moov_money_type,
+            'amount' => $moovRequest->moov_money_amount,
+            'phone' => $moovRequest->moov_money_phone,
+            'is_completed' => $moovRequest->is_completed,
+            'is_cancelled' => $moovRequest->is_cancelled,
+        ]);
+    }
+
+    /**
+     * Supprimer la requête de Firebase après complétion
+     * 
+     * @param Request $request
+     * @return void
+     */
+    private function removeRequestFromFirebase($request)
+    {
+        try {
+            // Supprimer la requête de la liste des requêtes en attente
+            $this->database->getReference('requests/' . $request->id)->remove();
+            
+            // Supprimer les requestMeta (rotation des drivers)
+            $request->requestMeta()->delete();
+            
+            Log::info('Request removed from Firebase after completion', [
+                'request_id' => $request->id,
+                'type' => $request->moov_money_type,
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to remove request from Firebase', [
+                'error' => $e->getMessage(),
+                'request_id' => $request->id,
+            ]);
+        }
+    }
+}

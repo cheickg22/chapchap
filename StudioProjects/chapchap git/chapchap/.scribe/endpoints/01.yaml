@@ -1,0 +1,57 @@
+name: ServiceLocations
+description: |-
+
+  Get ServiceLocatons
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/servicelocation
+    metadata:
+      groupName: ServiceLocations
+      groupDescription: |-
+
+        Get ServiceLocatons
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get all the ServiceLocatons.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "data": [
+                  {
+                      "id": "45c8948b-73dd-4557-af3c-a3dd62cd35b6",
+                      "name": "Wolrd",
+                      "currency_name": "Indian rupee",
+                      "currency_symbol": "₹",
+                      "currency_code": "INR",
+                      "timezone": "Asia/Kolkata",
+                      "active": 1
+                  }
+              ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

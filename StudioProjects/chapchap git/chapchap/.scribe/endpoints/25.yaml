@@ -1,0 +1,112 @@
+name: Preference
+description: |-
+
+  APIs for vehilce management apis. i.e types,car makes,models apis
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/common/preferences
+    metadata:
+      groupName: Preference
+      groupDescription: |-
+
+        APIs for vehilce management apis. i.e types,car makes,models apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get All Preferences for user'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+
+               "success": true,
+               "message": "preferences_listed",
+               "data": [
+                   {
+                       "id": 4,
+                       "name": "Pet",
+                       "icon": "https://restart.ondemandappz.com/storage/uploads/preference/images/9mme6ouhQmZjpWrRKLvn3RX2MUFrxryagl7Misyy.png",
+                       "created_at": "2025-08-21T14:04:46.000000Z",
+                       "updated_at": "2025-08-21T14:04:46.000000Z"
+                   },
+               ]
+          }
+
+          Get All Preferences for driver
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 200
+        content: |-
+          {
+
+               "success": true,
+               "message": "preferences_listed",
+               "data": [
+                   {
+                       "id": 4,
+                       "name": "Pet",
+                       "icon": "https://restart.ondemandappz.com/storage/uploads/preference/images/9mme6ouhQmZjpWrRKLvn3RX2MUFrxryagl7Misyy.png",
+                       "created_at": "2025-08-21T14:04:46.000000Z",
+                       "updated_at": "2025-08-21T14:04:46.000000Z",
+                       "driver_selected": false
+                   },
+               ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/common/preferences/store
+    metadata:
+      groupName: Preference
+      groupDescription: |-
+
+        APIs for vehilce management apis. i.e types,car makes,models apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

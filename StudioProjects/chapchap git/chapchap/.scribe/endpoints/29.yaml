@@ -1,0 +1,162 @@
+name: 'Driver Route Booking'
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/add-my-route-address
+    metadata:
+      groupName: 'Driver Route Booking'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Add My route address'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      my_route_lat:
+        name: my_route_lat
+        description: 'latitude of the address'
+        required: true
+        example: 1109.3616913
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      my_route_lng:
+        name: my_route_lng
+        description: 'longitude of the address'
+        required: true
+        example: 4.8761
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      my_route_address:
+        name: my_route_address
+        description: 'address text of the address'
+        required: true
+        example: nesciunt
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      my_route_lat: 1109.3616913
+      my_route_lng: 4.8761
+      my_route_address: nesciunt
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "address-updated-successfully",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/enable-my-route-booking
+    metadata:
+      groupName: 'Driver Route Booking'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Enable My Route Booking'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      is_enable:
+        name: is_enable
+        description: ''
+        required: true
+        example: '1'
+        type: string
+        enumValues:
+          - '1'
+          - '0'
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      current_lat:
+        name: current_lat
+        description: ''
+        required: true
+        example: quia
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      current_lng:
+        name: current_lng
+        description: ''
+        required: true
+        example: iusto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      current_address:
+        name: current_address
+        description: ''
+        required: true
+        example: eveniet
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      is_enable: '1'
+      current_lat: quia
+      current_lng: iusto
+      current_address: eveniet
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "enabled-my-route-succesfully",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

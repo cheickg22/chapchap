@@ -1,0 +1,303 @@
+name: Request-Chat
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: 'api/v1/request/chat-history/{request_id}'
+    metadata:
+      groupName: Request-Chat
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Chat history for both user & driver'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      request_id:
+        name: request_id
+        description: 'The ID of the request.'
+        required: true
+        example: 00308a88-ec2b-483d-9a0b-4f4166b78c5f
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      request_id: 00308a88-ec2b-483d-9a0b-4f4166b78c5f
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+               "success": true,
+               "message": "chats_listed",
+               "data": [
+                   {
+                       "id": "dab8a4a2-f904-43ee-9dd2-35ed11321e30",
+                       "message": "hi",
+                       "from_type": 1,
+                       "request_id": "30748675-21bf-478d-b74b-5ba631088138",
+                       "user_id": 29,
+                       "delivered": 0,
+                       "seen": 1,
+                       "created_at": "2024-11-06T14:25:03.000000Z",
+                       "updated_at": "2024-11-06T14:25:48.000000Z",
+                       "message_status": "receive",
+                       "converted_created_at": "7:55 PM"
+                   }
+               ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/send
+    metadata:
+      groupName: Request-Chat
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Send Chat Message'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      request_id:
+        name: request_id
+        description: 'request id of the trip'
+        required: true
+        example: nulla
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      message:
+        name: message
+        description: 'message of chat'
+        required: true
+        example: aut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      request_id: nulla
+      message: aut
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "message_sent_successfully",
+
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/seen
+    metadata:
+      groupName: Request-Chat
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update Seen'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "message_seen_successfully",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/request/user-chat-history
+    metadata:
+      groupName: Request-Chat
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Initiate Conversation'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "data": {
+                  "conversation": [
+                      {
+                          "id": "6c96f90a-bb44-4c8a-8542-e1c93f488085",
+                          "conversation_id": "bb81d8bd-5138-4726-83f4-4903393c861a",
+                          "sender_id": "9",
+                          "unseen_count": 0,
+                          "sender_type": "user",
+                          "content": "Vanakam bha",
+                          "created_at": "2024-10-28T18:09:39.000000Z",
+                          "updated_at": "2024-10-29T11:24:00.000000Z",
+                          "user_timezone": "28th Oct 11:39 PM",
+                          "converted_created_at": "28 Oct 2024 03:09 PM"
+                      }
+                  ],
+                  "new_chat": 0,
+                  "conversation_id": "bb81d8bd-5138-4726-83f4-4903393c861a",
+                  "count": 0
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/user-send-message
+    metadata:
+      groupName: Request-Chat
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'send message to admin'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      new_conversation:
+        name: new_conversation
+        description: ''
+        required: true
+        example: hic
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      content:
+        name: content
+        description: ''
+        required: true
+        example: aut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      new_conversation: hic
+      content: aut
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "data": {
+                  "message": "Hello",
+                  "message_id": "bdfd2cf0-331e-4e4c-a607-da3701eb21aa",
+                  "conversation_id": "bb81d8bd-5138-4726-83f4-4903393c861a",
+                  "sender_type": "user",
+                  "sender_id": 9,
+                  "created_at": {
+                      ".sv": "timestamp"
+                  },
+                  "message_success": "Message Sended successfully",
+                  "user_timezone": "25th Nov 07:00 PM"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

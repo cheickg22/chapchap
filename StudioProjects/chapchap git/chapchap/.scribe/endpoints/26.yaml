@@ -1,0 +1,152 @@
+name: Notification
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/notifications/get-notification
+    metadata:
+      groupName: Notification
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List Notification'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "data": [
+               {
+                   "id" : "8841c737-357f-4f9a-ad8d-f585504e0694",
+                   "title" : "Title",
+                   "body" : "Body",
+                   "image": "https://scribe.knuckles.wtf/img/logo.png",
+                   "converted_created_at": "23rd Nov 04:07 PM"
+               }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      0: GET
+      2: POST
+      3: PUT
+      4: PATCH
+      5: DELETE
+      6: OPTIONS
+    uri: 'api/v1/notifications/delete-notification/{notification_id}'
+    metadata:
+      groupName: Notification
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete Notifications'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      notification_id:
+        name: notification_id
+        description: 'The ID of the notification.'
+        required: true
+        example: 18be12e0-0c01-4e78-aafd-0f1d8a03b03a
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      notification_id: 18be12e0-0c01-4e78-aafd-0f1d8a03b03a
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      0: GET
+      2: POST
+      3: PUT
+      4: PATCH
+      5: DELETE
+      6: OPTIONS
+    uri: api/v1/notifications/delete-all-notification
+    metadata:
+      groupName: Notification
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete All user Notifications'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

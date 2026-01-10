@@ -1,0 +1,765 @@
+name: 'Driver Earnings'
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/today-earnings
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: Today-Earnings
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "current_date": "5th Oct 2020",
+                  "total_trips_count": 1,
+                  "total_trip_kms": 14,
+                  "total_earnings": 1073.44,
+                  "total_cash_trip_amount": 1073.44,
+                  "total_wallet_trip_amount": 0,
+                  "total_cash_trip_count": 1,
+                  "total_wallet_trip_count": 0,
+                  "currency_symbol": "₹"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/weekly-earnings
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Weekly Earnings'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      week_number:
+        name: week_number
+        description: 'week number of year'
+        required: false
+        example: 18
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      week_number: 18
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "week_days":
+                  {
+                      "monday": 1073.44,
+                      "tuesday": 0,
+                      "wednesday": 0,
+                      "thursday": 0,
+                      "friday": 0,
+                      "saturday": 0,
+                      "sunday": 0
+                  },
+                  "current_date": "12th Oct 2020",
+                  "current_week_number": 41,
+                  "start_of_week": "5th Oct 2020",
+                  "end_of_week": "11th Oct 2020",
+                  "disable_next_week": true,
+                  "disable_previous_week": false,
+                  "total_trips_count": 1,
+                  "total_trip_kms": 14,
+                  "total_earnings": 1073.44,
+                  "total_cash_trip_amount": 1073.44,
+                  "total_wallet_trip_amount": 0,
+                  "total_cash_trip_count": 1,
+                  "total_wallet_trip_count": 0,
+                  "currency_symbol": "₹"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/v1/driver/earnings-report/{from_date}/{to_date}'
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Earnings Report'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      from_date:
+        name: from_date
+        description: 'date date string'
+        required: false
+        example: et
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      to_date:
+        name: to_date
+        description: 'date date string'
+        required: false
+        example: deleniti
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      from_date: et
+      to_date: deleniti
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "from_date": "5th Oct 2020",
+                  "to_date": "11th Oct 2020",
+                  "total_trips_count": 1,
+                  "total_trip_kms": 14,
+                  "total_earnings": 1073.44,
+                  "total_cash_trip_amount": 1073.44,
+                  "total_wallet_trip_amount": 0,
+                  "total_cash_trip_count": 1,
+                  "total_wallet_trip_count": 0,
+                  "currency_symbol": "₹"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/history-report
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Owner Dashboard Driver Detail'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+               "success": true,
+               "driver_data": {
+                   "driver_id": "100",
+                   "mobile": "7899877890",
+                   "total_earnings": 323232,
+                   "total_distance": 20.402,
+                   "total_admin_earnings": 0,
+                   "total_revenue": 38450,
+                   "per_day_revenue": 38450,
+                   "total_trips": 3,
+                   "completed_requests": "2",
+                   "average_user_rating": 0.5,
+                   "rating_1_average": "0.5000",
+                   "rating_2_average": "0.0000",
+                   "rating_3_average": "0.0000",
+                   "rating_4_average": "0.0000",
+                   "rating_5_average": "0.0000",
+                   "total_duration_in_hours": 0.27,
+                   "average_login_hours_per_day": 0.27
+               }
+           }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/update-price
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/new-earnings
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List New Earnings'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "earnings_listed_successfully",
+              "currency_symbol": "₹",
+              "earnings": [
+                  {
+                      "from_date": "18-Nov-24",
+                      "to_date": "24-Nov-24",
+                      "total_amount": 0,
+                      "total_trips": 0,
+                      "total_wallet_amount": 0,
+                      "total_cash_amount": 0,
+                      "total_logged_in_hours": "0 Mins",
+                      "dates": {
+                          "Mon-18": 0,
+                          "Tue-19": 0,
+                          "Wed-20": 0,
+                          "Thu-21": 0,
+                          "Fri-22": 0,
+                          "Sat-23": 0,
+                          "Sun-24": 0
+                      }
+                  }
+              ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/earnings-by-date
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Earnings By Date'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      date:
+        name: date
+        description: 'Must be a valid date.'
+        required: true
+        example: '2025-08-23T13:55:25'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      date: '2025-08-23T13:55:25'
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "daily_earnings_listed_successfully",
+              "total_trips": 0,
+              "total_trip_kms": 0,
+              "total_hours_worked": "0 Mins",
+              "currency_symbol": "₹",
+              "requests": {
+                  "data": []
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/all-earnings
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: All-Earnings
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "current_date": "5th Oct 2020",
+                  "total_trips_count": 1,
+                  "total_trip_kms": 14,
+                  "total_earnings": 1073.44,
+                  "total_cash_trip_amount": 1073.44,
+                  "total_wallet_trip_amount": 0,
+                  "total_cash_trip_count": 1,
+                  "total_wallet_trip_count": 0,
+                  "currency_symbol": "₹"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/leader-board/trips
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Driver Leaderboard by Trips'
+      description: 'This endpoint retrieves the top drivers ranked by the total number of trips they completed today.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      current_lat:
+        name: current_lat
+        description: 'Current latitude of the driver.'
+        required: true
+        example: 37446.822
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      current_lng:
+        name: current_lng
+        description: 'Current longitude of the driver.'
+        required: true
+        example: 273780.07856343
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      current_lat: 37446.822
+      current_lng: 273780.07856343
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Driver trips leaderboard retrieved successfully.",
+            "data": [
+                {
+                    "driver_id": 1,
+                    "driver_name": "John Doe",
+                    "total_trips": 15,
+                    "profile_picture": "https://example.com/uploads/drivers/profile1.jpg"
+                },
+                {
+                    "driver_id": 2,
+                    "driver_name": "Jane Smith",
+                    "total_trips": 12,
+                    "profile_picture": "https://example.com/uploads/drivers/profile2.jpg"
+                }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/leader-board/earnings
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Driver Leaderboard by Earnings'
+      description: |-
+        This endpoint retrieves the top drivers based on their earnings for the current day,
+        limited to 20 drivers near the provided latitude and longitude. Drivers are ranked
+        by their total commission earned.
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      current_lat:
+        name: current_lat
+        description: 'The current latitude of the driver.'
+        required: true
+        example: 2630.11
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      current_lng:
+        name: current_lng
+        description: 'The current longitude of the driver.'
+        required: true
+        example: 62838.38273
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      current_lat: 2630.11
+      current_lng: 62838.38273
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Driver earnings leaderboard retrieved successfully.",
+            "data": [
+                {
+                    "driver_id": 1,
+                    "driver_name": "John Doe",
+                    "commission": 150.50,
+                    "profile_picture": "https://example.com/uploads/drivers/profile1.jpg"
+                },
+                {
+                    "driver_id": 2,
+                    "driver_name": "Jane Smith",
+                    "commission": 120.75,
+                    "profile_picture": "https://example.com/uploads/drivers/profile2.jpg"
+                }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/new-incentives
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List incentive history.'
+      description: 'The function calculates daily incentives earned, upcoming incentives, and total incentives earned for each day and week.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "incentive_history_listed",
+              "data": {
+                  "incentive_history": [
+                      {
+                          "from_date": "10-Nov-24",
+                          "to_date": "16-Nov-24",
+                          "dates": [
+                              {
+                                  "day": "Sun",
+                                  "date": "10-Nov-24",
+                                  "is_today": false,
+                                  "total_incentive_earned": 0,
+                                  "earn_upto": 1600,
+                                  "upcoming_incentives": [
+                                      {
+                                          "ride_count": 1,
+                                          "incentive_amount": 100,
+                                          "is_completed": false
+                                      },
+                                      {
+                                          "ride_count": 2,
+                                          "incentive_amount": 500,
+                                          "is_completed": false
+                                      },
+                                      {
+                                          "ride_count": 3,
+                                          "incentive_amount": 1000,
+                                          "is_completed": false
+                                      }
+                                  ]
+                              },
+                          ]
+                      },
+                  ]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/driver/week-incentives
+    metadata:
+      groupName: 'Driver Earnings'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List weekly incentive history.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "incentive_history_listed",
+              "data": {
+                  "incentive_history": [
+                      {
+                          "from_date": "29-Sep-24",
+                          "to_date": "16-Nov-24",
+                          "dates": [
+                              {
+                                  "day": "Sep",
+                                  "date": "29-Sep - 05-Oct",
+                                  "is_current_week": false,
+                                  "total_incentive_earned": 0,
+                                  "earn_upto": 150,
+                                  "upcoming_incentives": [
+                                      {
+                                          "ride_count": 2,
+                                          "incentive_amount": 100,
+                                          "is_completed": false
+                                      },
+                                      {
+                                          "ride_count": 3,
+                                          "incentive_amount": 50,
+                                          "is_completed": false
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

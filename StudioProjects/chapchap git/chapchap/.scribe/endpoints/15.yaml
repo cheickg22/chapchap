@@ -1,0 +1,229 @@
+name: Password-Reset
+description: |-
+
+  APIs for Email-Management
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/password/forgot
+    metadata:
+      groupName: Password-Reset
+      groupDescription: |-
+
+        APIs for Email-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Send the password reset email to the user.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'email of the user entered'
+        required: true
+        example: quitzon.david@example.com
+        type: email
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'The <code>mobile</code> of an existing record in the users table.'
+        required: true
+        example: odit
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: quitzon.david@example.com
+      mobile: odit
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/password/validate-token
+    metadata:
+      groupName: Password-Reset
+      groupDescription: |-
+
+        APIs for Email-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate the password reset token.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      token:
+        name: token
+        description: 'token of the email'
+        required: true
+        example: qui
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: 'email of the user entered'
+        required: true
+        example: oschaden@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      token: qui
+      email: oschaden@example.net
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/password/reset
+    metadata:
+      groupName: Password-Reset
+      groupDescription: |-
+
+        APIs for Email-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate the password reset token and update the password.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      token:
+        name: token
+        description: ''
+        required: true
+        example: ut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: 'Must be a valid email address. The <code>email</code> of an existing record in the users table.'
+        required: true
+        example: larkin.casper@example.org
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'number of the user entered'
+        required: true
+        example: 4608274.8979854
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      country:
+        name: country
+        description: ''
+        required: true
+        example: repellat
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'Must be at least 6 characters.'
+        required: true
+        example: ']CBJaEHO'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      role:
+        name: role
+        description: 'string of the user entered'
+        required: false
+        example: vero
+        type: required
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      token: ut
+      email: larkin.casper@example.org
+      mobile: 4608274.8979854
+      country: repellat
+      password: ']CBJaEHO'
+      role: vero
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"reset-success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

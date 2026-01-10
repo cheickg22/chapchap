@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChapChap - Transport et Livraison au Mali</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">C</span>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">ChapChap</span>
+                </div>
+                <button class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+                    Télécharger l'app
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 id="hero-title" class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                    Chargement...
+                </h1>
+                <p id="hero-subtitle" class="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto"></p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-lg">
+                        Commander maintenant
+                    </button>
+                    <button class="px-8 py-4 bg-white text-gray-700 font-semibold rounded-lg border-2 border-gray-200 hover:border-blue-600">
+                        Devenir chauffeur
+                    </button>
+                </div>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-6 mt-12 pt-12 border-t border-gray-200 max-w-2xl mx-auto">
+                    <div>
+                        <div id="stat-rides" class="text-3xl font-bold text-gray-900">10K+</div>
+                        <div class="text-sm text-gray-600 mt-1">Courses</div>
+                    </div>
+                    <div>
+                        <div id="stat-drivers" class="text-3xl font-bold text-gray-900">500+</div>
+                        <div class="text-sm text-gray-600 mt-1">Chauffeurs</div>
+                    </div>
+                    <div>
+                        <div id="stat-cities" class="text-3xl font-bold text-gray-900">5</div>
+                        <div class="text-sm text-gray-600 mt-1">Villes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Nos Services</h2>
+                <p class="text-lg text-gray-600">Une plateforme complète pour tous vos besoins</p>
+            </div>
+            
+            <div id="services-grid" class="grid md:grid-cols-3 gap-8">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-xl">C</span>
+                </div>
+                <span class="text-2xl font-bold text-white">ChapChap</span>
+            </div>
+            <p class="text-sm text-gray-500">© 2025 ChapChap. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Charger les données depuis l'API
+        fetch('/api/v1/common/landing-page?locale=fr')
+            .then(response => response.json())
+            .then(result => {
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // Hero section
+                    if (data.hero) {
+                        document.getElementById('hero-title').innerHTML = data.hero.title || 'Transport et Livraison Rapide au Mali';
+                        document.getElementById('hero-subtitle').textContent = data.hero.subtitle || 'Taxi, Livraison, MoovMoney';
+                        
+                        if (data.hero.stats) {
+                            document.getElementById('stat-rides').textContent = data.hero.stats.rides || '10K+';
+                            document.getElementById('stat-drivers').textContent = data.hero.stats.drivers || '500+';
+                            document.getElementById('stat-cities').textContent = data.hero.stats.cities || '5';
+                        }
+                    }
+                    
+                    // Services
+                    if (data.services && data.services.items) {
+                        const servicesGrid = document.getElementById('services-grid');
+                        servicesGrid.innerHTML = data.services.items.map(service => `
+                            <div class="bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-${service.color}-500 hover:shadow-xl transition-all">
+                                <div class="w-16 h-16 bg-${service.color}-100 rounded-xl flex items-center justify-center mb-6">
+                                    <span class="text-2xl">${service.icon === 'car' ? '🚗' : service.icon === 'package' ? '📦' : '💰'}</span>
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-900 mb-3">${service.name}</h3>
+                                <p class="text-gray-600 mb-6">${service.description}</p>
+                                <ul class="space-y-3">
+                                    ${service.features.map(f => `
+                                        <li class="flex items-center text-sm text-gray-600">
+                                            <span class="text-green-500 mr-2">✓</span> ${f}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        `).join('');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                document.getElementById('hero-title').textContent = 'Transport et Livraison Rapide au Mali';
+                document.getElementById('hero-subtitle').textContent = 'Taxi, Livraison, MoovMoney - Tout en un';
+            });
+    </script>
+</body>
+</html>

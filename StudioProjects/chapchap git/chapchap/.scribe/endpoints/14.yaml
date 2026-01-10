@@ -1,0 +1,1434 @@
+name: SignUp-And-Otp-Validation
+description: |-
+
+  APIs for User-Management
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/user/register
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Register the user and send welcome email.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: 'name of the user'
+        required: true
+        example: dolorem
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      last_name:
+        name: last_name
+        description: 'Must not be greater than 50 characters.'
+        required: false
+        example: sqkvybgrzsvz
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: 'email of the user'
+        required: true
+        example: dominique36@example.net
+        type: email
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'password provided user'
+        required: true
+        example: '6,*}crOobBW@Yq~/y'
+        type: password
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'mobile of user'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      terms_condition:
+        name: terms_condition
+        description: ''
+        required: true
+        example: '1'
+        type: boolean
+        enumValues:
+          - '1'
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      device_token:
+        name: device_token
+        description: 'device_token of the user'
+        required: true
+        example: est
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      login_by:
+        name: login_by
+        description: "from which device the user registered. the input should be 'android',or 'ios'"
+        required: true
+        example: dicta
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      oauth_token:
+        name: oauth_token
+        description: 'optional from social provider'
+        required: false
+        example: ut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      company_key:
+        name: company_key
+        description: 'optional company key of demo'
+        required: false
+        example: laboriosam
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password_confirmation:
+        name: password_confirmation
+        description: 'confirmed password provided user'
+        required: true
+        example: culpa
+        type: password
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      refferal_code:
+        name: refferal_code
+        description: 'optional refferal_code of the another user'
+        required: false
+        example: dolor
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      name: dolorem
+      last_name: sqkvybgrzsvz
+      email: dominique36@example.net
+      password: '6,*}crOobBW@Yq~/y'
+      mobile: 12
+      terms_condition: '1'
+      device_token: est
+      login_by: dicta
+      oauth_token: ut
+      company_key: laboriosam
+      password_confirmation: culpa
+      refferal_code: dolor
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "access_token": "371|QLvCnztanDYWRop8LbmyxYE7g4RxpgNiDMxWq6QE1accc1fe"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/user/validate-mobile
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate Mobile-For-User'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      mobile:
+        name: mobile
+        description: 'mobile of user'
+        required: true
+        example: 20
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      mobile: 20
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+          "success":true,
+          "message":"mobile_validated",
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 200
+        content: |-
+          {
+          "success":true,
+          "message":"email_does_not_exists",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/user/validate-mobile-for-login
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate Mobile-For-User-Login'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      mobile:
+        name: mobile
+        description: 'mobile of user'
+        required: true
+        example: 11
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      mobile: 11
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+          "success":true,
+          "message":"mobile_exists",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/user/update-password
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update password for user'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'optional User email'
+        required: false
+        example: kyleigh.homenick@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'optional User mobile'
+        required: false
+        example: doloribus
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'New password to be set'
+        required: true
+        example: 'DDS`{;7'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: kyleigh.homenick@example.com
+      mobile: doloribus
+      password: 'DDS`{;7'
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"password_updated_successfuly"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/update-password
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for Driver Register
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update password for Driver or Owner'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'optional User email'
+        required: false
+        example: benjamin16@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'optional User mobile'
+        required: false
+        example: et
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'New password to be set'
+        required: true
+        example: '6`)w2<LsT{UJUpQ|'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: benjamin16@example.net
+      mobile: et
+      password: '6`)w2<LsT{UJUpQ|'
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"password_updated_successfuly"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/register
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for Driver Register
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Register the driver and send welcome email.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: 'name of the driver'
+        required: true
+        example: et
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      last_name:
+        name: last_name
+        description: 'Must not be greater than 50 characters.'
+        required: false
+        example: orddhidmbyq
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: 'email of the driver'
+        required: true
+        example: wuckert.katelin@example.com
+        type: email
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'Must be at least 8 characters.'
+        required: true
+        example: 'z\L-g#RODj](1="N'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'mobile of driver'
+        required: true
+        example: 6
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      country:
+        name: country
+        description: ''
+        required: true
+        example: velit
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      device_token:
+        name: device_token
+        description: 'device_token of the driver'
+        required: true
+        example: enim
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      login_by:
+        name: login_by
+        description: 'from which device the driver registered'
+        required: true
+        example: ea
+        type: tinyInt
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      vehicle_type:
+        name: vehicle_type
+        description: 'vehicle types. listed by types api'
+        required: true
+        example: iste
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      address:
+        name: address
+        description: 'Must be at least 15 characters.'
+        required: false
+        example: qmwrdpbkhuhpthljwxqxalztiwjimkfbusdrbo
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      postal_code:
+        name: postal_code
+        description: 'Must be at least 6 characters. Must not be greater than 6 characters.'
+        required: false
+        example: poyodk
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      car_color:
+        name: car_color
+        description: 'car color of the driver'
+        required: true
+        example: laudantium
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      car_number:
+        name: car_number
+        description: 'car number of the driver'
+        required: true
+        example: et
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      is_company_driver:
+        name: is_company_driver
+        description: 'value can be 0 or 1.'
+        required: true
+        example: magnam
+        type: tinyInt
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      service_location_id:
+        name: service_location_id
+        description: 'service location of the driver. it can be listed from service location list apis'
+        required: true
+        example: quo
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      company_key:
+        name: company_key
+        description: 'optional company key of demo'
+        required: false
+        example: voluptatibus
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      terms_condition:
+        name: terms_condition
+        description: 'it should be 0 or 1'
+        required: true
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      refferal_code:
+        name: refferal_code
+        description: 'optional refferal_code of the another driver'
+        required: false
+        example: consectetur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      car_make:
+        name: car_make
+        description: 'car make of the driver'
+        required: true
+        example: aliquid
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      car_model:
+        name: car_model
+        description: 'car model of the driver'
+        required: true
+        example: et
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      custom_make:
+        name: custom_make
+        description: 'car make of the driver'
+        required: true
+        example: est
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      custom_model:
+        name: custom_model
+        description: 'car model of the driver'
+        required: true
+        example: ea
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      name: et
+      last_name: orddhidmbyq
+      email: wuckert.katelin@example.com
+      password: 'z\L-g#RODj](1="N'
+      mobile: 6
+      country: velit
+      device_token: enim
+      login_by: ea
+      vehicle_type: iste
+      address: qmwrdpbkhuhpthljwxqxalztiwjimkfbusdrbo
+      postal_code: poyodk
+      car_color: laudantium
+      car_number: et
+      is_company_driver: magnam
+      service_location_id: quo
+      company_key: voluptatibus
+      terms_condition: true
+      refferal_code: consectetur
+      car_make: aliquid
+      car_model: et
+      custom_make: est
+      custom_model: ea
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "access_token": "371|QLvCnztanDYWRop8LbmyxYE7g4RxpgNiDMxWq6QE1accc1fe"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/validate-mobile
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for Driver Register
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate Mobile-For-Driver'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      mobile:
+        name: mobile
+        description: 'mobile of driver'
+        required: true
+        example: 6
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      mobile: 6
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+          "success":true,
+          "message":"mobile_validated",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/validate-mobile-for-login
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for Driver Register
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate Mobile-For-Driver-For-Login'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      mobile:
+        name: mobile
+        description: 'mobile of driver'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      mobile: 16
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+          "success":true,
+          "message":"mobile_exists",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/user/register/send-otp
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Send the mobile number verification OTP during registration.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      country:
+        name: country
+        description: 'dial_code of the country'
+        required: true
+        example: deserunt
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'Mobile of the user'
+        required: true
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: 'Email of the user'
+        required: true
+        example: mazie.grady@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      country: deserunt
+      mobile: 12
+      email: mazie.grady@example.net
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+          "success":true,
+          "message":"success",
+          "message_keyword":"otp_sent_successfuly"
+          "data":{
+          "uuid":"6ffa38d1-d2ca-434a-8695-701ca22168b1"
+          }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/owner/register
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for Driver Register
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Owner Register'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      company_name:
+        name: company_name
+        description: 'name of the the company'
+        required: true
+        example: enim
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      name:
+        name: name
+        description: 'name of the owner'
+        required: true
+        example: doloremque
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      address:
+        name: address
+        description: 'address of the the company'
+        required: true
+        example: amet
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      postal_code:
+        name: postal_code
+        description: 'postal_code of the the company'
+        required: true
+        example: et
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      city:
+        name: city
+        description: 'city of the the company'
+        required: true
+        example: nulla
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      service_location_id:
+        name: service_location_id
+        description: 'service location of the owner. it can be listed from service location list apis'
+        required: true
+        example: voluptate
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      tax_number:
+        name: tax_number
+        description: 'tax_number of the the company'
+        required: true
+        example: odio
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      device_token:
+        name: device_token
+        description: 'device_token of the owner'
+        required: true
+        example: aliquid
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      login_by:
+        name: login_by
+        description: 'from which device the owner registered'
+        required: true
+        example: adipisci
+        type: tinyInt
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      country:
+        name: country
+        description: 'country dial code of the the company'
+        required: true
+        example: sint
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'mobile of owner'
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: 'email of the owner'
+        required: true
+        example: ckuhn@example.net
+        type: email
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      company_name: enim
+      name: doloremque
+      address: amet
+      postal_code: et
+      city: nulla
+      service_location_id: voluptate
+      tax_number: odio
+      device_token: aliquid
+      login_by: adipisci
+      country: sint
+      mobile: 2
+      email: ckuhn@example.net
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "access_token": "371|QLvCnztanDYWRop8LbmyxYE7g4RxpgNiDMxWq6QE1accc1fe"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/update/user/referral
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update User Referral'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      refferal_code:
+        name: refferal_code
+        description: 'refferal_code of the another user'
+        required: true
+        example: tempore
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      refferal_code: tempore
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/update/driver/referral
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update Driver Referral code'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      refferal_code:
+        name: refferal_code
+        description: 'refferal_code of the another user'
+        required: true
+        example: modi
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      refferal_code: modi
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/get/referral
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Referral code'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "data":
+              {
+                  "id": 15,
+                  "name": "Test Test",
+                  "last_name": null,
+                  "username": null,
+                  "email": "testa@gmail.com",
+                  "mobile": "9878987812",
+                  "profile_picture": null,
+                  "active": 1,
+                  "email_confirmed": 0,
+                  "mobile_confirmed": 1,
+                  "last_known_ip": "::1",
+                  "last_login_at": "2020-08-05 11:26:35",
+                  "refferal_code": "RAME123",
+                  "rating": 5,
+                  "no_of_ratings": 8,
+                  "currency_code": "INR",
+                  "currency_symbol": "$"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/send-mail-otp
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Send the email verification OTP during registration.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: string
+        required: false
+        example: fwunsch@example.org
+        type: required
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      otp:
+        name: otp
+        description: 'Provided otp'
+        required: true
+        example: sint
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: fwunsch@example.org
+      otp: sint
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/validate-email-otp
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate the mobile number verification OTP during registration.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: ''
+        required: true
+        example: et
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      otp:
+        name: otp
+        description: 'Provided otp'
+        required: true
+        example: vel
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      uuid:
+        name: uuid
+        description: 'uuid comes from sen otp api response'
+        required: true
+        example: 5c2547c5-43a2-35f6-9940-3fbe5f66524a
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: et
+      otp: vel
+      uuid: 5c2547c5-43a2-35f6-9940-3fbe5f66524a
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/user/register/validate-otp
+    metadata:
+      groupName: SignUp-And-Otp-Validation
+      groupDescription: |-
+
+        APIs for User-Management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate the mobile number verification OTP during registration.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      uuid:
+        name: uuid
+        description: 'uuid comes from sen otp api response'
+        required: true
+        example: bded7eaa-3cbd-3b38-b03d-ad28c40ae8a2
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      otp:
+        name: otp
+        description: 'Provided otp'
+        required: true
+        example: mollitia
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      uuid: bded7eaa-3cbd-3b38-b03d-ad28c40ae8a2
+      otp: mollitia
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

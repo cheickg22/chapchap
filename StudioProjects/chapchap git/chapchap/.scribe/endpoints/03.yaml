@@ -1,0 +1,192 @@
+name: 'Stripe Payment Gateway'
+description: |-
+
+  Payment-Related Apis
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/payment/stripe/create-setup-intent
+    metadata:
+      groupName: 'Stripe Payment Gateway'
+      groupDescription: |-
+
+        Payment-Related Apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Setup a StripeIntent'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"stripe_key_listed_success","data":{"client_secret":"seti_1QNX13SBCHfacuRqIglT6i8V_secret_RG37JHWQgOWjGNcXs4WPNTKiD57J0Nb","customer_id":null,"test_environment":true}}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/payment/stripe/save-card
+    metadata:
+      groupName: 'Stripe Payment Gateway'
+      groupDescription: |-
+
+        Payment-Related Apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Save Payment Method Id'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      payment_method_id:
+        name: payment_method_id
+        description: 'payment method id after saved the card from stripe'
+        required: true
+        example: incidunt
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      last_number:
+        name: last_number
+        description: 'last 4 numbers of the card'
+        required: true
+        example: 14
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      card_type:
+        name: card_type
+        description: 'card type of the card'
+        required: true
+        example: amet
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      valid_through:
+        name: valid_through
+        description: 'expiry date of the card'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      payment_method_id: incidunt
+      last_number: 14
+      card_type: amet
+      valid_through: consequatur
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+          "success": true,
+          "message": "Card saved successfully."}
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/payment/stripe/add-money-to-wallet
+    metadata:
+      groupName: 'Stripe Payment Gateway'
+      groupDescription: |-
+
+        Payment-Related Apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Add Money to Wallet By Stripe'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/payment/stripe/listen-webhooks
+    metadata:
+      groupName: 'Stripe Payment Gateway'
+      groupDescription: |-
+
+        Payment-Related Apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

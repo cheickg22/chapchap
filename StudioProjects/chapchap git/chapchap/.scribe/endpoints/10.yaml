@@ -1,0 +1,80 @@
+name: Ratings
+description: |-
+
+  APIs for User & Driver-trip ratig api
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/rating
+    metadata:
+      groupName: Ratings
+      groupDescription: |-
+
+        APIs for User & Driver-trip ratig api
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Rate The Request B/W User & Driver'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      request_id:
+        name: request_id
+        description: 'id of request'
+        required: true
+        example: ipsa
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      rating:
+        name: rating
+        description: 'rating of the request'
+        required: true
+        example: 19.3225
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      comment:
+        name: comment
+        description: 'optional comment of the request'
+        required: false
+        example: quod
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      request_id: ipsa
+      rating: 19.3225
+      comment: quod
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "rated_successfully"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

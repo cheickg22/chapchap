@@ -1,0 +1,117 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Moov Money API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration pour l'intégration de l'API Moov Money Mali
+    |
+    */
+
+    // Type d'API: 'soap' ou 'json'
+    'api_type' => env('MOOV_MONEY_API_TYPE', 'json'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | SOAP API Configuration (Legacy)
+    |--------------------------------------------------------------------------
+    */
+
+    'cash_in_url' => env('MOOV_MONEY_CASH_IN_URL', 'https://api.moovmoney.ml:38443/apiaccess/IntegratingCashIn'),
+    
+    'cash_out_url' => env('MOOV_MONEY_CASH_OUT_URL', 'https://api.moovmoney.ml:38443/apiaccess/IntegratingCashOut'),
+    
+    'shortcode' => env('MOOV_MONEY_SHORTCODE', '22300001009'),
+    
+    'username' => env('MOOV_MONEY_USERNAME', '00001009'),
+    
+    'password' => env('MOOV_MONEY_PASSWORD', 'Accounting_2025test'),
+    
+    'result_url' => env('MOOV_MONEY_RESULT_URL', env('APP_URL') . '/api/v1/moov-money/callback'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | JSON REST API Configuration (Recommended)
+    |--------------------------------------------------------------------------
+    */
+
+    'api_base_url' => env('MOOV_MONEY_API_BASE_URL', 'https://api.moovmoney.ml/api/v1'),
+    
+    'api_key' => env('MOOV_MONEY_API_KEY'),
+    
+    'api_secret' => env('MOOV_MONEY_API_SECRET'),
+    
+    'merchant_id' => env('MOOV_MONEY_MERCHANT_ID'),
+    
+    'callback_url' => env('MOOV_MONEY_CALLBACK_URL', env('APP_URL') . '/api/v1/moov-money/callback'),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Transaction Settings
+    |--------------------------------------------------------------------------
+    */
+    
+    'currency' => env('MOOV_MONEY_CURRENCY', 'XOF'),
+    
+    'min_amount' => env('MOOV_MONEY_MIN_AMOUNT', 100),
+    
+    'max_amount' => env('MOOV_MONEY_MAX_AMOUNT', 1000000),
+    
+    'voucher_expiry_hours' => env('MOOV_MONEY_VOUCHER_EXPIRY_HOURS', 24),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | SSL Configuration
+    |--------------------------------------------------------------------------
+    */
+    
+    'verify_ssl' => env('MOOV_MONEY_VERIFY_SSL', true),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Test Mode (for testing without real API)
+    |--------------------------------------------------------------------------
+    */
+    
+    'test_mode' => env('MOOV_MONEY_TEST_MODE', false),
+    
+    'mock' => env('MOOV_MONEY_MOCK', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Commission Settings
+    |--------------------------------------------------------------------------
+    */
+    
+    'deposit_commission_rate' => env('MOOV_MONEY_DEPOSIT_COMMISSION_RATE', 2.0),
+    
+    'withdrawal_commission_rate' => env('MOOV_MONEY_WITHDRAWAL_COMMISSION_RATE', 2.5),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Settings
+    |--------------------------------------------------------------------------
+    */
+    
+    'email_notifications' => env('MOOV_MONEY_EMAIL_NOTIFICATIONS', true),
+    
+    'sms_notifications' => env('MOOV_MONEY_SMS_NOTIFICATIONS', false),
+    
+    'admin_email' => env('MOOV_MONEY_ADMIN_EMAIL', env('MAIL_FROM_ADDRESS')),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Timeout Settings
+    |--------------------------------------------------------------------------
+    */
+    
+    'api_timeout' => env('MOOV_MONEY_API_TIMEOUT', 30),
+    
+    'retry_attempts' => env('MOOV_MONEY_RETRY_ATTEMPTS', 3),
+    
+    'retry_delay' => env('MOOV_MONEY_RETRY_DELAY', 5),
+
+];

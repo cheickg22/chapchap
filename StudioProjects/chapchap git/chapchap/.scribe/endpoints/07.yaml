@@ -1,0 +1,1825 @@
+name: User-trips-apis
+description: |-
+
+  APIs for User-trips apis
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/list-packages
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List Packages'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pick_lat:
+        name: pick_lat
+        description: 'pikup lat of the user'
+        required: true
+        example: 82.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_lng:
+        name: pick_lng
+        description: 'pikup lng of the user'
+        required: true
+        example: 5596.2
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      transport_type:
+        name: transport_type
+        description: 'for super and super-bidding'
+        required: true
+        example: aut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      pick_lat: 82.0
+      pick_lng: 5596.2
+      transport_type: aut
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "data": [
+                  {
+                      "id": 1,
+                      "package_name": "1 hr 5KM",
+                      "description": "Something Something",
+                      "short_description": "Best ride for travel",
+                      "user_wallet_balance": 100,
+                      "currency": "$",
+                      "currency_name": "ARS",
+                      "max_price": 500,
+                      "min_price": 500,
+                      "typesWithPrice": {
+                          "data": [
+                              {
+                                  "zone_type_id": "5cd8ed19-5725-4f82-a8a1-d92d9a5d24ca",
+                                  "type_id": "e42b124a-d309-4484-8dcd-f2b6cbc6b9f7",
+                                  "name": "Hatchback",
+                                  "icon": "https://restart.ondemandappz.com/storage/uploads/types/images/RpTI3AXc1ABbsyPrqLicWwJhVd66z2CPaF70Rkbu.png",
+                                  "capacity": 4,
+                                  "currency": "$",
+                                  "unit": 1,
+                                  "unit_in_words": "Km",
+                                  "distance_price_per_km": "5",
+                                  "time_price_per_min": "5",
+                                  "free_distance": "5",
+                                  "free_min": "0",
+                                  "payment_type": "cash,online,wallet",
+                                  "fare_amount": 500,
+                                  "description": "Compact joint family car",
+                                  "short_description": "Compact",
+                                  "supported_vehicles": null,
+                                  "is_default": false,
+                                  "discounted_total": 0,
+                                  "has_discount": false,
+                                  "promocode_id": null,
+                                  "user_wallet_balance": 100
+                              },
+                              {
+                                  "zone_type_id": "9f2f70cf-68ee-41eb-8639-a03af9b5f1f5",
+                                  "type_id": "103e6158-a844-46d2-a746-5748051709a0",
+                                  "name": "Sedan",
+                                  "icon": "https://restart.ondemandappz.com/storage/uploads/types/images/vnvOHLDT6tzlER4flbXOn6mxaudalFpbPqkce22A.jpeg",
+                                  "capacity": 4,
+                                  "currency": "$",
+                                  "unit": 1,
+                                  "unit_in_words": "Km",
+                                  "distance_price_per_km": "5",
+                                  "time_price_per_min": "5",
+                                  "free_distance": "5",
+                                  "free_min": "0",
+                                  "payment_type": "cash,online,wallet",
+                                  "fare_amount": 500,
+                                  "description": "Compact and premium four Wheeler",
+                                  "short_description": "Sedan Type",
+                                  "supported_vehicles": null,
+                                  "is_default": false,
+                                  "discounted_total": 0,
+                                  "has_discount": false,
+                                  "promocode_id": null,
+                                  "user_wallet_balance": 100
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "id": 6,
+                      "package_name": "3 hour package",
+                      "description": "auto with carrage",
+                      "short_description": "auto with carrage",
+                      "user_wallet_balance": 100,
+                      "currency": "$",
+                      "currency_name": "ARS",
+                      "max_price": 900,
+                      "min_price": 300,
+                      "typesWithPrice": {
+                          "data": [
+                              {
+                                  "zone_type_id": "5cd8ed19-5725-4f82-a8a1-d92d9a5d24ca",
+                                  "type_id": "e42b124a-d309-4484-8dcd-f2b6cbc6b9f7",
+                                  "name": "Hatchback",
+                                  "icon": "https://restart.ondemandappz.com/storage/uploads/types/images/RpTI3AXc1ABbsyPrqLicWwJhVd66z2CPaF70Rkbu.png",
+                                  "capacity": 4,
+                                  "currency": "$",
+                                  "unit": 1,
+                                  "unit_in_words": "Km",
+                                  "distance_price_per_km": "5",
+                                  "time_price_per_min": "5",
+                                  "free_distance": "5",
+                                  "free_min": "0",
+                                  "payment_type": "cash,online,wallet",
+                                  "fare_amount": 600,
+                                  "description": "Compact joint family car",
+                                  "short_description": "Compact",
+                                  "supported_vehicles": null,
+                                  "is_default": false,
+                                  "discounted_total": 0,
+                                  "has_discount": false,
+                                  "promocode_id": null,
+                                  "user_wallet_balance": 100
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "id": 8,
+                      "package_name": "1hr 30mins",
+                      "description": "Best Ride for trvel",
+                      "short_description": "Best ride for travel",
+                      "user_wallet_balance": 100,
+                      "currency": "$",
+                      "currency_name": "ARS",
+                      "max_price": null,
+                      "min_price": null,
+                      "typesWithPrice": {
+                          "data": []
+                      }
+                  }
+              ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/request/promocode-list
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List Promo codes for user'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "message": "promo_listed",
+              "data": [
+              {
+                  "id": "8b117607-2f85-4713-a20f-3cf11b816d6e",
+                  "service_location_id": "48e861b5-8d4d-4281-807c-1cdd2a5fee3e",
+                  "code": "21555",
+                  "minimum_trip_amount": 50,
+                  "maximum_discount_amount": 50,
+                  "discount_percent": 50,
+                  "total_uses": 50,
+                  "uses_per_user": 50,
+                  "from": "2020-10-14 00:00:00",
+                  "to": "2020-10-23 23:59:59",
+                  "active": 1,
+                  "is_applied": false,
+                  "created_at": "2020-10-14 16:52:45",
+                  "updated_at": "2020-10-14 16:52:45"
+              }]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/create
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Create Request'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pick_lat:
+        name: pick_lat
+        description: 'pikup lat of the user'
+        required: true
+        example: 1.958427898
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_lng:
+        name: pick_lng
+        description: 'pikup lng of the user'
+        required: true
+        example: 6484431.3595
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      vehicle_type:
+        name: vehicle_type
+        description: 'id of zone_type_id'
+        required: true
+        example: quisquam
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      payment_opt:
+        name: payment_opt
+        description: "type of ride whther cash or card, wallet('0 => card,1 => cash,2 => wallet)"
+        required: true
+        example: veniam
+        type: tinyInteger
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_address:
+        name: pick_address
+        description: 'pickup address of the trip request'
+        required: true
+        example: ducimus
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drivers:
+        name: drivers
+        description: 'drivers json can be fetch from firebase db'
+        required: true
+        example: nisi
+        type: json
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      is_later:
+        name: is_later
+        description: 'sometimes it represent the schedule rides param must be 1.'
+        required: false
+        example: est
+        type: tinyInteger
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      trip_start_time:
+        name: trip_start_time
+        description: 'sometimes it represent the schedule rides param must be datetime format:Y-m-d H:i:s.'
+        required: false
+        example: odio
+        type: timestamp
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      promocode_id:
+        name: promocode_id
+        description: 'optional id of promo table'
+        required: false
+        example: ipsum
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      transport_type:
+        name: transport_type
+        description: ''
+        required: true
+        example: eius
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lat:
+        name: drop_lat
+        description: 'drop lat of the user'
+        required: true
+        example: 14981871.4
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lng:
+        name: drop_lng
+        description: 'drop lng of the user'
+        required: true
+        example: 55249.765
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_address:
+        name: drop_address
+        description: 'drop address of the trip request'
+        required: true
+        example: nulla
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      rental_pack_id:
+        name: rental_pack_id
+        description: 'optional id of package type'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      pick_lat: 1.958427898
+      pick_lng: 6484431.3595
+      vehicle_type: quisquam
+      payment_opt: veniam
+      pick_address: ducimus
+      drivers: nisi
+      is_later: est
+      trip_start_time: odio
+      promocode_id: ipsum
+      transport_type: eius
+      drop_lat: 14981871.4
+      drop_lng: 55249.765
+      drop_address: nulla
+      rental_pack_id: 1
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "id": "068ecb7a-7198-4322-82b2-28c8e1c90f0a",
+                  "request_number": "REQ_000002",
+                  "is_later": 0,
+                  "user_id": 15,
+                  "trip_start_time": "5th Aug 09:54 PM",
+                  "arrived_at": null,
+                  "accepted_at": null,
+                  "completed_at": "5th Aug 11:49 PM",
+                  "is_driver_started": 0,
+                  "is_driver_arrived": 0,
+                  "is_trip_start": 0,
+                  "is_completed": 1,
+                  "is_cancelled": 0,
+                  "cancel_method": "0",
+                  "payment_opt": "1",
+                  "is_paid": 1,
+                  "user_rated": 0,
+                  "driver_rated": 0,
+                  "unit": "0",
+                  "zone_type_id": "b0a3a2ce-d248-4767-adea-ae2932731436",
+                  "vehicle_type_name": "Mini",
+                  "pick_lat": 11.0797,
+                  "pick_lng": 76.9997,
+                  "drop_lat": 11.41157598,
+                  "drop_lng": 76.77196096,
+                  "pick_address": "gandhi puram",
+                  "drop_address": "saravanm patti"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/delivery/create
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Create Request'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pick_lat:
+        name: pick_lat
+        description: 'pikup lat of the user'
+        required: true
+        example: 0.3506477
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_lng:
+        name: pick_lng
+        description: 'pikup lng of the user'
+        required: true
+        example: 1508183.2496235
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      vehicle_type:
+        name: vehicle_type
+        description: 'id of zone_type_id'
+        required: true
+        example: odit
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      payment_opt:
+        name: payment_opt
+        description: "type of ride whther cash or card, wallet('0 => card,1 => cash,2 => wallet)"
+        required: true
+        example: commodi
+        type: tinyInteger
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_address:
+        name: pick_address
+        description: 'pickup address of the trip request'
+        required: true
+        example: expedita
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drivers:
+        name: drivers
+        description: 'drivers json can be fetch from firebase db'
+        required: true
+        example: odio
+        type: json
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      is_later:
+        name: is_later
+        description: 'sometimes it represent the schedule rides param must be 1.'
+        required: false
+        example: est
+        type: tinyInteger
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      trip_start_time:
+        name: trip_start_time
+        description: 'sometimes it represent the schedule rides param must be datetime format:Y-m-d H:i:s.'
+        required: false
+        example: repellat
+        type: timestamp
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      promocode_id:
+        name: promocode_id
+        description: 'optional id of promo table'
+        required: false
+        example: corporis
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      transport_type:
+        name: transport_type
+        description: ''
+        required: true
+        example: sunt
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lat:
+        name: drop_lat
+        description: 'drop lat of the user'
+        required: true
+        example: 34.53313
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lng:
+        name: drop_lng
+        description: 'drop lng of the user'
+        required: true
+        example: 65183949.8
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pickup_poc_name:
+        name: pickup_poc_name
+        description: 'optionl pickup poc name of the trip pick address'
+        required: false
+        example: officia
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pickup_poc_mobile:
+        name: pickup_poc_mobile
+        description: 'optionl pickup poc mobile of the trip pick address'
+        required: false
+        example: qui
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_poc_name:
+        name: drop_poc_name
+        description: 'optionl drop poc name of the trip drop address'
+        required: false
+        example: unde
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_poc_mobile:
+        name: drop_poc_mobile
+        description: 'optionl drop poc mobile of the trip drop address'
+        required: false
+        example: maiores
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      goods_type_id:
+        name: goods_type_id
+        description: 'goods types of the request'
+        required: true
+        example: 8
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      goods_type_quantity:
+        name: goods_type_quantity
+        description: "goods type's quantity of the request"
+        required: true
+        example: possimus
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_address:
+        name: drop_address
+        description: 'drop address of the trip request'
+        required: true
+        example: corrupti
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      rental_pack_id:
+        name: rental_pack_id
+        description: 'optional id of package type'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      pick_lat: 0.3506477
+      pick_lng: 1508183.2496235
+      vehicle_type: odit
+      payment_opt: commodi
+      pick_address: expedita
+      drivers: odio
+      is_later: est
+      trip_start_time: repellat
+      promocode_id: corporis
+      transport_type: sunt
+      drop_lat: 34.53313
+      drop_lng: 65183949.8
+      pickup_poc_name: officia
+      pickup_poc_mobile: qui
+      drop_poc_name: unde
+      drop_poc_mobile: maiores
+      goods_type_id: 8
+      goods_type_quantity: possimus
+      drop_address: corrupti
+      rental_pack_id: 16
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "id": "068ecb7a-7198-4322-82b2-28c8e1c90f0a",
+                  "request_number": "REQ_000002",
+                  "is_later": 0,
+                  "user_id": 15,
+                  "trip_start_time": "5th Aug 09:54 PM",
+                  "arrived_at": null,
+                  "accepted_at": null,
+                  "completed_at": "5th Aug 11:49 PM",
+                  "is_driver_started": 0,
+                  "is_driver_arrived": 0,
+                  "is_trip_start": 0,
+                  "is_completed": 1,
+                  "is_cancelled": 0,
+                  "cancel_method": "0",
+                  "payment_opt": "1",
+                  "is_paid": 1,
+                  "user_rated": 0,
+                  "driver_rated": 0,
+                  "unit": "0",
+                  "zone_type_id": "b0a3a2ce-d248-4767-adea-ae2932731436",
+                  "vehicle_type_name": "Mini",
+                  "pick_lat": 11.0797,
+                  "pick_lng": 76.9997,
+                  "drop_lat": 11.41157598,
+                  "drop_lng": 76.77196096,
+                  "pick_address": "gandhi puram",
+                  "drop_address": "saravanm patti"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/change-drop-location
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Change Drop Location on trip'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      request_id:
+        name: request_id
+        description: 'id request'
+        required: true
+        example: culpa
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lat:
+        name: drop_lat
+        description: 'drop lat of the user'
+        required: true
+        example: 188148.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lng:
+        name: drop_lng
+        description: 'drop lng of the user'
+        required: true
+        example: 0.7467225
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_address:
+        name: drop_address
+        description: 'drop address of the trip request'
+        required: true
+        example: debitis
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      request_id: culpa
+      drop_lat: 188148.0
+      drop_lng: 0.7467225
+      drop_address: debitis
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "drop_changed_successfully"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/cancel
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'User Cancel Request'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      request_id:
+        name: request_id
+        description: 'id of request'
+        required: true
+        example: aut
+        type: uuid
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      reason:
+        name: reason
+        description: 'optional reason provided by user'
+        required: false
+        example: quod
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      custom_reason:
+        name: custom_reason
+        description: 'optional custom reason provided by user'
+        required: false
+        example: nobis
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      request_id: aut
+      reason: quod
+      custom_reason: nobis
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/respond-for-bid
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Respond For Bid ride'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/user/payment-method
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update payment Method'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/user/payment-confirm
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update payment Confirmation'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/user/driver-tip
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: |-
+
+        APIs for User-trips apis
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Driver tips'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      request_id:
+        name: request_id
+        description: ''
+        required: true
+        example: facilis
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      tip_amount:
+        name: tip_amount
+        description: ''
+        required: true
+        example: eligendi
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      request_id: facilis
+      tip_amount: eligendi
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/eta
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Calculate an Eta'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pick_lat:
+        name: pick_lat
+        description: 'pikup lat of the user'
+        required: true
+        example: 1025.95
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_lng:
+        name: pick_lng
+        description: 'pikup lng of the user'
+        required: true
+        example: 39671.9798
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      vehicle_type:
+        name: vehicle_type
+        description: 'id of zone_type_id'
+        required: true
+        example: nam
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      ride_type:
+        name: ride_type
+        description: 'type of ride whther ride now or scheduele trip'
+        required: true
+        example: aut
+        type: tinyInteger
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drivers:
+        name: drivers
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      promo_code:
+        name: promo_code
+        description: 'optional promo code that the user provided'
+        required: false
+        example: non
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lat:
+        name: drop_lat
+        description: 'drop lat of the user'
+        required: true
+        example: 458.8501
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lng:
+        name: drop_lng
+        description: 'drop lng of the user'
+        required: true
+        example: 284804.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      pick_lat: 1025.95
+      pick_lng: 39671.9798
+      vehicle_type: nam
+      ride_type: aut
+      drivers: architecto
+      promo_code: non
+      drop_lat: 458.8501
+      drop_lng: 284804.0
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "zone_type_id": "9ea6f9a0-6fd2-4962-9d81-645e6301096f",
+                  "name": "Mini",
+                  "distance": 11.87,
+                  "time": 55,
+                  "base_distance": 5,
+                  "base_price": 5,
+                  "price_per_distance": 5,
+                  "price_per_time": 5,
+                  "distance_price": 59.36,
+                  "time_price": 148.83333333333331,
+                  "ride_fare": 213.19333333333333,
+                  "tax_amount": 63.958,
+                  "tax": "30",
+                  "total": 277.15133333333335,
+                  "approximate_value": 1,
+                  "min_amount": 277.15133333333335,
+                  "max_amount": 291.00890000000004,
+                  "currency": null,
+                  "type_name": "Mini",
+                  "unit": null,
+                  "unit_in_words_without_lang": "km",
+                  "unit_in_words": "km",
+                  "driver_arival_estimation": "23 min"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/serviceVerify
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: ''
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      address:
+        name: address
+        description: ''
+        required: true
+        example: []
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      ride_type:
+        name: ride_type
+        description: ''
+        required: true
+        example: non
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      address: []
+      ride_type: non
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/request/list-recent-searches
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List Recent Searches'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "Listed Recent Searches Successfully",
+              "data": [
+                  {
+                      "id": 108,
+                      "user_id": 9,
+                      "pick_lat": 11.05894918,
+                      "pick_lng": 76.99666478,
+                      "drop_lat": 11.0788511,
+                      "drop_lng": 76.9399321,
+                      "pick_address": "265 Saravanampatti Siranandha Puram Tamil Nadu, India",
+                      "pick_short_address": "265 Saravanampatti Siranandha Puram Tamil Nadu",
+                      "drop_address": "Vijay Surya Residency, Kanuvai - Thudiyalur Road, Thudiyalur, Tamil Nadu, India",
+                      "drop_short_address": "Vijay Surya Residency",
+                      "pickup_poc_name": null,
+                      "pickup_poc_mobile": null,
+                      "pickup_poc_instruction": null,
+                      "drop_poc_name": null,
+                      "drop_poc_mobile": null,
+                      "drop_poc_instruction": null,
+                      "total_distance": 10282,
+                      "total_time": 25,
+                      "poly_line": "c}nbAcl}tMB}@mAm@aAc@DOPJxBfAfBx@dCnApFbCvChAnHxCtClAfDtAfAn@f@b@V^LRT`@Zp@T~@l@zCWR@r@TxAl@`Cp@|FzA`LbA|IDzAB~BVnBJjAh@`F?ZEb@?b@FXd@`BdAbD~@tBTp@`AnCNf@BZJj@l@jEv@jG@f@Gt@KlAA~@M|@Kd@SfAQ|@Cd@Hv@dAzETfA@XOz@Q~BE\\GfAI|B?d@JLFPBXCbBE~@?NBXFHN\\HXBLD^@pAD`@LrAX~@`@z@bBfD\\x@h@|D^rBl@~BDj@@tBDh@JXLL?THPTRRRBRAv@@zB@xDC~BEhBIt@WlAk@fB_@|@KHY@K@UJEN@x@D`BThCTxA@ZKbA]~ASv@E`@ChBA\\BRRtAD\\@~@?fACpAA~@ATEvA@dCG|EwG@sABi@D}@NmATi@Du@DKAGAaANkBZiDr@iB\\y@J{BPkEXkJj@_FReCRaEr@mDr@mCl@}Dv@uC`@mC^iHx@iKfAwJfAaFr@sG|@{Fd@aFX}EPuETaETwGXiETsELQ?J|AD`@f@hE",
+                      "transport_type": "taxi",
+                      "searchStops": {
+                          "data": []
+                      }
+                  }
+              ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/request/get-directions
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get Directions'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pick_lat:
+        name: pick_lat
+        description: 'pikup lat of the user'
+        required: true
+        example: 19167.656540901
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_lng:
+        name: pick_lng
+        description: 'pikup lng of the user'
+        required: true
+        example: 3.454425
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lat:
+        name: drop_lat
+        description: 'Drop lat of the user'
+        required: true
+        example: 327.858878
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lng:
+        name: drop_lng
+        description: 'Drop lng of the user'
+        required: true
+        example: 47303049.506654
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      pick_lat: 19167.656540901
+      pick_lng: 3.454425
+      drop_lat: 327.858878
+      drop_lng: 47303049.506654
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              x"success": true,
+              x"message": "success",
+              x"points": "snrbAmaauM"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/dispatcher/request/eta
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Calculate an Eta'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pick_lat:
+        name: pick_lat
+        description: 'pikup lat of the user'
+        required: true
+        example: 626116056.80064
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_lng:
+        name: pick_lng
+        description: 'pikup lng of the user'
+        required: true
+        example: 206099205.68559
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      vehicle_type:
+        name: vehicle_type
+        description: 'id of zone_type_id'
+        required: true
+        example: ut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      ride_type:
+        name: ride_type
+        description: 'type of ride whther ride now or scheduele trip'
+        required: true
+        example: dicta
+        type: tinyInteger
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drivers:
+        name: drivers
+        description: ''
+        required: true
+        example: rerum
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      promo_code:
+        name: promo_code
+        description: 'optional promo code that the user provided'
+        required: false
+        example: exercitationem
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lat:
+        name: drop_lat
+        description: 'drop lat of the user'
+        required: true
+        example: 3391491.7436
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      drop_lng:
+        name: drop_lng
+        description: 'drop lng of the user'
+        required: true
+        example: 159.58
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      pick_lat: 626116056.80064
+      pick_lng: 206099205.68559
+      vehicle_type: ut
+      ride_type: dicta
+      drivers: rerum
+      promo_code: exercitationem
+      drop_lat: 3391491.7436
+      drop_lng: 159.58
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "data":
+              {
+                  "zone_type_id": "9ea6f9a0-6fd2-4962-9d81-645e6301096f",
+                  "name": "Mini",
+                  "distance": 11.87,
+                  "time": 55,
+                  "base_distance": 5,
+                  "base_price": 5,
+                  "price_per_distance": 5,
+                  "price_per_time": 5,
+                  "distance_price": 59.36,
+                  "time_price": 148.83333333333331,
+                  "ride_fare": 213.19333333333333,
+                  "tax_amount": 63.958,
+                  "tax": "30",
+                  "total": 277.15133333333335,
+                  "approximate_value": 1,
+                  "min_amount": 277.15133333333335,
+                  "max_amount": 291.00890000000004,
+                  "currency": null,
+                  "type_name": "Mini",
+                  "unit": null,
+                  "unit_in_words_without_lang": "km",
+                  "unit_in_words": "km",
+                  "driver_arival_estimation": "23 min"
+              }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/dispatcher/request/list_packages
+    metadata:
+      groupName: User-trips-apis
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List Packages'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      pick_lat:
+        name: pick_lat
+        description: 'pikup lat of the user'
+        required: true
+        example: 11888.29124028
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      pick_lng:
+        name: pick_lng
+        description: 'pikup lng of the user'
+        required: true
+        example: 219.6
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      transport_type:
+        name: transport_type
+        description: 'for super and super-bidding'
+        required: true
+        example: provident
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      pick_lat: 11888.29124028
+      pick_lng: 219.6
+      transport_type: provident
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "data": [
+                  {
+                      "id": 1,
+                      "package_name": "1 hr 5KM",
+                      "description": "Something Something",
+                      "short_description": "Best ride for travel",
+                      "user_wallet_balance": 100,
+                      "currency": "$",
+                      "currency_name": "ARS",
+                      "max_price": 500,
+                      "min_price": 500,
+                      "typesWithPrice": {
+                          "data": [
+                              {
+                                  "zone_type_id": "5cd8ed19-5725-4f82-a8a1-d92d9a5d24ca",
+                                  "type_id": "e42b124a-d309-4484-8dcd-f2b6cbc6b9f7",
+                                  "name": "Hatchback",
+                                  "icon": "https://restart.ondemandappz.com/storage/uploads/types/images/RpTI3AXc1ABbsyPrqLicWwJhVd66z2CPaF70Rkbu.png",
+                                  "capacity": 4,
+                                  "currency": "$",
+                                  "unit": 1,
+                                  "unit_in_words": "Km",
+                                  "distance_price_per_km": "5",
+                                  "time_price_per_min": "5",
+                                  "free_distance": "5",
+                                  "free_min": "0",
+                                  "payment_type": "cash,online,wallet",
+                                  "fare_amount": 500,
+                                  "description": "Compact joint family car",
+                                  "short_description": "Compact",
+                                  "supported_vehicles": null,
+                                  "is_default": false,
+                                  "discounted_total": 0,
+                                  "has_discount": false,
+                                  "promocode_id": null,
+                                  "user_wallet_balance": 100
+                              },
+                              {
+                                  "zone_type_id": "9f2f70cf-68ee-41eb-8639-a03af9b5f1f5",
+                                  "type_id": "103e6158-a844-46d2-a746-5748051709a0",
+                                  "name": "Sedan",
+                                  "icon": "https://restart.ondemandappz.com/storage/uploads/types/images/vnvOHLDT6tzlER4flbXOn6mxaudalFpbPqkce22A.jpeg",
+                                  "capacity": 4,
+                                  "currency": "$",
+                                  "unit": 1,
+                                  "unit_in_words": "Km",
+                                  "distance_price_per_km": "5",
+                                  "time_price_per_min": "5",
+                                  "free_distance": "5",
+                                  "free_min": "0",
+                                  "payment_type": "cash,online,wallet",
+                                  "fare_amount": 500,
+                                  "description": "Compact and premium four Wheeler",
+                                  "short_description": "Sedan Type",
+                                  "supported_vehicles": null,
+                                  "is_default": false,
+                                  "discounted_total": 0,
+                                  "has_discount": false,
+                                  "promocode_id": null,
+                                  "user_wallet_balance": 100
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "id": 6,
+                      "package_name": "3 hour package",
+                      "description": "auto with carrage",
+                      "short_description": "auto with carrage",
+                      "user_wallet_balance": 100,
+                      "currency": "$",
+                      "currency_name": "ARS",
+                      "max_price": 900,
+                      "min_price": 300,
+                      "typesWithPrice": {
+                          "data": [
+                              {
+                                  "zone_type_id": "5cd8ed19-5725-4f82-a8a1-d92d9a5d24ca",
+                                  "type_id": "e42b124a-d309-4484-8dcd-f2b6cbc6b9f7",
+                                  "name": "Hatchback",
+                                  "icon": "https://restart.ondemandappz.com/storage/uploads/types/images/RpTI3AXc1ABbsyPrqLicWwJhVd66z2CPaF70Rkbu.png",
+                                  "capacity": 4,
+                                  "currency": "$",
+                                  "unit": 1,
+                                  "unit_in_words": "Km",
+                                  "distance_price_per_km": "5",
+                                  "time_price_per_min": "5",
+                                  "free_distance": "5",
+                                  "free_min": "0",
+                                  "payment_type": "cash,online,wallet",
+                                  "fare_amount": 600,
+                                  "description": "Compact joint family car",
+                                  "short_description": "Compact",
+                                  "supported_vehicles": null,
+                                  "is_default": false,
+                                  "discounted_total": 0,
+                                  "has_discount": false,
+                                  "promocode_id": null,
+                                  "user_wallet_balance": 100
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "id": 8,
+                      "package_name": "1hr 30mins",
+                      "description": "Best Ride for trvel",
+                      "short_description": "Best ride for travel",
+                      "user_wallet_balance": 100,
+                      "currency": "$",
+                      "currency_name": "ARS",
+                      "max_price": null,
+                      "min_price": null,
+                      "typesWithPrice": {
+                          "data": []
+                      }
+                  }
+              ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

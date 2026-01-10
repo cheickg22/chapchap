@@ -1,0 +1,411 @@
+name: User-Login
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/mobile-otp
+    metadata:
+      groupName: User-Login
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Send Mobile Otp'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      mobile:
+        name: mobile
+        description: 'optional mobile of the user entered'
+        required: false
+        example: nemo
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      country_code:
+        name: country_code
+        description: 'Country Code of the user mobile'
+        required: false
+        example: minima
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      mobile: nemo
+      country_code: minima
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/validate-otp
+    metadata:
+      groupName: User-Login
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Validate Mobile Otp'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      mobile:
+        name: mobile
+        description: 'optional mobile of the user entered'
+        required: false
+        example: quidem
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      otp:
+        name: otp
+        description: ''
+        required: true
+        example: aut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      country_code:
+        name: country_code
+        description: 'Country Code of the user mobile'
+        required: false
+        example: distinctio
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      mobile: quidem
+      otp: aut
+      country_code: distinctio
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "otp" : 895579
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/user/login
+    metadata:
+      groupName: User-Login
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Login user and respond with access token and refresh token.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'optional email of the user entered'
+        required: false
+        example: fritsch.mackenzie@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'optional password of the user entered'
+        required: false
+        example: 'g7CWK&0Z'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      username:
+        name: username
+        description: 'The <code>username</code> of an existing record in the users table.'
+        required: true
+        example: aut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'optional mobile of the user entered'
+        required: false
+        example: debitis
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      login_by:
+        name: login_by
+        description: ''
+        required: true
+        example: ut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      device_token:
+        name: device_token
+        description: 'fcm_token of the user entered'
+        required: true
+        example: nesciunt
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: fritsch.mackenzie@example.net
+      password: 'g7CWK&0Z'
+      username: aut
+      mobile: debitis
+      login_by: ut
+      device_token: nesciunt
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "access_token": "98|6jzNOIahjd2V72je0OeucPRuaRiIhJxWKXFvNVUr7027d348"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/driver/login
+    metadata:
+      groupName: User-Login
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Login driver and respond with access token and refresh token.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: 'optional email of the user entered'
+        required: false
+        example: rthiel@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: 'optional password of the user entered'
+        required: false
+        example: 2J7)dyDeHQ
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      username:
+        name: username
+        description: 'The <code>username</code> of an existing record in the users table.'
+        required: true
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      mobile:
+        name: mobile
+        description: 'optional mobile of the user entered'
+        required: false
+        example: porro
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      login_by:
+        name: login_by
+        description: 'i.e android,ios'
+        required: true
+        example: accusamus
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      device_token:
+        name: device_token
+        description: 'optional fcm_token for push notification'
+        required: false
+        example: velit
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      social_unique_id:
+        name: social_unique_id
+        description: 'optional mobile of the user entered'
+        required: false
+        example: eveniet
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      apn_token:
+        name: apn_token
+        description: 'optional fcm_token for ios push notification'
+        required: false
+        example: aut
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: rthiel@example.com
+      password: 2J7)dyDeHQ
+      username: consequatur
+      mobile: porro
+      login_by: accusamus
+      device_token: velit
+      social_unique_id: eveniet
+      apn_token: aut
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+              "success": true,
+              "message": "success",
+              "access_token": "98|6jzNOIahjd2V72je0OeucPRuaRiIhJxWKXFvNVUr7027d348"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/logout
+    metadata:
+      groupName: User-Login
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Logout the user based on their access token.'
+      description: ''
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success":true,"message":"success"}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
