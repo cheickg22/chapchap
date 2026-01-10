@@ -1,0 +1,65 @@
+{
+  "project_info": {
+    "project_number": "1021781820888",
+    "firebase_url": "https://chapchap-e45b0-default-rtdb.firebaseio.com",
+    "project_id": "chapchap-e45b0",
+    "storage_bucket": "chapchap-e45b0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021781820888:android:c498c508900b9aa1c59ead",
+        "android_client_info": {
+          "package_name": "com.chapchap_livraison.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA101Qj9lm79JhFfBiLBIM_9eIpyr_Vb54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1021781820888-tt4e4oh8u90kd5og3v7bt4gca0pqadh7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.chapchaplivraison"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021781820888:android:c577da0c4a80350cc59ead",
+        "android_client_info": {
+          "package_name": "com.chapchap_livraison.user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA101Qj9lm79JhFfBiLBIM_9eIpyr_Vb54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1021781820888-tt4e4oh8u90kd5og3v7bt4gca0pqadh7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.chapchaplivraison"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
