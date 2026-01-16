@@ -500,5 +500,11 @@
   "preferences": "Préférences",
   "planYourRide": "Planifiez votre trajet",
   "changeEmail": "Changer l’e-mail",
-  "verifyEmailId": "Vérifiez votre adresse e-mail"
+  "verifyEmailId": "Vérifiez votre adresse e-mail",
+  "verifyEmailText": "Vérifier l'adresse e-mail",
+  "deliveryOutStation": "Poste de livraison",
+  "deliveryRental": "Location de livraison",
+  "deliveryRide": "Livraison",
+  "unnamed_street": "Rue sans nom"
+
 }

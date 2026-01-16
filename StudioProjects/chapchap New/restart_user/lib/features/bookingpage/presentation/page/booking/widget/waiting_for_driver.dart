@@ -60,10 +60,10 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                     MyText(
                       text: AppLocalizations.of(context)!.discoverYourDriver,
                       textStyle:
-                          Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                color: Theme.of(context).primaryColorDark,
-                                fontWeight: FontWeight.w600,
-                              ),
+                      Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).primaryColorDark,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -110,10 +110,10 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       border:
-                          Border.all(width: 1, color: AppColors.borderColor)),
+                      Border.all(width: 1, color: AppColors.borderColor)),
                   child: Padding(
                     padding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                     child: Column(
                       children: [
                         ListView.builder(
@@ -145,6 +145,7 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                                       Expanded(
                                         child: MyText(
                                           text: address.address,
+                                          maxLines: 2,
                                         ),
                                       ),
                                     ],
@@ -183,6 +184,7 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                                       Expanded(
                                         child: MyText(
                                           text: address.address,
+                                          maxLines: 2,
                                         ),
                                       ),
                                     ],
@@ -201,13 +203,14 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                     textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).primaryColorDark,
                         fontWeight: FontWeight.bold),
+                    maxLines: 2,
                   ),
                   SizedBox(height: size.width * 0.03),
                   Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border:
-                            Border.all(width: 1, color: AppColors.borderColor)),
+                        Border.all(width: 1, color: AppColors.borderColor)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 4),
@@ -225,7 +228,7 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                                 child: Loader(),
                               ),
                               errorWidget: (context, url, error) =>
-                                  const Center(
+                              const Center(
                                 child: Text(""),
                               ),
                             ),
@@ -258,26 +261,26 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       border:
-                          Border.all(width: 1, color: AppColors.borderColor)),
+                      Border.all(width: 1, color: AppColors.borderColor)),
                   child: Padding(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     child: Row(
                       children: [
                         Icon(
                             context.read<BookingBloc>().isSavedCardChoose
                                 ? Icons.credit_card_rounded
                                 : context
-                                            .read<BookingBloc>()
-                                            .selectedPaymentType ==
-                                        'cash'
-                                    ? Icons.payments_outlined
-                                    : context
-                                                .read<BookingBloc>()
-                                                .selectedPaymentType ==
-                                            'card'
-                                        ? Icons.credit_card_rounded
-                                        : Icons.account_balance_wallet_outlined,
+                                .read<BookingBloc>()
+                                .selectedPaymentType ==
+                                'cash'
+                                ? Icons.payments_outlined
+                                : context
+                                .read<BookingBloc>()
+                                .selectedPaymentType ==
+                                'card'
+                                ? Icons.credit_card_rounded
+                                : Icons.account_balance_wallet_outlined,
                             color: Theme.of(context).primaryColorDark),
                         SizedBox(width: size.width * 0.05),
                         MyText(
@@ -300,7 +303,7 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                       color: Theme.of(context).primaryColorDark,
                       fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: size.width * 0.03),
+                SizedBox(height: size.width * 0.05),
                 InkWell(
                   onTap: () {
                     showModalBottomSheet(
@@ -309,7 +312,7 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                       isScrollControlled: true,
                       enableDrag: false,
                       backgroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
+                      Theme.of(context).scaffoldBackgroundColor,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(20.0),
@@ -336,8 +339,8 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                                           .textTheme
                                           .displayLarge!
                                           .copyWith(
-                                              color: Theme.of(context)
-                                                  .primaryColorDark),
+                                          color: Theme.of(context)
+                                              .primaryColorDark),
                                     ),
                                   ),
                                   SizedBox(height: size.width * 0.05),
@@ -353,12 +356,12 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                                   SizedBox(height: size.width * 0.05),
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                    MainAxisAlignment.spaceEvenly,
                                     children: [
                                       CustomButton(
                                         buttonName:
-                                            AppLocalizations.of(context)!
-                                                .cancelRide,
+                                        AppLocalizations.of(context)!
+                                            .cancelRide,
                                         borderRadius: 5,
                                         isBorder: true,
                                         width: size.width * 0.4,
@@ -366,20 +369,20 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                                         buttonColor: Theme.of(context)
                                             .scaffoldBackgroundColor,
                                         textSize: context
-                                                    .read<BookingBloc>()
-                                                    .languageCode ==
-                                                'fr'
+                                            .read<BookingBloc>()
+                                            .languageCode ==
+                                            'fr'
                                             ? 14
                                             : null,
                                         textColor:
-                                            Theme.of(context).primaryColor,
+                                        Theme.of(context).primaryColor,
                                         onTap: () {
                                           context
                                               .read<BookingBloc>()
                                               .timerCount(context,
-                                                  duration: 0,
-                                                  isNormalRide: true,
-                                                  isCloseTimer: true);
+                                              duration: 0,
+                                              isNormalRide: true,
+                                              isCloseTimer: true);
                                           context
                                               .read<BookingBloc>()
                                               .onRideBottomPosition = -250;
@@ -393,12 +396,12 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                                       ),
                                       CustomButton(
                                         buttonName:
-                                            AppLocalizations.of(context)!.back,
+                                        AppLocalizations.of(context)!.back,
                                         borderRadius: 5,
                                         width: size.width * 0.4,
                                         height: size.width * 0.1,
                                         buttonColor:
-                                            Theme.of(context).primaryColor,
+                                        Theme.of(context).primaryColor,
                                         textColor: AppColors.white,
                                         onTap: () {
                                           Navigator.pop(context);
@@ -418,30 +421,27 @@ class WaitingForDriverConfirmation extends StatelessWidget {
                       color: AppColors.red,
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.cancel_outlined,
+                    padding: EdgeInsets.all(size.width * 0.02),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.cancel_outlined,
+                                color: AppColors.white),
+                            SizedBox(width: size.width * 0.025),
+                            MyText(
+                              text: AppLocalizations.of(context)!.cancelRide,
+                              textStyle: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                  fontWeight: FontWeight.bold,
                                   color: AppColors.white),
-                              SizedBox(width: size.width * 0.025),
-                              MyText(
-                                text: AppLocalizations.of(context)!.cancelRide,
-                                textStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.white),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),

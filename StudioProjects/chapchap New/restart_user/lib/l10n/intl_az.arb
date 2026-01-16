@@ -499,5 +499,10 @@
    "preferences": "Üstünlüklər",
    "planYourRide": "Səyahətinizi planlaşdırın",
    "changeEmail": "E-poçtu dəyiş",
-   "verifyEmailId": "E-poçt ünvanınızı doğrulayın"
+   "verifyEmailId": "E-poçt ünvanınızı doğrulayın",
+  "verifyEmailText": "E-poçt ünvanını təsdiq edin",
+  "deliveryOutStation": "Çatdırılma stansiyası",
+  "deliveryRental": "Çatdırılma icarəsi",
+  "deliveryRide": "Çatdırılma",
+  "unnamed_street": "Adsız küçə"
         }

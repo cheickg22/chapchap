@@ -70,438 +70,487 @@ class BookingBottomWidget extends StatelessWidget {
                       SizedBox(height: size.width * 0.03),
                       BlocBuilder<BookingBloc, BookingState>(
                           builder: (context, state) {
-                        return AnimatedBuilder(
-                          animation: bookingBloc.draggableController,
-                          builder: (context, _) {
-                            if (shouldHideAddInstruction()) {
-                              return const SizedBox.shrink();
-                            }
+                            return AnimatedBuilder(
+                              animation: bookingBloc.draggableController,
+                              builder: (context, _) {
+                                if (shouldHideAddInstruction()) {
+                                  return const SizedBox.shrink();
+                                }
 
-                            return Row(
-                              mainAxisAlignment: isTaxi
+                                return Row(
+                                  mainAxisAlignment: isTaxi
                                   // ? MainAxisAlignment.spaceAround
-                                  ? MainAxisAlignment.spaceBetween
-                                  : MainAxisAlignment.start,
-                              children: [
-                                // PAYMENT
-                                if (isTaxi)
-                                  InkWell(
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                          context: context,
-                                          barrierColor:
+                                      ? MainAxisAlignment.spaceBetween
+                                      : MainAxisAlignment.start,
+                                  children: [
+                                    // PAYMENT
+                                    if (isTaxi)
+                                      InkWell(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                              context: context,
+                                              barrierColor:
                                               Theme.of(context).shadowColor,
-                                          backgroundColor: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(20.0),
-                                            ),
-                                          ),
-                                          builder: (_) {
-                                            return SelectPaymentMethodWidget(
-                                                cont: context);
-                                          });
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                            bookingBloc.isSavedCardChoose
-                                                ? Icons.credit_card_rounded
-                                                : bookingBloc
-                                                            .selectedPaymentType ==
-                                                        'cash'
+                                              backgroundColor: Theme.of(context)
+                                                  .scaffoldBackgroundColor,
+                                              shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.vertical(
+                                                  top: Radius.circular(20.0),
+                                                ),
+                                              ),
+                                              builder: (_) {
+                                                return SelectPaymentMethodWidget(
+                                                    cont: context);
+                                              });
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                                bookingBloc.isSavedCardChoose
+                                                    ? Icons.credit_card_rounded
+                                                    : bookingBloc
+                                                    .selectedPaymentType ==
+                                                    'cash'
                                                     ? Icons.payments_outlined
                                                     : bookingBloc
-                                                                .selectedPaymentType ==
-                                                            'card'
-                                                        ? Icons
-                                                            .credit_card_rounded
-                                                        : Icons
-                                                            .account_balance_wallet_outlined,
-                                            size: size.width * 0.05,
-                                            color: hasLowWalletBalance
-                                                ? AppColors.red
-                                                : Theme.of(context)
+                                                    .selectedPaymentType ==
+                                                    'card'
+                                                    ? Icons
+                                                    .credit_card_rounded
+                                                    : Icons
+                                                    .account_balance_wallet_outlined,
+                                                size: size.width * 0.05,
+                                                color: hasLowWalletBalance
+                                                    ? AppColors.red
+                                                    : Theme.of(context)
                                                     .primaryColorDark),
-                                        SizedBox(width: size.width * 0.025),
-                                        MyText(
-                                            text: bookingBloc.isSavedCardChoose
-                                                ? 'Card'
-                                                : (bookingBloc
-                                                            .selectedPaymentType ==
-                                                        'cash')
+                                            SizedBox(width: size.width * 0.025),
+                                            MyText(
+                                                text: bookingBloc.isSavedCardChoose
+                                                    ? 'Card'
+                                                    : (bookingBloc
+                                                    .selectedPaymentType ==
+                                                    'cash')
                                                     ? AppLocalizations.of(
-                                                            context)!
-                                                        .cash
+                                                    context)!
+                                                    .cash
                                                     : (context
-                                                                .read<
-                                                                    BookingBloc>()
-                                                                .selectedPaymentType ==
-                                                            'wallet')
-                                                        ? AppLocalizations.of(
-                                                                context)!
-                                                            .wallet
-                                                        : bookingBloc
-                                                            .selectedPaymentType,
+                                                    .read<
+                                                    BookingBloc>()
+                                                    .selectedPaymentType ==
+                                                    'wallet')
+                                                    ? AppLocalizations.of(
+                                                    context)!
+                                                    .wallet
+                                                    : bookingBloc
+                                                    .selectedPaymentType,
+                                                textStyle: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium!
+                                                    .copyWith(
+                                                  // fontWeight: FontWeight.bold,
+                                                    color: hasLowWalletBalance
+                                                        ? AppColors.red
+                                                        : null))
+                                          ],
+                                        ),
+                                      ),
+                                    if (isTaxi && !isRental) ...[
+                                      if (hasNonRentalPreferences) ...[
+                                        InkWell(
+                                          onTap: () {
+                                            showModalBottomSheet(
+                                                context: context,
+                                                isScrollControlled: false,
+                                                enableDrag: false,
+                                                isDismissible: false,
+                                                barrierColor:
+                                                Theme.of(context).shadowColor,
+                                                backgroundColor: Theme.of(context)
+                                                    .scaffoldBackgroundColor,
+                                                shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(20.0),
+                                                    topRight: Radius.circular(
+                                                        20.0), // Adjust the radius to your liking
+                                                  ),
+                                                ),
+                                                builder: (_) {
+                                                  return SelectPreferenceWidget(
+                                                    cont: context,
+                                                    arg: arg,
+                                                  );
+                                                });
+                                            // } else {
+                                            //   showToast(message: "Unavailable");
+                                            // }
+                                          },
+                                          child: Row(children: [
+                                            Icon(Icons.tune,
+                                                size: 20,
+                                                color: Theme.of(context)
+                                                    .primaryColorDark),
+                                            SizedBox(width: size.width * 0.03),
+                                            Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                MyText(
+                                                    text: AppLocalizations.of(
+                                                        context)!
+                                                        .preferences,
+                                                    textStyle: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium!
+                                                        .copyWith()),
+                                                Wrap(
+                                                  spacing: 4,
+                                                  runSpacing: 4,
+                                                  children: List.generate(
+                                                      bookingBloc
+                                                          .selectedPreferenceDetailsList
+                                                          .length, (index) {
+                                                    try {
+                                                      final prefId = bookingBloc
+                                                          .selectedPreferenceDetailsList[
+                                                      index];
+                                                      final prefList = bookingBloc
+                                                          .preferenceDetailsList ??
+                                                          [];
+                                                      final pref =
+                                                      prefList.firstWhere(
+                                                            (e) =>
+                                                        e.preferenceId ==
+                                                            prefId,
+                                                      );
+                                                      return Container(
+                                                        padding: EdgeInsets.all(
+                                                            size.width * 0.005),
+                                                        width: 14,
+                                                        height: 14,
+                                                        decoration:
+                                                        const BoxDecoration(
+                                                          color: AppColors.white,
+                                                        ),
+                                                        child: CachedNetworkImage(
+                                                          imageUrl: pref.icon,
+                                                          fit: BoxFit.cover,
+                                                          width: 12,
+                                                          height: 12,
+                                                          errorWidget: (context,
+                                                              url, error) =>
+                                                          const SizedBox
+                                                              .shrink(),
+                                                        ),
+                                                      );
+                                                    } catch (e) {
+                                                      return const SizedBox
+                                                          .shrink();
+                                                    }
+                                                  }),
+                                                )
+                                              ],
+                                            )
+                                          ]),
+                                        ),
+                                      ] else ...[
+                                        MyText(
+                                            text: AppLocalizations.of(context)!
+                                                .preferences,
                                             textStyle: Theme.of(context)
                                                 .textTheme
                                                 .bodyMedium!
                                                 .copyWith(
-                                                    // fontWeight: FontWeight.bold,
-                                                    color: hasLowWalletBalance
-                                                        ? AppColors.red
-                                                        : null))
-                                      ],
-                                    ),
-                                  ),
-                                if (isTaxi && !isRental) ...[
-                                  if (hasNonRentalPreferences) ...[
-                                    InkWell(
-                                      onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: false,
-                                            enableDrag: false,
-                                            isDismissible: false,
-                                            barrierColor:
-                                                Theme.of(context).shadowColor,
-                                            backgroundColor: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(20.0),
-                                                topRight: Radius.circular(
-                                                    20.0), // Adjust the radius to your liking
-                                              ),
-                                            ),
-                                            builder: (_) {
-                                              return SelectPreferenceWidget(
-                                                cont: context,
-                                                arg: arg,
-                                              );
-                                            });
-                                      },
-                                      child: Row(children: [
-                                        Icon(Icons.tune,
-                                            size: 20,
-                                            color: Theme.of(context)
-                                                .primaryColorDark),
-                                        SizedBox(width: size.width * 0.03),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            MyText(
-                                                text: AppLocalizations.of(
-                                                        context)!
-                                                    .preferences,
-                                                textStyle: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium!
-                                                    .copyWith()),
-                                            Wrap(
-                                              spacing: 4,
-                                              runSpacing: 4,
-                                              children: List.generate(
-                                                  bookingBloc
-                                                      .selectedPreferenceDetailsList
-                                                      .length, (index) {
-                                                try {
-                                                  final prefId = bookingBloc
-                                                          .selectedPreferenceDetailsList[
-                                                      index];
-                                                  final prefList = bookingBloc
-                                                          .preferenceDetailsList ??
-                                                      [];
-                                                  final pref =
-                                                      prefList.firstWhere(
-                                                    (e) =>
-                                                        e.preferenceId ==
-                                                        prefId,
-                                                  );
-                                                  return CachedNetworkImage(
-                                                    imageUrl: pref.icon,
-                                                    fit: BoxFit.cover,
-                                                    width: 12,
-                                                    height: 12,
-                                                    errorWidget: (context, url,
-                                                            error) =>
-                                                        const SizedBox.shrink(),
-                                                  );
-                                                } catch (e) {
-                                                  return const SizedBox
-                                                      .shrink();
-                                                }
-                                              }),
-                                            )
-                                          ],
-                                        )
-                                      ]),
-                                    ),
-                                  ] else ...[
-                                    MyText(
-                                        text: AppLocalizations.of(context)!
-                                            .preferences,
-                                        textStyle: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(
                                                 color: AppColors.hintColor)),
-                                  ]
-                                ],
+                                      ]
+                                    ],
 
-                                if (isTaxi && isRental) ...[
-                                  if (hasRentalPreferences) ...[
-                                    InkWell(
-                                      onTap: () {
-                                        showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: false,
-                                            enableDrag: false,
-                                            isDismissible: false,
-                                            barrierColor:
-                                                Theme.of(context).shadowColor,
-                                            backgroundColor: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(20.0),
-                                                topRight: Radius.circular(
-                                                    20.0), // Adjust the radius to your liking
-                                              ),
-                                            ),
-                                            builder: (_) {
-                                              return SelectPreferenceWidget(
-                                                cont: context,
-                                                arg: arg,
-                                              );
-                                            });
-                                      },
-                                      child: Row(children: [
-                                        Icon(Icons.tune,
-                                            size: 20,
-                                            color: Theme.of(context)
-                                                .primaryColorDark),
-                                        SizedBox(width: size.width * 0.03),
-                                        Column(
-                                          children: [
-                                            MyText(
-                                                text: AppLocalizations.of(
-                                                        context)!
-                                                    .preferences,
-                                                textStyle: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium!
-                                                    .copyWith()),
-                                            (context
-                                                        .read<BookingBloc>()
-                                                        .isRentalRide ==
-                                                    false)
-                                                ? Row(
-                                                    children: List.generate(
-                                                        context
-                                                            .read<BookingBloc>()
-                                                            .selectedPreferenceDetailsList
-                                                            .length, (index) {
-                                                      try {
-                                                        final prefId = context
-                                                            .read<BookingBloc>()
-                                                            .selectedPreferenceDetailsList[index];
-                                                        final prefList = context
-                                                                .read<
-                                                                    BookingBloc>()
-                                                                .preferenceDetailsList ??
-                                                            [];
-                                                        final pref =
-                                                            prefList.firstWhere(
-                                                          (e) =>
-                                                              e.preferenceId ==
-                                                              prefId,
-                                                        );
-                                                        return CachedNetworkImage(
-                                                          imageUrl: pref.icon,
-                                                          fit: BoxFit.cover,
-                                                          width: 12,
-                                                          height: 12,
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              const SizedBox
-                                                                  .shrink(),
-                                                        );
-                                                      } catch (e) {
-                                                        return const SizedBox
-                                                            .shrink();
-                                                      }
-                                                    }),
-                                                  )
-                                                : Row(
-                                                    children: List.generate(
-                                                        context
-                                                            .read<BookingBloc>()
-                                                            .selectedPreferenceDetailsList
-                                                            .length, (index) {
-                                                      try {
-                                                        final prefId = context
-                                                            .read<BookingBloc>()
-                                                            .selectedPreferenceDetailsList[index];
-                                                        final prefList = context
-                                                                .read<
-                                                                    BookingBloc>()
-                                                                .rentalPreferenceDetailsList ??
-                                                            [];
-                                                        final pref =
-                                                            prefList.firstWhere(
-                                                          (e) =>
-                                                              e.preferenceId ==
-                                                              prefId,
-                                                        );
-                                                        return CachedNetworkImage(
-                                                          imageUrl: pref.icon,
-                                                          fit: BoxFit.cover,
-                                                          width: 12,
-                                                          height: 12,
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              const SizedBox
-                                                                  .shrink(),
-                                                        );
-                                                      } catch (e) {
-                                                        return const SizedBox
-                                                            .shrink();
-                                                      }
-                                                    }),
-                                                  )
-                                          ],
-                                        )
-                                      ]),
-                                    ),
-                                  ] else ...[
-                                    MyText(
-                                        text: AppLocalizations.of(context)!
-                                            .preferences,
-                                        textStyle: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(
-                                                color: AppColors.hintColor)),
-                                  ]
-                                ],
-
-                                if (isTaxi) ...[
-                                  Builder(builder: (context) {
-                                    final disableCoupons =
-                                        bookingBloc.showBiddingVehicles;
-                                    return InkWell(
-                                      onTap: disableCoupons
-                                          ? null
-                                          : () {
-                                              context
-                                                  .read<BookingBloc>()
-                                                  .promoErrorText = '';
-                                              context
-                                                  .read<BookingBloc>()
-                                                  .add(UpdateEvent());
-                                              showModalBottomSheet(
+                                    if (isTaxi && isRental) ...[
+                                      if (hasRentalPreferences) ...[
+                                        InkWell(
+                                          onTap: () {
+                                            showModalBottomSheet(
                                                 context: context,
-                                                isScrollControlled: true,
-                                                barrierColor: Theme.of(context)
-                                                    .shadowColor,
-                                                backgroundColor: Theme.of(
-                                                        context)
+                                                isScrollControlled: false,
+                                                enableDrag: false,
+                                                isDismissible: false,
+                                                barrierColor:
+                                                Theme.of(context).shadowColor,
+                                                backgroundColor: Theme.of(context)
                                                     .scaffoldBackgroundColor,
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.vertical(
-                                                    top: Radius.circular(20.0),
+                                                shape: const RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.only(
+                                                    topLeft: Radius.circular(20.0),
+                                                    topRight: Radius.circular(
+                                                        20.0), // Adjust the radius to your liking
                                                   ),
                                                 ),
                                                 builder: (_) {
-                                                  return BlocProvider.value(
-                                                    value: context
-                                                        .read<BookingBloc>(),
-                                                    child: ApplyCouponWidget(
-                                                      arg: arg,
-                                                      cont: context,
-                                                    ),
+                                                  return SelectPreferenceWidget(
+                                                    cont: context,
+                                                    arg: arg,
                                                   );
-                                                },
-                                              );
-                                            },
-                                      child: Opacity(
-                                        opacity: disableCoupons ? 0.4 : 1,
-                                        child: Row(children: [
-                                          Image.asset(
-                                            AppImages.ticketImage,
-                                            width: size.width * 0.05,
-                                          ),
-                                          SizedBox(width: size.width * 0.025),
-                                          MyText(
-                                              text:
+                                                });
+                                            // } else {
+                                            //   showToast(message: "Unavailable");
+                                            // }
+                                          },
+                                          child: Row(children: [
+                                            Icon(Icons.tune,
+                                                size: 20,
+                                                color: Theme.of(context)
+                                                    .primaryColorDark),
+                                            SizedBox(width: size.width * 0.03),
+                                            Column(
+                                              children: [
+                                                MyText(
+                                                    text: AppLocalizations.of(
+                                                        context)!
+                                                        .preferences,
+                                                    textStyle: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium!
+                                                        .copyWith()),
+                                                (context
+                                                    .read<BookingBloc>()
+                                                    .isRentalRide ==
+                                                    false)
+                                                    ? Row(
+                                                  children: List.generate(
+                                                      context
+                                                          .read<BookingBloc>()
+                                                          .selectedPreferenceDetailsList
+                                                          .length, (index) {
+                                                    try {
+                                                      final prefId = context
+                                                          .read<BookingBloc>()
+                                                          .selectedPreferenceDetailsList[index];
+                                                      final prefList = context
+                                                          .read<
+                                                          BookingBloc>()
+                                                          .preferenceDetailsList ??
+                                                          [];
+                                                      final pref =
+                                                      prefList.firstWhere(
+                                                            (e) =>
+                                                        e.preferenceId ==
+                                                            prefId,
+                                                      );
+                                                      return Container(
+                                                        padding:
+                                                        EdgeInsets.all(
+                                                            size.width *
+                                                                0.005),
+                                                        width: 14,
+                                                        height: 14,
+                                                        decoration:
+                                                        const BoxDecoration(
+                                                          color:
+                                                          AppColors.white,
+                                                        ),
+                                                        child:
+                                                        CachedNetworkImage(
+                                                          imageUrl: pref.icon,
+                                                          fit: BoxFit.cover,
+                                                          width: 12,
+                                                          height: 12,
+                                                          errorWidget: (context,
+                                                              url,
+                                                              error) =>
+                                                          const SizedBox
+                                                              .shrink(),
+                                                        ),
+                                                      );
+                                                    } catch (e) {
+                                                      return const SizedBox
+                                                          .shrink();
+                                                    }
+                                                  }),
+                                                )
+                                                    : Row(
+                                                  children: List.generate(
+                                                      context
+                                                          .read<BookingBloc>()
+                                                          .selectedPreferenceDetailsList
+                                                          .length, (index) {
+                                                    try {
+                                                      final prefId = context
+                                                          .read<BookingBloc>()
+                                                          .selectedPreferenceDetailsList[index];
+                                                      final prefList = context
+                                                          .read<
+                                                          BookingBloc>()
+                                                          .rentalPreferenceDetailsList ??
+                                                          [];
+                                                      final pref =
+                                                      prefList.firstWhere(
+                                                            (e) =>
+                                                        e.preferenceId ==
+                                                            prefId,
+                                                      );
+                                                      return Container(
+                                                        padding:
+                                                        EdgeInsets.all(
+                                                            size.width *
+                                                                0.005),
+                                                        width: 14,
+                                                        height: 14,
+                                                        decoration:
+                                                        const BoxDecoration(
+                                                          color:
+                                                          AppColors.white,
+                                                        ),
+                                                        child:
+                                                        CachedNetworkImage(
+                                                          imageUrl: pref.icon,
+                                                          fit: BoxFit.cover,
+                                                          width: 12,
+                                                          height: 12,
+                                                          errorWidget: (context,
+                                                              url,
+                                                              error) =>
+                                                          const SizedBox
+                                                              .shrink(),
+                                                        ),
+                                                      );
+                                                    } catch (e) {
+                                                      return const SizedBox
+                                                          .shrink();
+                                                    }
+                                                  }),
+                                                )
+                                              ],
+                                            )
+                                          ]),
+                                        ),
+                                      ] else ...[
+                                        MyText(
+                                            text: AppLocalizations.of(context)!
+                                                .preferences,
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium!
+                                                .copyWith(
+                                                color: AppColors.hintColor)),
+                                      ]
+                                    ],
+
+                                    if (isTaxi) ...[
+                                      Builder(builder: (context) {
+                                        final disableCoupons =
+                                            bookingBloc.showBiddingVehicles;
+                                        return InkWell(
+                                          onTap: disableCoupons
+                                              ? null
+                                              : () {
+                                            context
+                                                .read<BookingBloc>()
+                                                .promoErrorText = '';
+                                            context
+                                                .read<BookingBloc>()
+                                                .add(UpdateEvent());
+                                            showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled: true,
+                                              barrierColor: Theme.of(context)
+                                                  .shadowColor,
+                                              backgroundColor: Theme.of(
+                                                  context)
+                                                  .scaffoldBackgroundColor,
+                                              shape:
+                                              const RoundedRectangleBorder(
+                                                borderRadius:
+                                                BorderRadius.vertical(
+                                                  top: Radius.circular(20.0),
+                                                ),
+                                              ),
+                                              builder: (_) {
+                                                return BlocProvider.value(
+                                                  value: context
+                                                      .read<BookingBloc>(),
+                                                  child: ApplyCouponWidget(
+                                                    arg: arg,
+                                                    cont: context,
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Opacity(
+                                            opacity: disableCoupons ? 0.4 : 1,
+                                            child: Row(children: [
+                                              Image.asset(
+                                                AppImages.ticketImage,
+                                                width: size.width * 0.05,
+                                                color: Theme.of(context)
+                                                    .primaryColorDark,
+                                              ),
+                                              SizedBox(width: size.width * 0.025),
+                                              MyText(
+                                                  text:
                                                   AppLocalizations.of(context)!
                                                       .coupon,
-                                              textStyle: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium!
-                                                  .copyWith())
-                                        ]),
-                                      ),
-                                    );
-                                  })
-                                ]
-                              ],
+                                                  textStyle: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium!
+                                                      .copyWith())
+                                            ]),
+                                          ),
+                                        );
+                                      })
+                                    ]
+                                  ],
+                                );
+                              },
                             );
-                          },
-                        );
-                      }),
+                          }),
                       SizedBox(height: size.width * 0.03),
                       if (isTaxi ||
                           bookingBloc.isOutstationRide ||
                           isRental) ...[
                         BlocBuilder<BookingBloc, BookingState>(
                             builder: (context, state) {
-                          return AnimatedBuilder(
-                            animation: bookingBloc.draggableController,
-                            builder: (context, _) {
-                              if (shouldHideAddInstruction()) {
-                                return const SizedBox.shrink();
-                              }
+                              return AnimatedBuilder(
+                                animation: bookingBloc.draggableController,
+                                builder: (context, _) {
+                                  if (shouldHideAddInstruction()) {
+                                    return const SizedBox.shrink();
+                                  }
 
-                              return InkWell(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isDismissible: true,
-                                    enableDrag: true,
-                                    isScrollControlled: true,
-                                    barrierColor: Theme.of(context).shadowColor,
-                                    builder: (_) {
-                                      return BlocProvider.value(
-                                        value: cont.read<BookingBloc>(),
-                                        child: const AddInstructionWidget(),
+                                  return InkWell(
+                                    onTap: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isDismissible: true,
+                                        enableDrag: true,
+                                        isScrollControlled: true,
+                                        barrierColor: Theme.of(context).shadowColor,
+                                        builder: (_) {
+                                          return BlocProvider.value(
+                                            value: cont.read<BookingBloc>(),
+                                            child: const AddInstructionWidget(),
+                                          );
+                                        },
                                       );
                                     },
-                                  );
-                                },
-                                child: Center(
-                                  child: MyText(
-                                      text: AppLocalizations.of(context)!
-                                          .addInstructions,
-                                      textStyle: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(
+                                    child: Center(
+                                      child: MyText(
+                                          text: AppLocalizations.of(context)!
+                                              .addInstructions,
+                                          textStyle: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .copyWith(
                                             color: Theme.of(context)
                                                 .primaryColorDark,
                                             fontSize: 14,
                                           )),
-                                ),
+                                    ),
+                                  );
+                                },
                               );
-                            },
-                          );
-                        }),
+                            }),
                         SizedBox(height: size.width * 0.05),
                       ],
                       Row(
@@ -521,13 +570,13 @@ class BookingBottomWidget extends StatelessWidget {
                                   ? Theme.of(context).dividerColor
                                   : Theme.of(context).primaryColor,
                               buttonName: (bookingBloc.transportType ==
-                                          'delivery' &&
-                                      !bookingBloc.detailView)
+                                  'delivery' &&
+                                  !bookingBloc.detailView)
                                   ? AppLocalizations.of(context)!.continueN
                                   : (bookingBloc.scheduleDateTime.isEmpty)
-                                      ? AppLocalizations.of(context)!.rideNow
-                                      : AppLocalizations.of(context)!
-                                          .scheduleRide,
+                                  ? AppLocalizations.of(context)!.rideNow
+                                  : AppLocalizations.of(context)!
+                                  .scheduleRide,
                               isLoader: bookingBloc.isLoading,
                               onTap: () {
                                 if (bookingBloc.selectedVehicleIndex != 999) {
@@ -541,33 +590,33 @@ class BookingBottomWidget extends StatelessWidget {
                                         const Duration(milliseconds: 301), () {
                                       if (!context.mounted) return;
                                       context.read<BookingBloc>().detailView =
-                                          true;
+                                      true;
                                       context
                                           .read<BookingBloc>()
                                           .add(UpdateEvent());
                                     });
                                   } else {
                                     if ((bookingBloc.isOutstationRide &&
-                                            context
-                                                .read<BookingBloc>()
-                                                .isRoundTrip &&
-                                            context
-                                                .read<BookingBloc>()
-                                                .scheduleDateTimeForReturn
-                                                .isNotEmpty) ||
+                                        context
+                                            .read<BookingBloc>()
+                                            .isRoundTrip &&
+                                        context
+                                            .read<BookingBloc>()
+                                            .scheduleDateTimeForReturn
+                                            .isNotEmpty) ||
                                         ((bookingBloc.isOutstationRide &&
-                                                !context
-                                                    .read<BookingBloc>()
-                                                    .isRoundTrip) ||
+                                            !context
+                                                .read<BookingBloc>()
+                                                .isRoundTrip) ||
                                             (!bookingBloc.isOutstationRide))) {
                                       if (bookingBloc.transportType == 'taxi' ||
                                           (context
-                                                      .read<BookingBloc>()
-                                                      .transportType ==
-                                                  'delivery' &&
+                                              .read<BookingBloc>()
+                                              .transportType ==
+                                              'delivery' &&
                                               context
-                                                      .read<BookingBloc>()
-                                                      .selectedGoodsTypeId !=
+                                                  .read<BookingBloc>()
+                                                  .selectedGoodsTypeId !=
                                                   0)) {
                                         if (!hasLowWalletBalance) {
                                           bookingBloc.detailView = false;
@@ -578,91 +627,92 @@ class BookingBottomWidget extends StatelessWidget {
                                               .read<BookingBloc>()
                                               .isMultiTypeVechiles;
                                           bool biddingDispatch = !context
-                                                  .read<BookingBloc>()
-                                                  .isRentalRide
+                                              .read<BookingBloc>()
+                                              .isRentalRide
                                               ? context
-                                                      .read<BookingBloc>()
-                                                      .isMultiTypeVechiles
-                                                  ? context
-                                                          .read<BookingBloc>()
-                                                          .sortedEtaDetailsList[context
-                                                              .read<
-                                                                  BookingBloc>()
-                                                              .selectedVehicleIndex]
-                                                          .dispatchType !=
-                                                      'normal'
-                                                  : context
-                                                          .read<BookingBloc>()
-                                                          .etaDetailsList[context
-                                                              .read<
-                                                                  BookingBloc>()
-                                                              .selectedVehicleIndex]
-                                                          .dispatchType !=
-                                                      'normal'
+                                              .read<BookingBloc>()
+                                              .isMultiTypeVechiles
+                                              ? context
+                                              .read<BookingBloc>()
+                                              .sortedEtaDetailsList[context
+                                              .read<
+                                              BookingBloc>()
+                                              .selectedVehicleIndex]
+                                              .dispatchType !=
+                                              'normal'
+                                              : context
+                                              .read<BookingBloc>()
+                                              .etaDetailsList[context
+                                              .read<
+                                              BookingBloc>()
+                                              .selectedVehicleIndex]
+                                              .dispatchType !=
+                                              'normal'
                                               : false;
                                           if (((!multiVehicle &&
-                                                      biddingDispatch) ||
-                                                  (multiVehicle &&
-                                                      showBid &&
-                                                      biddingDispatch)) &&
+                                              biddingDispatch) ||
+                                              (multiVehicle &&
+                                                  showBid &&
+                                                  biddingDispatch)) &&
                                               context
-                                                      .read<BookingBloc>()
-                                                      .showSharedRide ==
+                                                  .read<BookingBloc>()
+                                                  .showSharedRide ==
                                                   false) {
                                             context
                                                 .read<BookingBloc>()
                                                 .add(EnableBiddingEvent());
                                           } else {
                                             if (context
-                                                    .read<BookingBloc>()
-                                                    .showSharedRide ==
+                                                .read<BookingBloc>()
+                                                .showSharedRide ==
                                                 false) {
                                               context.read<BookingBloc>().add(
-                                                      BookingCreateRequestEvent(
+                                                  BookingCreateRequestEvent(
+                                                    context: context,
                                                     userData: context
                                                         .read<BookingBloc>()
                                                         .userData!,
                                                     vehicleData: !context
-                                                            .read<BookingBloc>()
-                                                            .isRentalRide
+                                                        .read<BookingBloc>()
+                                                        .isRentalRide
                                                         ? context
-                                                                .read<
-                                                                    BookingBloc>()
-                                                                .isMultiTypeVechiles
-                                                            ? context
-                                                                    .read<
-                                                                        BookingBloc>()
-                                                                    .sortedEtaDetailsList[
-                                                                context
-                                                                    .read<
-                                                                        BookingBloc>()
-                                                                    .selectedVehicleIndex]
-                                                            : context
-                                                                    .read<
-                                                                        BookingBloc>()
-                                                                    .etaDetailsList[
-                                                                context
-                                                                    .read<
-                                                                        BookingBloc>()
-                                                                    .selectedVehicleIndex]
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .isMultiTypeVechiles
+                                                        ? context
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .sortedEtaDetailsList[
+                                                    context
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .selectedVehicleIndex]
                                                         : context
-                                                                .read<BookingBloc>()
-                                                                .rentalEtaDetailsList[
-                                                            context
-                                                                .read<
-                                                                    BookingBloc>()
-                                                                .selectedVehicleIndex],
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .etaDetailsList[
+                                                    context
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .selectedVehicleIndex]
+                                                        : context
+                                                        .read<BookingBloc>()
+                                                        .rentalEtaDetailsList[
+                                                    context
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .selectedVehicleIndex],
                                                     pickupAddressList:
-                                                        arg.pickupAddressList,
+                                                    arg.pickupAddressList,
                                                     dropAddressList:
-                                                        arg.stopAddressList,
+                                                    arg.stopAddressList,
                                                     selectedTransportType:
-                                                        context
-                                                            .read<BookingBloc>()
-                                                            .transportType,
+                                                    context
+                                                        .read<BookingBloc>()
+                                                        .transportType,
                                                     paidAt: context
-                                                            .read<BookingBloc>()
-                                                            .payAtDrop
+                                                        .read<BookingBloc>()
+                                                        .payAtDrop
                                                         ? 'Receiver'
                                                         : 'Sender',
                                                     selectedPaymentType: context
@@ -690,62 +740,63 @@ class BookingBottomWidget extends StatelessWidget {
                                                         .selectedCardToken,
                                                     parcelType: arg.title,
                                                     preferences: context
-                                                            .read<BookingBloc>()
-                                                            .selectPreference
-                                                            .isNotEmpty
+                                                        .read<BookingBloc>()
+                                                        .selectPreference
+                                                        .isNotEmpty
                                                         ? context
-                                                            .read<BookingBloc>()
-                                                            .selectPreference
+                                                        .read<BookingBloc>()
+                                                        .selectPreference
                                                         : context
-                                                            .read<BookingBloc>()
-                                                            .selectedPreferenceDetailsList,
+                                                        .read<BookingBloc>()
+                                                        .selectedPreferenceDetailsList,
                                                     sharedRide: context
-                                                            .read<BookingBloc>()
-                                                            .showSharedRide
+                                                        .read<BookingBloc>()
+                                                        .showSharedRide
                                                         ? 1
                                                         : null,
                                                     seatsTaken: context
-                                                            .read<BookingBloc>()
-                                                            .showSharedRide
+                                                        .read<BookingBloc>()
+                                                        .showSharedRide
                                                         ? context
-                                                            .read<BookingBloc>()
-                                                            .selectedSharedSeats
+                                                        .read<BookingBloc>()
+                                                        .selectedSharedSeats
                                                         : null,
                                                   ));
                                             } else {
                                               context.read<BookingBloc>().add(
-                                                      BookingCreateRequestEvent(
+                                                  BookingCreateRequestEvent(
+                                                    context: context,
                                                     userData: context
                                                         .read<BookingBloc>()
                                                         .userData!,
                                                     vehicleData: !context
-                                                            .read<BookingBloc>()
-                                                            .isRentalRide
+                                                        .read<BookingBloc>()
+                                                        .isRentalRide
                                                         ? context
-                                                                .read<BookingBloc>()
-                                                                .etaDetailsList[
-                                                            context
-                                                                .read<
-                                                                    BookingBloc>()
-                                                                .selectedVehicleIndex]
+                                                        .read<BookingBloc>()
+                                                        .etaDetailsList[
+                                                    context
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .selectedVehicleIndex]
                                                         : context
-                                                                .read<BookingBloc>()
-                                                                .rentalEtaDetailsList[
-                                                            context
-                                                                .read<
-                                                                    BookingBloc>()
-                                                                .selectedVehicleIndex],
+                                                        .read<BookingBloc>()
+                                                        .rentalEtaDetailsList[
+                                                    context
+                                                        .read<
+                                                        BookingBloc>()
+                                                        .selectedVehicleIndex],
                                                     pickupAddressList:
-                                                        arg.pickupAddressList,
+                                                    arg.pickupAddressList,
                                                     dropAddressList:
-                                                        arg.stopAddressList,
+                                                    arg.stopAddressList,
                                                     selectedTransportType:
-                                                        context
-                                                            .read<BookingBloc>()
-                                                            .transportType,
+                                                    context
+                                                        .read<BookingBloc>()
+                                                        .transportType,
                                                     paidAt: context
-                                                            .read<BookingBloc>()
-                                                            .payAtDrop
+                                                        .read<BookingBloc>()
+                                                        .payAtDrop
                                                         ? 'Receiver'
                                                         : 'Sender',
                                                     selectedPaymentType: context
@@ -773,26 +824,26 @@ class BookingBottomWidget extends StatelessWidget {
                                                         .selectedCardToken,
                                                     parcelType: arg.title,
                                                     preferences: context
-                                                            .read<BookingBloc>()
-                                                            .selectPreference
-                                                            .isNotEmpty
+                                                        .read<BookingBloc>()
+                                                        .selectPreference
+                                                        .isNotEmpty
                                                         ? context
-                                                            .read<BookingBloc>()
-                                                            .selectPreference
+                                                        .read<BookingBloc>()
+                                                        .selectPreference
                                                         : context
-                                                            .read<BookingBloc>()
-                                                            .selectedPreferenceDetailsList,
+                                                        .read<BookingBloc>()
+                                                        .selectedPreferenceDetailsList,
                                                     sharedRide: context
-                                                            .read<BookingBloc>()
-                                                            .showSharedRide
+                                                        .read<BookingBloc>()
+                                                        .showSharedRide
                                                         ? 1
                                                         : null,
                                                     seatsTaken: context
-                                                            .read<BookingBloc>()
-                                                            .showSharedRide
+                                                        .read<BookingBloc>()
+                                                        .showSharedRide
                                                         ? context
-                                                            .read<BookingBloc>()
-                                                            .selectedSharedSeats
+                                                        .read<BookingBloc>()
+                                                        .selectedSharedSeats
                                                         : null,
                                                   ));
                                             }
@@ -800,14 +851,14 @@ class BookingBottomWidget extends StatelessWidget {
                                         } else {
                                           showToast(
                                               message:
-                                                  AppLocalizations.of(context)!
-                                                      .lowWalletBalance);
+                                              AppLocalizations.of(context)!
+                                                  .lowWalletBalance);
                                         }
                                       } else {
                                         showToast(
                                             message:
-                                                AppLocalizations.of(context)!
-                                                    .pleaseSelectGoodsType);
+                                            AppLocalizations.of(context)!
+                                                .pleaseSelectGoodsType);
                                       }
                                     } else {
                                       showToast(
@@ -830,12 +881,12 @@ class BookingBottomWidget extends StatelessWidget {
                                 child: InkWell(
                                   onTap: () {
                                     context.read<BookingBloc>().add(
-                                          DetailViewUpdateEvent(context
-                                                  .read<BookingBloc>()
-                                                  .detailView
-                                              ? false
-                                              : true),
-                                        );
+                                      DetailViewUpdateEvent(context
+                                          .read<BookingBloc>()
+                                          .detailView
+                                          ? false
+                                          : true),
+                                    );
                                   },
                                   child: Icon(
                                     bookingBloc.detailView

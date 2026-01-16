@@ -499,5 +499,11 @@
      "preferences": "Preferencias",
      "planYourRide": "Planifica tu viaje",
      "changeEmail": "Cambiar correo electrónico",
-     "verifyEmailId": "Verifica tu correo electrónico"
-        }
+     "verifyEmailId": "Verifica tu correo electrónico",
+  "verifyEmailText": "Verificar dirección de correo electrónico",
+  "deliveryOutStation": "Estación de entrega",
+  "deliveryRental": "Alquiler de entrega",
+  "deliveryRide": "Entrega",
+  "unnamed_street": "Calle sin nombre"
+
+}

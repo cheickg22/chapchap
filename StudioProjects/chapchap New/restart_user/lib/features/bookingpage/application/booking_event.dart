@@ -84,8 +84,8 @@ class BookingEtaSelectEvent extends BookingEvent {
 
   BookingEtaSelectEvent(
       {required this.selectedVehicleIndex,
-      required this.isOutstationRide,
-      this.selectedTypeEta});
+        required this.isOutstationRide,
+        this.selectedTypeEta});
 }
 
 class BookingRentalPackageSelectEvent extends BookingEvent {
@@ -123,6 +123,8 @@ class TimerEvent extends BookingEvent {
 class NoDriversEvent extends BookingEvent {}
 
 class BookingCreateRequestEvent extends BookingEvent {
+  final BuildContext context;
+
   final UserDetail userData;
   final dynamic vehicleData;
   final List<AddressModel> pickupAddressList;
@@ -145,6 +147,7 @@ class BookingCreateRequestEvent extends BookingEvent {
   final int? seatsTaken;
 
   BookingCreateRequestEvent({
+    required this.context,
     required this.userData,
     required this.vehicleData,
     required this.pickupAddressList,
@@ -175,9 +178,9 @@ class BookingCancelRequestEvent extends BookingEvent {
 
   BookingCancelRequestEvent(
       {required this.requestId,
-      this.reason,
-      this.timerCancel,
-      this.customReason});
+        this.reason,
+        this.timerCancel,
+        this.customReason});
 }
 
 class TripRideCancelEvent extends BookingEvent {
@@ -245,6 +248,7 @@ class BiddingCreateRequestEvent extends BookingEvent {
   final String scheduleDateTimeForReturn;
   final String? parcelType;
   final List preferences;
+  final List preferencesIcons;
 
   BiddingCreateRequestEvent({
     required this.userData,
@@ -267,6 +271,7 @@ class BiddingCreateRequestEvent extends BookingEvent {
     required this.scheduleDateTimeForReturn,
     this.parcelType,
     required this.preferences,
+    required this.preferencesIcons,
   });
 }
 
@@ -308,19 +313,19 @@ class PolylineEvent extends BookingEvent {
   final bool? isDropChanged;
   PolylineEvent(
       {required this.pickLat,
-      required this.pickLng,
-      required this.dropLat,
-      required this.dropLng,
-      required this.stops,
-      required this.pickAddress,
-      required this.dropAddress,
-      this.isInitCall,
-      this.isDriverStream,
-      this.isDriverToPick,
-      this.arg,
-      this.icon,
-      this.markerId,
-      this.isDropChanged});
+        required this.pickLng,
+        required this.dropLat,
+        required this.dropLng,
+        required this.stops,
+        required this.pickAddress,
+        required this.dropAddress,
+        this.isInitCall,
+        this.isDriverStream,
+        this.isDriverToPick,
+        this.arg,
+        this.icon,
+        this.markerId,
+        this.isDropChanged});
 }
 
 class ChatWithDriverEvent extends BookingEvent {
@@ -364,8 +369,8 @@ class SelectBiddingOrDemandEvent extends BookingEvent {
 
   SelectBiddingOrDemandEvent(
       {required this.selectedTypeEta,
-      required this.isBidding,
-      required this.shareRide});
+        required this.isBidding,
+        required this.shareRide});
 }
 
 class UpdateMinChildSizeEvent extends BookingEvent {
@@ -398,11 +403,11 @@ class WalletPageReUpdateEvents extends BookingEvent {
   String money;
   WalletPageReUpdateEvents(
       {required this.from,
-      required this.url,
-      required this.userId,
-      required this.requestId,
-      required this.currencySymbol,
-      required this.money});
+        required this.url,
+        required this.userId,
+        required this.requestId,
+        required this.currencySymbol,
+        required this.money});
 }
 
 class InvoiceInitEvent extends BookingEvent {
@@ -477,8 +482,8 @@ class ReceiverContactEvent extends BookingEvent {
 
   ReceiverContactEvent(
       {required this.name,
-      required this.number,
-      required this.isReceiveMyself});
+        required this.number,
+        required this.isReceiveMyself});
 }
 
 class SelectContactDetailsEvent extends BookingEvent {}
@@ -492,10 +497,10 @@ class ChangeDestinationEvent extends BookingEvent {
 
   ChangeDestinationEvent(
       {required this.requestId,
-      required this.duration,
-      required this.distance,
-      required this.polyLine,
-      required this.dropAddressList});
+        required this.duration,
+        required this.distance,
+        required this.polyLine,
+        required this.dropAddressList});
 }
 
 class AddMarkersEvent extends BookingEvent {
@@ -537,7 +542,9 @@ class UpdateMapTypeEvent extends BookingEvent {
 class SelectedPreferenceEvent extends BookingEvent {
   final int prefId;
   final bool isSelected;
-  SelectedPreferenceEvent({required this.prefId, required this.isSelected});
+  final String prefIcon;
+  SelectedPreferenceEvent(
+      {required this.prefId, required this.isSelected, required this.prefIcon});
 }
 
 class ConfirmPreferenceSelectionEvent extends BookingEvent {
