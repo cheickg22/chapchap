@@ -1260,6 +1260,22 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     });
   }
 
+  String _stripHtmlTags(String htmlText) {
+    final regex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: false);
+    String strippedText = htmlText.replaceAll(regex, '');
+
+    strippedText = strippedText
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&apos;', "'");
+
+    return strippedText.trim();
+  }
+
   Future<String> _fetchAddressFromLatLng({
     required double latitude,
     required double longitude,
@@ -1290,9 +1306,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (response.statusCode != 200) {
         final translated = await _translateToArabic(
             nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
-        return translated ??
+        return _stripHtmlTags(translated ??
             nearestPlace ??
-            AppLocalizations.of(context)!.unnamed_street;
+            AppLocalizations.of(context)!.unnamed_street);
       }
 
       final data = response.data;
@@ -1301,9 +1317,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (status != "OK" && status != "ZERO_RESULTS") {
         final translated = await _translateToArabic(
             nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
-        return translated ??
+        return _stripHtmlTags(translated ??
             nearestPlace ??
-            AppLocalizations.of(context)!.unnamed_street;
+            AppLocalizations.of(context)!.unnamed_street);
       }
 
       final results = data["results"] as List?;
@@ -1311,9 +1327,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (results == null || results.isEmpty) {
         final translated = await _translateToArabic(
             nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
-        return translated ??
+        return _stripHtmlTags(translated ??
             nearestPlace ??
-            AppLocalizations.of(context)!.unnamed_street;
+            AppLocalizations.of(context)!.unnamed_street);
       }
 
       List? addressComponents;
@@ -1367,73 +1383,22 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (nearestPlace != null && nearestPlace.isNotEmpty) {
         addressPartsEnglish.add(nearestPlace);
       }
-      // else if (locality.isNotEmpty) {
-      //   addressPartsEnglish.add(locality);
-      // } else {
-      //   addressPartsEnglish.add(AppLocalizations.of(context)!.unnamed_street);
-      // }
-      //
-      // if (quartier != null && quartier.isNotEmpty) {
-      //   final quartierLower = quartier.toLowerCase();
-      //   if (!addressPartsEnglish
-      //       .any((part) => part.toLowerCase().contains(quartierLower))) {
-      //     addressPartsEnglish.add(quartier);
-      //     print("✓ Added quartier: $quartier");
-      //   }
-      // }
-      //
-      // if (neighborhood.isNotEmpty &&
-      //     !addressPartsEnglish.any((part) =>
-      //         part.toLowerCase().contains(neighborhood.toLowerCase()))) {
-      //   addressPartsEnglish.add(neighborhood);
-      // }
-      //
+
       if (sublocalityLevel1.isNotEmpty &&
           !addressPartsEnglish.any((part) =>
               part.toLowerCase().contains(sublocalityLevel1.toLowerCase()))) {
         addressPartsEnglish.add(sublocalityLevel1);
       }
-      //
-      // if (sublocality.isNotEmpty &&
-      //     !addressPartsEnglish.any((part) =>
-      //         part.toLowerCase().contains(sublocality.toLowerCase()))) {
-      //   addressPartsEnglish.add(sublocality);
-      // }
-      //
-      // if (locality.isNotEmpty &&
-      //     !addressPartsEnglish.any(
-      //             (part) => part.toLowerCase().contains(locality.toLowerCase()))) {
-      //   addressPartsEnglish.add(locality);
-      // }
-      //
-      // if (administrativeAreaLevel2.isNotEmpty &&
-      //     !addressPartsEnglish.any((part) => part
-      //         .toLowerCase()
-      //         .contains(administrativeAreaLevel2.toLowerCase()))) {
-      //   addressPartsEnglish.add(administrativeAreaLevel2);
-      // }
-      //
-      // if (administrativeAreaLevel1.isNotEmpty) {
-      //   addressPartsEnglish.add(administrativeAreaLevel1);
-      // }
-      //
-      // if (postalCode.isNotEmpty) {
-      //   addressPartsEnglish.add(postalCode);
-      // }
-      //
-      // if (country.isNotEmpty) {
-      //   addressPartsEnglish.add(country);
-      // }
 
       // Join English parts
-      final englishAddress = addressPartsEnglish.join(', ');
+      final englishAddress = addressPartsEnglish.join('- ');
 
       final arabicAddress = await _translateToArabic(englishAddress);
 
       if (arabicAddress != null && arabicAddress.isNotEmpty) {
-        return arabicAddress;
+        return _stripHtmlTags(arabicAddress);
       } else {
-        return englishAddress;
+        return _stripHtmlTags(englishAddress);
       }
     } catch (e) {
       return AppLocalizations.of(context)!.unnamed_street;
