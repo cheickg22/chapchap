@@ -207,7 +207,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
   double selectedEtaAmount = 0.0;
   TextEditingController filterCapacityController =
-  TextEditingController(text: '1');
+      TextEditingController(text: '1');
   int filterCapasity = 1;
   List filterCategory = [];
   List filterPermit = [];
@@ -224,7 +224,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   List<int> tempSelectPreference = [];
   List<String> tempSelectPreferenceIcons = [];
   final DraggableScrollableController draggableController =
-  DraggableScrollableController();
+      DraggableScrollableController();
 
   bool enableOndemandRides = false;
   bool enableBiddingRides = false;
@@ -416,11 +416,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     mapType = event.arg.mapType;
     pickUpAddressList = event.arg.pickupAddressList;
     dropAddressList =
-    ((event.arg.isRentalRide != null && event.arg.isRentalRide!) ||
-        (event.arg.isWithoutDestinationRide != null &&
-            event.arg.isWithoutDestinationRide!))
-        ? []
-        : event.arg.stopAddressList;
+        ((event.arg.isRentalRide != null && event.arg.isRentalRide!) ||
+                (event.arg.isWithoutDestinationRide != null &&
+                    event.arg.isWithoutDestinationRide!))
+            ? []
+            : event.arg.stopAddressList;
     userData = event.arg.userData;
     transportType = event.arg.transportType;
     polyLine = event.arg.polyString;
@@ -429,8 +429,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     requestData = event.arg.userData.onTripRequest != ""
         ? event.arg.userData.onTripRequest.data
         : event.arg.userData.metaRequest != ""
-        ? event.arg.userData.metaRequest.data
-        : null;
+            ? event.arg.userData.metaRequest.data
+            : null;
 
     if (dropAddressList.length >= 2) {
       minChildSize = 0.52;
@@ -462,8 +462,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                   event.arg.userData.userCanMakeARideAfterXMiniutes))));
       scheduleDateTime = DateTime.now()
           .add(Duration(
-          minutes:
-          int.parse(event.arg.userData.userCanMakeARideAfterXMiniutes)))
+              minutes:
+                  int.parse(event.arg.userData.userCanMakeARideAfterXMiniutes)))
           .toString();
     }
     if (event.arg.isRentalRide != null &&
@@ -543,7 +543,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               dropAddressList: dropAddressList,
               isOutstationRide: event.arg.isOutstationRide,
               isWithoutDestinationRide:
-              event.arg.isWithoutDestinationRide ?? false,
+                  event.arg.isWithoutDestinationRide ?? false,
               // preferenceId:event.arg.preferenceId!,
             ));
           }
@@ -563,7 +563,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               dropAddressList: [],
               isOutstationRide: event.arg.isOutstationRide,
               isWithoutDestinationRide:
-              event.arg.isWithoutDestinationRide ?? false,
+                  event.arg.isWithoutDestinationRide ?? false,
               // preferenceId: event.arg.preferenceId!
             ));
           }
@@ -584,8 +584,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                   (userData!.onTripRequest != null &&
                       userData!.onTripRequest != ""))) {
             if (((event.arg.isWithoutDestinationRide != null &&
-                !event.arg.isWithoutDestinationRide!) ||
-                (event.arg.isWithoutDestinationRide == null)) &&
+                        !event.arg.isWithoutDestinationRide!) ||
+                    (event.arg.isWithoutDestinationRide == null)) &&
                 ((event.arg.isRentalRide != null && !event.arg.isRentalRide!) ||
                     event.arg.isRentalRide == null)) {
               await addDistanceMarker(
@@ -610,10 +610,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               event.arg.stopAddressList.length > 1) {
             for (var i = 0; i < event.arg.stopAddressList.length; i++) {
               if (((event.arg.isWithoutDestinationRide != null &&
-                  !event.arg.isWithoutDestinationRide!) ||
-                  (event.arg.isWithoutDestinationRide == null)) &&
+                          !event.arg.isWithoutDestinationRide!) ||
+                      (event.arg.isWithoutDestinationRide == null)) &&
                   ((event.arg.isRentalRide != null &&
-                      !event.arg.isRentalRide!) ||
+                          !event.arg.isRentalRide!) ||
                       event.arg.isRentalRide == null)) {
                 await addDistanceMarker(
                     LatLng(double.parse(event.arg.droplat),
@@ -638,10 +638,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           } else {
             if (dropAddressList.isNotEmpty) {
               if (((event.arg.isWithoutDestinationRide != null &&
-                  !event.arg.isWithoutDestinationRide!) ||
-                  (event.arg.isWithoutDestinationRide == null)) &&
+                          !event.arg.isWithoutDestinationRide!) ||
+                      (event.arg.isWithoutDestinationRide == null)) &&
                   ((event.arg.isRentalRide != null &&
-                      !event.arg.isRentalRide!) ||
+                          !event.arg.isRentalRide!) ||
                       event.arg.isRentalRide == null)) {
                 await addDistanceMarker(
                     LatLng(double.parse(event.arg.droplat),
@@ -664,8 +664,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             }
           }
           if ((event.arg.isRentalRide == null ||
-              (event.arg.isRentalRide != null &&
-                  !event.arg.isRentalRide!)) &&
+                  (event.arg.isRentalRide != null &&
+                      !event.arg.isRentalRide!)) &&
               (event.arg.isWithoutDestinationRide == null ||
                   (event.arg.isWithoutDestinationRide != null &&
                       !event.arg.isWithoutDestinationRide!))) {
@@ -696,7 +696,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               // Initialize bidding flags based on current offer vs allowed range
               try {
                 final double baseline =
-                double.parse(requestData!.requestEtaAmount);
+                    double.parse(requestData!.requestEtaAmount);
                 final String lowPct = requestData!.biddingLowPercentage;
                 final double minAllowed = (lowPct == '0')
                     ? 0.0
@@ -713,10 +713,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                 if (googleMapController != null) {
                   googleMapController!.animateCamera(
                       CameraUpdate.newCameraPosition(CameraPosition(
-                        target: LatLng(double.parse(event.arg.picklat),
-                            double.parse(event.arg.picklng)),
-                        zoom: 17.0,
-                      )));
+                    target: LatLng(double.parse(event.arg.picklat),
+                        double.parse(event.arg.picklng)),
+                    zoom: 17.0,
+                  )));
                 }
               } else {
                 if (fmController != null) {
@@ -734,10 +734,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                 if (googleMapController != null) {
                   googleMapController!.animateCamera(
                       CameraUpdate.newCameraPosition(CameraPosition(
-                        target: LatLng(double.parse(event.arg.picklat),
-                            double.parse(event.arg.picklng)),
-                        zoom: 17.0,
-                      )));
+                    target: LatLng(double.parse(event.arg.picklat),
+                        double.parse(event.arg.picklng)),
+                    zoom: 17.0,
+                  )));
                 }
               } else {
                 if (fmController != null) {
@@ -794,7 +794,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     if (isRentalRide) {
       // Move the selected vehicle to the top of the list
       final selectedVehicle =
-      rentalEtaDetailsList.removeAt(selectedVehicleIndex);
+          rentalEtaDetailsList.removeAt(selectedVehicleIndex);
       rentalEtaDetailsList.insert(0, selectedVehicle);
       selectedVehicleIndex = 0;
       paymentList = rentalEtaDetailsList[0].paymentType.split(",");
@@ -803,13 +803,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           ? rentalEtaDetailsList[0].discountedTotel
           : rentalEtaDetailsList[0].fareAmount;
       rentalPreferenceDetailsList =
-      rentalEtaDetailsList[0].rentalPreferenceList!;
+          rentalEtaDetailsList[0].rentalPreferenceList!;
     } else {
       // // Move the selected vehicle to the top of the list
       if (event.selectedTypeEta != 'Shared') {
         if (isMultiTypeVechiles) {
           final selectedVehicle =
-          sortedEtaDetailsList.removeAt(selectedVehicleIndex);
+              sortedEtaDetailsList.removeAt(selectedVehicleIndex);
           sortedEtaDetailsList.insert(0, selectedVehicle);
           selectedVehicleIndex = 0;
         } else {
@@ -832,11 +832,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       selectedPaymentType = paymentList.isNotEmpty ? paymentList.first : '';
       selectedEtaAmount = isMultiTypeVechiles
           ? sortedEtaDetailsList[0].hasDiscount
-          ? sortedEtaDetailsList[0].discountTotal
-          : sortedEtaDetailsList[0].total
+              ? sortedEtaDetailsList[0].discountTotal
+              : sortedEtaDetailsList[0].total
           : etaDetailsList[0].hasDiscount
-          ? etaDetailsList[0].discountTotal
-          : etaDetailsList[0].total;
+              ? etaDetailsList[0].discountTotal
+              : etaDetailsList[0].total;
     }
     if (!event.isOutstationRide) {
       scheduleDateTime = '';
@@ -866,8 +866,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
   timerCount(BuildContext context,
       {required int duration,
-        bool? isCloseTimer,
-        required bool isNormalRide}) async {
+      bool? isCloseTimer,
+      required bool isNormalRide}) async {
     int count = duration;
 
     if (isCloseTimer == null && isNormalRide) {
@@ -995,7 +995,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         sharedRide: event.sharedRide,
         seatsTaken: event.seatsTaken);
     data.fold(
-          (error) {
+      (error) {
         if (error.message == 'logout') {
           emit(LogoutState());
         } else if (event.promocode != null) {
@@ -1011,7 +1011,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           showToast(message: '${error.message}');
         }
       },
-          (success) async {
+      (success) async {
         etaDetailsList.clear();
         sortedEtaDetailsList.clear();
         nearByEtaVechileList.clear();
@@ -1028,7 +1028,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           enableShareRides = success.enabledDispatchType.shared;
           if (etaDetailsList.any((element) => element.dispatchType == 'both') ||
               (etaDetailsList
-                  .any((element) => element.dispatchType == 'normal') &&
+                      .any((element) => element.dispatchType == 'normal') &&
                   etaDetailsList
                       .any((element) => element.dispatchType == 'bidding'))) {
             isMultiTypeVechiles = true;
@@ -1058,20 +1058,20 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               ? sortedEtaDetailsList[selectedVehicleIndex].preferenceList
               : etaDetailsList[selectedVehicleIndex].preferenceList;
           savedCardList =
-          (success.savedCards != null) ? success.savedCards! : [];
+              (success.savedCards != null) ? success.savedCards! : [];
           paymentList = isMultiTypeVechiles
               ? sortedEtaDetailsList[selectedVehicleIndex]
-              .paymentType
-              .split(',')
+                  .paymentType
+                  .split(',')
               : etaDetailsList[selectedVehicleIndex].paymentType.split(',');
           selectedPaymentType = paymentList.isNotEmpty ? paymentList.first : '';
           selectedEtaAmount = isMultiTypeVechiles
               ? sortedEtaDetailsList[selectedVehicleIndex].hasDiscount
-              ? sortedEtaDetailsList[selectedVehicleIndex].discountTotal
-              : sortedEtaDetailsList[selectedVehicleIndex].total
+                  ? sortedEtaDetailsList[selectedVehicleIndex].discountTotal
+                  : sortedEtaDetailsList[selectedVehicleIndex].total
               : etaDetailsList[selectedVehicleIndex].hasDiscount
-              ? etaDetailsList[selectedVehicleIndex].discountTotal
-              : etaDetailsList[selectedVehicleIndex].total;
+                  ? etaDetailsList[selectedVehicleIndex].discountTotal
+                  : etaDetailsList[selectedVehicleIndex].total;
 
           if (event.promocode != null) {
             // applyCoupon = false;
@@ -1106,7 +1106,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     );
 
     data.fold(
-          (error) {
+      (error) {
         if (error.message == 'logout') {
           emit(LogoutState());
         } else if (event.promocode != null) {
@@ -1116,7 +1116,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           showToast(message: '${error.message}');
         }
       },
-          (success) async {
+      (success) async {
         rentalPackagesList = success.data;
         savedCardList = success.savedCards;
 
@@ -1147,7 +1147,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
     selectedPackageId = rentalPackagesList[selectedPackageIndex].id.toString();
     rentalEtaDetailsList = (rentalPackagesList.isNotEmpty &&
-        rentalPackagesList[selectedPackageIndex].typesWithPrice != null)
+            rentalPackagesList[selectedPackageIndex].typesWithPrice != null)
         ? rentalPackagesList[selectedPackageIndex].typesWithPrice!.data
         : [];
     if (rentalEtaDetailsList.isNotEmpty) {
@@ -1216,12 +1216,12 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             if (e['is_active'] == 1 &&
                 e['is_available'] == true &&
                 ((e['vehicle_types'] != null &&
-                    e['vehicle_types']
-                        .contains(nearByEtaVechileList[i].typeId)) ||
+                        e['vehicle_types']
+                            .contains(nearByEtaVechileList[i].typeId)) ||
                     (e['vehicle_type'] != null &&
                         e['vehicle_type'] == nearByEtaVechileList[i].typeId))) {
               DateTime dt =
-              DateTime.fromMillisecondsSinceEpoch(e['updated_at']);
+                  DateTime.fromMillisecondsSinceEpoch(e['updated_at']);
               if (DateTime.now().difference(dt).inMinutes <= 2) {
                 vehicles.add(e);
                 if (vehicles.isNotEmpty) {
@@ -1366,63 +1366,64 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
       if (nearestPlace != null && nearestPlace.isNotEmpty) {
         addressPartsEnglish.add(nearestPlace);
-      } else if (locality.isNotEmpty) {
-        addressPartsEnglish.add(locality);
-      } else {
-        addressPartsEnglish.add(AppLocalizations.of(context)!.unnamed_street);
       }
-
-      if (quartier != null && quartier.isNotEmpty) {
-        final quartierLower = quartier.toLowerCase();
-        if (!addressPartsEnglish
-            .any((part) => part.toLowerCase().contains(quartierLower))) {
-          addressPartsEnglish.add(quartier);
-          print("✓ Added quartier: $quartier");
-        }
-      }
-
-      if (neighborhood.isNotEmpty &&
-          !addressPartsEnglish.any((part) =>
-              part.toLowerCase().contains(neighborhood.toLowerCase()))) {
-        addressPartsEnglish.add(neighborhood);
-      }
-
+      // else if (locality.isNotEmpty) {
+      //   addressPartsEnglish.add(locality);
+      // } else {
+      //   addressPartsEnglish.add(AppLocalizations.of(context)!.unnamed_street);
+      // }
+      //
+      // if (quartier != null && quartier.isNotEmpty) {
+      //   final quartierLower = quartier.toLowerCase();
+      //   if (!addressPartsEnglish
+      //       .any((part) => part.toLowerCase().contains(quartierLower))) {
+      //     addressPartsEnglish.add(quartier);
+      //     print("✓ Added quartier: $quartier");
+      //   }
+      // }
+      //
+      // if (neighborhood.isNotEmpty &&
+      //     !addressPartsEnglish.any((part) =>
+      //         part.toLowerCase().contains(neighborhood.toLowerCase()))) {
+      //   addressPartsEnglish.add(neighborhood);
+      // }
+      //
       if (sublocalityLevel1.isNotEmpty &&
           !addressPartsEnglish.any((part) =>
               part.toLowerCase().contains(sublocalityLevel1.toLowerCase()))) {
         addressPartsEnglish.add(sublocalityLevel1);
       }
-
-      if (sublocality.isNotEmpty &&
-          !addressPartsEnglish.any((part) =>
-              part.toLowerCase().contains(sublocality.toLowerCase()))) {
-        addressPartsEnglish.add(sublocality);
-      }
-
-      if (locality.isNotEmpty &&
-          !addressPartsEnglish.any(
-                  (part) => part.toLowerCase().contains(locality.toLowerCase()))) {
-        addressPartsEnglish.add(locality);
-      }
-
-      if (administrativeAreaLevel2.isNotEmpty &&
-          !addressPartsEnglish.any((part) => part
-              .toLowerCase()
-              .contains(administrativeAreaLevel2.toLowerCase()))) {
-        addressPartsEnglish.add(administrativeAreaLevel2);
-      }
-
-      if (administrativeAreaLevel1.isNotEmpty) {
-        addressPartsEnglish.add(administrativeAreaLevel1);
-      }
-
-      if (postalCode.isNotEmpty) {
-        addressPartsEnglish.add(postalCode);
-      }
-
-      if (country.isNotEmpty) {
-        addressPartsEnglish.add(country);
-      }
+      //
+      // if (sublocality.isNotEmpty &&
+      //     !addressPartsEnglish.any((part) =>
+      //         part.toLowerCase().contains(sublocality.toLowerCase()))) {
+      //   addressPartsEnglish.add(sublocality);
+      // }
+      //
+      // if (locality.isNotEmpty &&
+      //     !addressPartsEnglish.any(
+      //             (part) => part.toLowerCase().contains(locality.toLowerCase()))) {
+      //   addressPartsEnglish.add(locality);
+      // }
+      //
+      // if (administrativeAreaLevel2.isNotEmpty &&
+      //     !addressPartsEnglish.any((part) => part
+      //         .toLowerCase()
+      //         .contains(administrativeAreaLevel2.toLowerCase()))) {
+      //   addressPartsEnglish.add(administrativeAreaLevel2);
+      // }
+      //
+      // if (administrativeAreaLevel1.isNotEmpty) {
+      //   addressPartsEnglish.add(administrativeAreaLevel1);
+      // }
+      //
+      // if (postalCode.isNotEmpty) {
+      //   addressPartsEnglish.add(postalCode);
+      // }
+      //
+      // if (country.isNotEmpty) {
+      //   addressPartsEnglish.add(country);
+      // }
 
       // Join English parts
       final englishAddress = addressPartsEnglish.join(', ');
@@ -1595,7 +1596,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     try {
       final dio = Dio();
 
-      final parts = text.split(',').map((e) => e.trim()).toList();
+      final parts = text.split('-').map((e) => e.trim()).toList();
 
       final translatedParts = <String>[];
 
@@ -1632,7 +1633,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               final data = myMemoryResponse.data;
               if (data is Map && data['responseStatus'] == 200) {
                 final translated =
-                data['responseData']?['translatedText']?.toString();
+                    data['responseData']?['translatedText']?.toString();
                 if (translated != null &&
                     translated.isNotEmpty &&
                     translated != part && // Not same as original
@@ -1723,7 +1724,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         return null;
       }
 
-      final result = translatedParts.join('، ');
+      final result = translatedParts.join('- ');
       return result;
     } catch (e, stackTrace) {
       return null;
@@ -1744,6 +1745,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       addressList: event.dropAddressList,
       context: event.context,
     );
+    pickUpAddressList = updatedPickupAddresses;
+    dropAddressList = updatedDropAddresses;
+
     final data = await serviceLocator<BookingUsecase>().createRequest(
         userData: event.userData,
         vehicleData: event.vehicleData,
@@ -1753,21 +1757,21 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         paidAt: event.paidAt,
         parcelType: event.parcelType,
         selectedPaymentType:
-        event.cardToken.isNotEmpty ? 'card' : event.selectedPaymentType,
+            event.cardToken.isNotEmpty ? 'card' : event.selectedPaymentType,
         cardToken: event.cardToken,
         scheduleDateTime: event.scheduleDateTime,
         isEtaRental: event.isRentalRide,
         isBidRide: false,
         goodsTypeId: event.goodsTypeId,
         goodsQuantity:
-        event.goodsQuantity.isEmpty ? 'Loose' : event.goodsQuantity,
+            event.goodsQuantity.isEmpty ? 'Loose' : event.goodsQuantity,
         offeredRideFare: "",
         polyLine: event.polyLine,
         isAirport: ((event.pickupAddressList.first.isAirportLocation != null &&
-            event.pickupAddressList.first.isAirportLocation!) ||
-            (event.dropAddressList.any((element) =>
-            (element.isAirportLocation != null &&
-                element.isAirportLocation!))))
+                    event.pickupAddressList.first.isAirportLocation!) ||
+                (event.dropAddressList.any((element) =>
+                    (element.isAirportLocation != null &&
+                        element.isAirportLocation!))))
             ? true
             : false,
         isParcel: (event.selectedTransportType == 'delivery') ? true : false,
@@ -1780,7 +1784,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         seatsTaken: event.seatsTaken,
         preferences: event.preferences);
     data.fold(
-          (error) {
+      (error) {
         isLoading = false;
         if (error.message == 'logout') {
           emit(LogoutState());
@@ -1789,7 +1793,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           emit(BookingCreateRequestFailureState());
         }
       },
-          (success) async {
+      (success) async {
         isLoading = false;
         isTripStart = true;
         nearByVechileSubscription?.cancel();
@@ -1804,10 +1808,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               if (googleMapController != null) {
                 googleMapController!.animateCamera(
                     CameraUpdate.newCameraPosition(CameraPosition(
-                      target: LatLng(event.pickupAddressList.first.lat,
-                          event.pickupAddressList.first.lng),
-                      zoom: 15.5,
-                    )));
+                  target: LatLng(event.pickupAddressList.first.lat,
+                      event.pickupAddressList.first.lng),
+                  zoom: 15.5,
+                )));
               }
             } else {
               if (fmController != null) {
@@ -1838,14 +1842,14 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         timerCancel: event.timerCancel,
         customReason: event.customReason);
     data.fold(
-          (error) {
+      (error) {
         debugPrint(error.toString());
         emit(BookingLoadingStopState());
         if (error.message == 'logout') {
           emit(LogoutState());
         }
       },
-          (success) {
+      (success) {
         requestData = null;
         isTripStart = false;
         isNormalRideSearching = false;
@@ -1959,7 +1963,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           etaDurationStream?.cancel();
         }
         if ((requestData!.isTripStart != 1 ||
-            requestData!.isOutStation == '1') &&
+                requestData!.isOutStation == '1') &&
             (requestData!.arrivedAt != '') &&
             (requestData!.dropLat != '0' &&
                 requestData!.dropLng != '0' &&
@@ -2003,30 +2007,30 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           final marker = (driverData!.vehicleTypeIcon == 'truck')
               ? truckMarker
               : (driverData!.vehicleTypeIcon == 'motor_bike')
-              ? bikeMarker
-              : (driverData!.vehicleTypeIcon == 'auto')
-              ? autoMarker
-              : (driverData!.vehicleTypeIcon == 'lcv')
-              ? lcv
-              : (driverData!.vehicleTypeIcon == 'ehcv')
-              ? ehcv
-              : (driverData!.vehicleTypeIcon == 'hatchback')
-              ? hatchBack
-              : (driverData!.vehicleTypeIcon == 'hcv')
-              ? hcv
-              : (driverData!.vehicleTypeIcon == 'mcv')
-              ? mcv
-              : (driverData!.vehicleTypeIcon ==
-              'luxury')
-              ? luxury
-              : (driverData!.vehicleTypeIcon ==
-              'premium')
-              ? premium
-              : (driverData!
-              .vehicleTypeIcon ==
-              'suv')
-              ? suv
-              : carMarker;
+                  ? bikeMarker
+                  : (driverData!.vehicleTypeIcon == 'auto')
+                      ? autoMarker
+                      : (driverData!.vehicleTypeIcon == 'lcv')
+                          ? lcv
+                          : (driverData!.vehicleTypeIcon == 'ehcv')
+                              ? ehcv
+                              : (driverData!.vehicleTypeIcon == 'hatchback')
+                                  ? hatchBack
+                                  : (driverData!.vehicleTypeIcon == 'hcv')
+                                      ? hcv
+                                      : (driverData!.vehicleTypeIcon == 'mcv')
+                                          ? mcv
+                                          : (driverData!.vehicleTypeIcon ==
+                                                  'luxury')
+                                              ? luxury
+                                              : (driverData!.vehicleTypeIcon ==
+                                                      'premium')
+                                                  ? premium
+                                                  : (driverData!
+                                                              .vehicleTypeIcon ==
+                                                          'suv')
+                                                      ? suv
+                                                      : carMarker;
           if (requestData!.polyLine.isNotEmpty) {
             markerList.clear();
             markerList.add(Marker(
@@ -2044,7 +2048,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             if (userData != null &&
                 requestData!.requestStops.data.isEmpty &&
                 ((userData!.metaRequest != null &&
-                    userData!.metaRequest != "") ||
+                        userData!.metaRequest != "") ||
                     (userData!.onTripRequest != null &&
                         userData!.onTripRequest != ""))) {
               markerList.add(Marker(
@@ -2104,8 +2108,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               dropLat: double.parse(requestData!.dropLat),
               dropLng: double.parse(requestData!.dropLng),
               stops: (requestData != null &&
-                  requestData!.arrivedAt != "" &&
-                  dropAddressList.length > 1)
+                      requestData!.arrivedAt != "" &&
+                      dropAddressList.length > 1)
                   ? dropAddressList
                   : [],
               pickAddress: '',
@@ -2405,29 +2409,29 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       final marker = (driver['vehicle_type_icon'] == 'truck')
           ? truckMarker
           : (driver['vehicle_type_icon'] == 'motor_bike')
-          ? bikeMarker
-          : (driver['vehicle_type_icon'] == 'auto')
-          ? autoMarker
-          : (driver['vehicle_type_icon'] == 'lcv')
-          ? lcv
-          : (driver['vehicle_type_icon'] == 'ehcv')
-          ? ehcv
-          : (driver['vehicle_type_icon'] == 'hatchback')
-          ? hatchBack
-          : (driver['vehicle_type_icon'] == 'hcv')
-          ? hcv
-          : (driver['vehicle_type_icon'] == 'mcv')
-          ? mcv
-          : (driver['vehicle_type_icon'] ==
-          'luxury')
-          ? luxury
-          : (driver['vehicle_type_icon'] ==
-          'premium')
-          ? premium
-          : (driver['vehicle_type_icon'] ==
-          'suv')
-          ? suv
-          : carMarker;
+              ? bikeMarker
+              : (driver['vehicle_type_icon'] == 'auto')
+                  ? autoMarker
+                  : (driver['vehicle_type_icon'] == 'lcv')
+                      ? lcv
+                      : (driver['vehicle_type_icon'] == 'ehcv')
+                          ? ehcv
+                          : (driver['vehicle_type_icon'] == 'hatchback')
+                              ? hatchBack
+                              : (driver['vehicle_type_icon'] == 'hcv')
+                                  ? hcv
+                                  : (driver['vehicle_type_icon'] == 'mcv')
+                                      ? mcv
+                                      : (driver['vehicle_type_icon'] ==
+                                              'luxury')
+                                          ? luxury
+                                          : (driver['vehicle_type_icon'] ==
+                                                  'premium')
+                                              ? premium
+                                              : (driver['vehicle_type_icon'] ==
+                                                      'suv')
+                                                  ? suv
+                                                  : carMarker;
 
       if (vsync != null &&
           (driverPosition != null &&
@@ -2485,23 +2489,23 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           await addDistanceMarker(
               (requestData != null && requestData!.arrivedAt == "")
                   ? LatLng(double.parse(requestData!.pickLat),
-                  double.parse(requestData!.pickLng))
+                      double.parse(requestData!.pickLng))
                   : LatLng(double.parse(requestData!.dropLat),
-                  double.parse(requestData!.dropLng)),
+                      double.parse(requestData!.dropLng)),
               double.tryParse(distance)!,
               time: double.parse(duration));
         } else {
           markerList.removeWhere(
-                  (element) => element.markerId == const MarkerId('distance'));
+              (element) => element.markerId == const MarkerId('distance'));
         }
         if (!requestData!.isRental) {
           markerList.add(Marker(
             markerId: const MarkerId("drop"),
             position: (requestData != null && requestData!.arrivedAt == "")
                 ? LatLng(double.parse(requestData!.pickLat),
-                double.parse(requestData!.pickLng))
+                    double.parse(requestData!.pickLng))
                 : LatLng(double.parse(requestData!.dropLat),
-                double.parse(requestData!.dropLng)),
+                    double.parse(requestData!.dropLng)),
             rotation: 0.0,
             icon: await MarkerWidget(
               isPickup: (requestData != null && requestData!.arrivedAt == "")
@@ -2536,9 +2540,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           polyLine = '';
           polylines.clear();
           markerList.removeWhere(
-                  (element) => element.markerId.value.contains('drop'));
+              (element) => element.markerId.value.contains('drop'));
           markerList.removeWhere(
-                  (element) => element.markerId == const MarkerId('distance'));
+              (element) => element.markerId == const MarkerId('distance'));
         }
       }
     });
@@ -2558,13 +2562,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         ratings: event.ratings,
         feedBack: event.feedBack);
     data.fold(
-          (error) {
+      (error) {
         debugPrint(error.toString());
         if (error.message == 'logout') {
           emit(LogoutState());
         }
       },
-          (success) {
+      (success) {
         emit(BookingUserRatingsSuccessState());
       },
     );
@@ -2575,13 +2579,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     if (goodsTypeList.isEmpty) {
       final data = await serviceLocator<BookingUsecase>().getGoodsTypes();
       data.fold(
-            (error) {
+        (error) {
           debugPrint(error.toString());
           if (error.message == 'logout') {
             emit(LogoutState());
           }
         },
-            (success) {
+        (success) {
           goodsTypeList = success.data;
           emit(SelectGoodsTypeState());
         },
@@ -2605,11 +2609,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
       final double totalValue = multi
           ? (isOutstationRide && isRoundTrip)
-          ? (sortedEtaDetailsList[selectedVehicleIndex].total * 2)
-          : sortedEtaDetailsList[selectedVehicleIndex].total
+              ? (sortedEtaDetailsList[selectedVehicleIndex].total * 2)
+              : sortedEtaDetailsList[selectedVehicleIndex].total
           : (isOutstationRide && isRoundTrip)
-          ? (etaDetailsList[selectedVehicleIndex].total * 2)
-          : etaDetailsList[selectedVehicleIndex].total;
+              ? (etaDetailsList[selectedVehicleIndex].total * 2)
+              : etaDetailsList[selectedVehicleIndex].total;
 
       // Prefill bid value if empty
       if (farePriceController.text.isEmpty) {
@@ -2652,11 +2656,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         : etaDetailsList[selectedVehicleIndex].basePrice;
     final double totalValue = isMultiTypeVechiles
         ? (event.isOutStation && isRoundTrip)
-        ? (sortedEtaDetailsList[selectedVehicleIndex].total * 2)
-        : sortedEtaDetailsList[selectedVehicleIndex].total
+            ? (sortedEtaDetailsList[selectedVehicleIndex].total * 2)
+            : sortedEtaDetailsList[selectedVehicleIndex].total
         : (event.isOutStation && isRoundTrip)
-        ? (etaDetailsList[selectedVehicleIndex].total * 2)
-        : etaDetailsList[selectedVehicleIndex].total;
+            ? (etaDetailsList[selectedVehicleIndex].total * 2)
+            : etaDetailsList[selectedVehicleIndex].total;
 
     if (farePriceController.text.isEmpty) {
       farePriceController.text = (requestData != null)
@@ -2667,21 +2671,21 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (event.isIncrease) {
         if (bidHighPercentage == "0" ||
             (double.parse(farePriceController.text.toString()) +
-                (double.parse(userData!.biddingAmountIncreaseOrDecrease
-                    .toString()))) <=
+                    (double.parse(userData!.biddingAmountIncreaseOrDecrease
+                        .toString()))) <=
                 (totalValue +
                     ((double.parse(bidHighPercentage) / 100) * totalValue))) {
           isBiddingIncreaseLimitReach = false;
           isBiddingDecreaseLimitReach = false;
           farePriceController.text = (farePriceController.text.isEmpty)
               ? (basePrice +
-              double.parse(
-                  userData!.biddingAmountIncreaseOrDecrease.toString()))
-              .toStringAsFixed(2)
+                      double.parse(
+                          userData!.biddingAmountIncreaseOrDecrease.toString()))
+                  .toStringAsFixed(2)
               : (double.parse(farePriceController.text.toString()) +
-              double.parse(
-                  userData!.biddingAmountIncreaseOrDecrease.toString()))
-              .toStringAsFixed(2);
+                      double.parse(
+                          userData!.biddingAmountIncreaseOrDecrease.toString()))
+                  .toStringAsFixed(2);
         } else {
           isBiddingIncreaseLimitReach = true;
           isBiddingDecreaseLimitReach = false;
@@ -2689,7 +2693,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         emit(BookingUpdateState());
       } else {
         final double step =
-        double.parse(userData!.biddingAmountIncreaseOrDecrease.toString());
+            double.parse(userData!.biddingAmountIncreaseOrDecrease.toString());
         final double currentPrice = farePriceController.text.isNotEmpty
             ? double.parse(farePriceController.text.toString())
             : totalValue;
@@ -2697,7 +2701,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         final double minAllowedPrice = bidLowPercentage == "0"
             ? 0.0
             : totalValue -
-            ((double.parse(bidLowPercentage) / 100) * totalValue);
+                ((double.parse(bidLowPercentage) / 100) * totalValue);
 
         // Only decrease if after decreasing we are still >= minAllowedPrice
         final double nextPrice = currentPrice - step;
@@ -2720,10 +2724,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     } else {
       if (event.isIncrease) {
         if ((requestData != null &&
-            requestData!.biddingHighPercentage == "0") ||
+                requestData!.biddingHighPercentage == "0") ||
             (double.parse(farePriceController.text.toString()) +
-                (double.parse(userData!.biddingAmountIncreaseOrDecrease
-                    .toString()))) <=
+                    (double.parse(userData!.biddingAmountIncreaseOrDecrease
+                        .toString()))) <=
                 (double.parse(requestData!.requestEtaAmount) +
                     ((double.parse(requestData!.biddingHighPercentage) / 100) *
                         double.parse(requestData!.requestEtaAmount)))) {
@@ -2731,16 +2735,16 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           isBiddingDecreaseLimitReach = false;
           farePriceController.text = (farePriceController.text.isEmpty)
               ? (double.parse(requestData!.offerredRideFare) +
-              double.parse(
-                  userData!.biddingAmountIncreaseOrDecrease.toString()))
-              .toStringAsFixed(2)
+                      double.parse(
+                          userData!.biddingAmountIncreaseOrDecrease.toString()))
+                  .toStringAsFixed(2)
               : (double.parse(farePriceController.text.toString()) +
-              double.parse(
-                  userData!.biddingAmountIncreaseOrDecrease.toString()))
-              .toStringAsFixed(2);
+                      double.parse(
+                          userData!.biddingAmountIncreaseOrDecrease.toString()))
+                  .toStringAsFixed(2);
           if (!((double.parse(farePriceController.text.toString()) +
-              (double.parse(
-                  userData!.biddingAmountIncreaseOrDecrease.toString()))) <=
+                  (double.parse(
+                      userData!.biddingAmountIncreaseOrDecrease.toString()))) <=
               (double.parse(requestData!.requestEtaAmount) +
                   ((double.parse(requestData!.biddingHighPercentage) / 100) *
                       double.parse(requestData!.requestEtaAmount))))) {
@@ -2755,7 +2759,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       } else {
         // Decrease branch for existing request (requestData != null)
         final double step =
-        double.parse(userData!.biddingAmountIncreaseOrDecrease.toString());
+            double.parse(userData!.biddingAmountIncreaseOrDecrease.toString());
         final double baseline = double.parse(requestData!.requestEtaAmount);
         final double currentPrice = farePriceController.text.isNotEmpty
             ? double.parse(farePriceController.text.toString())
@@ -2797,23 +2801,23 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         paidAt: event.paidAt,
         parcelType: event.parcelType,
         selectedPaymentType:
-        event.cardToken.isNotEmpty ? 'card' : event.selectedPaymentType,
+            event.cardToken.isNotEmpty ? 'card' : event.selectedPaymentType,
         cardToken: event.cardToken,
         scheduleDateTime: event.scheduleDateTime,
         isEtaRental: false,
         isBidRide: true,
         goodsTypeId: event.goodsTypeId,
         goodsQuantity:
-        event.goodsQuantity.isEmpty ? 'Loose' : event.goodsQuantity,
+            event.goodsQuantity.isEmpty ? 'Loose' : event.goodsQuantity,
         offeredRideFare: event.offeredRideFare,
         polyLine: event.polyLine,
         // isPetAvailable: event.isPetAvailable,
         // isLuggageAvailable: event.isLuggageAvailable,
         isAirport: ((event.pickupAddressList.first.isAirportLocation != null &&
-            event.pickupAddressList.first.isAirportLocation!) ||
-            (event.dropAddressList.any((element) =>
-            (element.isAirportLocation != null &&
-                element.isAirportLocation!))))
+                    event.pickupAddressList.first.isAirportLocation!) ||
+                (event.dropAddressList.any((element) =>
+                    (element.isAirportLocation != null &&
+                        element.isAirportLocation!))))
             ? true
             : false,
         isParcel: (event.selectedTransportType == 'delivery') ? true : false,
@@ -2823,7 +2827,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         taxiInstruction: instructionsController.text,
         preferences: event.preferences);
     data.fold(
-          (error) {
+      (error) {
         isLoading = false;
         if (error.message == 'logout') {
           emit(LogoutState());
@@ -2832,7 +2836,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           emit(BiddingCreateRequestFailureState());
         }
       },
-          (success) {
+      (success) {
         isLoading = false;
         requestData = OnTripRequestData.fromJson(success["data"]);
         isBiddingDecreaseLimitReach = false;
@@ -2860,7 +2864,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                 ? jsonEncode(event.dropAddressList)
                 : 'null',
             'goods': (requestData!.transportType != 'taxi' &&
-                requestData!.goodsType != '-')
+                    requestData!.goodsType != '-')
                 ? '${requestData!.goodsType} - ${requestData!.goodsTypeQuantity}'
                 : 'null',
             'pick_lat': double.parse(requestData!.pickLat),
@@ -2871,20 +2875,20 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             'is_out_station': event.isOutstationRide,
             'distance': event.isOutstationRide
                 ? userData!.distanceUnit == 'mi'
-                ? ((double.parse(requestData!.totalDistance) * 1.60934) *
-                1000)
-                .toString()
-                : (double.parse(requestData!.totalDistance) * 1000)
-                .toString()
+                    ? ((double.parse(requestData!.totalDistance) * 1.60934) *
+                            1000)
+                        .toString()
+                    : (double.parse(requestData!.totalDistance) * 1000)
+                        .toString()
                 : isMultiTypeVechiles
-                ? sortedEtaDetailsList[selectedVehicleIndex].distance
-                : etaDetailsList[selectedVehicleIndex].distance.toString(),
+                    ? sortedEtaDetailsList[selectedVehicleIndex].distance
+                    : etaDetailsList[selectedVehicleIndex].distance.toString(),
             'completed_ride_count': userData!.completedRideCount,
             'ratings': userData!.rating,
             'trip_type': event.isOutstationRide
                 ? event.isRoundTrip
-                ? 'Round Trip'
-                : 'One Way Trip'
+                    ? 'Round Trip'
+                    : 'One Way Trip'
                 : 'Bidding',
             'start_date': requestData!.tripStartTime,
             'return_date': requestData!.returnTime,
@@ -2908,15 +2912,15 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               final bool multi = isMultiTypeVechiles;
               final String lowPct = multi
                   ? sortedEtaDetailsList[selectedVehicleIndex]
-                  .biddingLowPercentage
+                      .biddingLowPercentage
                   : etaDetailsList[selectedVehicleIndex].biddingLowPercentage;
               final double totalValue = multi
                   ? (isOutstationRide && isRoundTrip)
-                  ? (sortedEtaDetailsList[selectedVehicleIndex].total * 2)
-                  : sortedEtaDetailsList[selectedVehicleIndex].total
+                      ? (sortedEtaDetailsList[selectedVehicleIndex].total * 2)
+                      : sortedEtaDetailsList[selectedVehicleIndex].total
                   : (isOutstationRide && isRoundTrip)
-                  ? (etaDetailsList[selectedVehicleIndex].total * 2)
-                  : etaDetailsList[selectedVehicleIndex].total;
+                      ? (etaDetailsList[selectedVehicleIndex].total * 2)
+                      : etaDetailsList[selectedVehicleIndex].total;
               final double minAllowed = (lowPct == '0')
                   ? 0.0
                   : totalValue - ((double.parse(lowPct) / 100) * totalValue);
@@ -2932,10 +2936,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               if (googleMapController != null) {
                 googleMapController!.animateCamera(
                     CameraUpdate.newCameraPosition(CameraPosition(
-                      target: LatLng(event.pickupAddressList.first.lat,
-                          event.pickupAddressList.first.lng),
-                      zoom: 17.0,
-                    )));
+                  target: LatLng(event.pickupAddressList.first.lat,
+                      event.pickupAddressList.first.lng),
+                  zoom: 17.0,
+                )));
               }
             } else {
               if (fmController != null) {
@@ -2988,7 +2992,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         .handleError((onError) {
       biddingRequestStream?.cancel();
     }).listen(
-          (DatabaseEvent event) {
+      (DatabaseEvent event) {
         debugPrint("BIDDING STREAM");
         Map rideList = {};
         DataSnapshot snapshots = event.snapshot;
@@ -3007,7 +3011,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                 }
                 biddingTimerEvent(
                     duration: int.parse(
-                        userData!.maximumTimeForFindDriversForBittingRide) +
+                            userData!.maximumTimeForFindDriversForBittingRide) +
                         5);
               });
             }
@@ -3041,13 +3045,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           requestId: (requestData != null)
               ? requestData!.id
               : (event.id != null)
-              ? event.id!
-              : '',
+                  ? event.id!
+                  : '',
           driverId: event.driver['driver_id'].toString(),
           acceptRideFare: event.driver['price'].toString(),
           offeredRideFare: farePriceController.text);
       data.fold(
-            (error) {
+        (error) {
           isLoading = false;
           if (error.message == 'logout') {
             emit(LogoutState());
@@ -3056,7 +3060,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             emit(BiddingCreateRequestFailureState());
           }
         },
-            (success) async {
+        (success) async {
           if (requestData != null) {
             await FirebaseDatabase.instance
                 .ref()
@@ -3064,7 +3068,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                 .remove();
             driverStreamRide(driverId: event.driver["driver_id"]);
             biddingDriverList.removeWhere(
-                    (element) => element["driver_id"] == event.driver["driver_id"]);
+                (element) => element["driver_id"] == event.driver["driver_id"]);
             add(BookingGetUserDetailsEvent(requestId: requestData!.id));
           }
           add(UpdateEvent());
@@ -3074,11 +3078,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       await FirebaseDatabase.instance
           .ref()
           .child(
-          'bid-meta/${requestData!.id}/drivers/driver_${event.driver["driver_id"]}')
+              'bid-meta/${requestData!.id}/drivers/driver_${event.driver["driver_id"]}')
           .update({"is_rejected": 'by_user'});
       if (biddingDriverList.isNotEmpty) {
         biddingDriverList.removeWhere(
-                (element) => element["driver_id"] == event.driver["driver_id"]);
+            (element) => element["driver_id"] == event.driver["driver_id"]);
         emit(BookingUpdateState());
       }
       emit(BookingUpdateState());
@@ -3090,7 +3094,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     final data = await serviceLocator<BookingUsecase>().cancelReasons(
         beforeOrAfter: event.beforeOrAfter, requestId: requestData!.id);
     data.fold(
-          (error) {
+      (error) {
         if (error.message == 'logout') {
           emit(LogoutState());
         } else {
@@ -3098,7 +3102,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           emit(BookingUpdateState());
         }
       },
-          (success) {
+      (success) {
         cancelReasonsList = success.data;
         emit(CancelReasonState());
       },
@@ -3116,12 +3120,12 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       isOpenStreet: mapType == 'open_street_map',
     );
     data.fold(
-          (error) {
+      (error) {
         debugPrint(error.toString());
         showToast(message: error.message ?? '');
         emit(BookingUpdateState());
       },
-          (success) async {
+      (success) async {
         distance = success.distance;
         if (success.duration.contains('.')) {
           duration = double.parse(success.duration).toStringAsFixed(1);
@@ -3146,7 +3150,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             dropAddressList: event.arg!.stopAddressList,
             isOutstationRide: event.arg!.isOutstationRide,
             isWithoutDestinationRide:
-            event.arg!.isWithoutDestinationRide ?? false,
+                event.arg!.isWithoutDestinationRide ?? false,
           ));
         }
         if (event.icon != null) {
@@ -3157,7 +3161,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         }
         if (event.arg != null &&
             ((event.arg!.isWithoutDestinationRide != null &&
-                !event.arg!.isWithoutDestinationRide!) ||
+                    !event.arg!.isWithoutDestinationRide!) ||
                 (event.arg!.isWithoutDestinationRide == null)) &&
             ((event.arg!.isRentalRide != null && !event.arg!.isRentalRide!) ||
                 event.arg!.isRentalRide == null)) {
@@ -3186,7 +3190,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                     userData!.onTripRequest != ""))) {
           if (event.arg != null &&
               ((event.arg!.isWithoutDestinationRide != null &&
-                  !event.arg!.isWithoutDestinationRide!) ||
+                      !event.arg!.isWithoutDestinationRide!) ||
                   (event.arg!.isWithoutDestinationRide == null)) &&
               ((event.arg!.isRentalRide != null && !event.arg!.isRentalRide!) ||
                   event.arg!.isRentalRide == null)) {
@@ -3225,7 +3229,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         } else {
           if (event.arg != null &&
               ((event.arg!.isWithoutDestinationRide != null &&
-                  !event.arg!.isWithoutDestinationRide!) ||
+                      !event.arg!.isWithoutDestinationRide!) ||
                   (event.arg!.isWithoutDestinationRide == null)) &&
               ((event.arg!.isRentalRide != null && !event.arg!.isRentalRide!) ||
                   event.arg!.isRentalRide == null)) {
@@ -3586,32 +3590,32 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
     List etaList = !isRentalRide
         ? isMultiTypeVechiles
-        ? sortedEtaDetailsList
-        : etaDetailsList
+            ? sortedEtaDetailsList
+            : etaDetailsList
         : rentalEtaDetailsList;
     String choosenEtaTypeId =
-    etaList.isNotEmpty ? etaList[selectedVehicleIndex].typeId : '';
+        etaList.isNotEmpty ? etaList[selectedVehicleIndex].typeId : '';
     for (var element in driverData) {
       if (element['is_active'] == 1 &&
           element['is_available'] == true &&
           ((element['vehicle_types'] != null &&
-              element['vehicle_types'].contains(choosenEtaTypeId)) ||
+                  element['vehicle_types'].contains(choosenEtaTypeId)) ||
               (element['vehicle_type'] != null &&
                   element['vehicle_type'] == choosenEtaTypeId))) {
         if (((transportType == 'taxi' && element['transport_type'] == 'taxi') ||
-            (transportType == 'delivery' &&
-                element['transport_type'] == 'delivery') ||
-            element['transport_type'] == 'bidding' ||
-            element['transport_type'] == 'both')
-        // || (transportType == 'delivery' &&  element['transport_type'] == 'both')
-        ) {
+                (transportType == 'delivery' &&
+                    element['transport_type'] == 'delivery') ||
+                element['transport_type'] == 'bidding' ||
+                element['transport_type'] == 'both')
+            // || (transportType == 'delivery' &&  element['transport_type'] == 'both')
+            ) {
           DateTime dt =
-          DateTime.fromMillisecondsSinceEpoch(element['updated_at']);
+              DateTime.fromMillisecondsSinceEpoch(element['updated_at']);
 
           if (DateTime.now().difference(dt).inMinutes <= 2) {
             if (markerList
                 .where((e) => e.markerId.toString().contains(
-                'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                    'marker#${element['id']}#${element['vehicle_type_icon']}'))
                 .isEmpty) {
               markerList.add(Marker(
                 markerId: MarkerId(
@@ -3623,55 +3627,55 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                 icon: (element['vehicle_type_icon'] == 'truck')
                     ? truckMarker
                     : (element['vehicle_type_icon'] == 'motor_bike')
-                    ? bikeMarker
-                    : (element['vehicle_type_icon'] == 'auto')
-                    ? autoMarker
-                    : (element['vehicle_type_icon'] == 'lcv')
-                    ? lcv
-                    : (element['vehicle_type_icon'] == 'ehcv')
-                    ? ehcv
-                    : (element['vehicle_type_icon'] ==
-                    'hatchback')
-                    ? hatchBack
-                    : (element['vehicle_type_icon'] ==
-                    'hcv')
-                    ? hcv
-                    : (element['vehicle_type_icon'] ==
-                    'mcv')
-                    ? mcv
-                    : (element['vehicle_type_icon'] ==
-                    'luxury')
-                    ? luxury
-                    : (element['vehicle_type_icon'] ==
-                    'premium')
-                    ? premium
-                    : (element['vehicle_type_icon'] ==
-                    'suv')
-                    ? suv
-                    : carMarker,
+                        ? bikeMarker
+                        : (element['vehicle_type_icon'] == 'auto')
+                            ? autoMarker
+                            : (element['vehicle_type_icon'] == 'lcv')
+                                ? lcv
+                                : (element['vehicle_type_icon'] == 'ehcv')
+                                    ? ehcv
+                                    : (element['vehicle_type_icon'] ==
+                                            'hatchback')
+                                        ? hatchBack
+                                        : (element['vehicle_type_icon'] ==
+                                                'hcv')
+                                            ? hcv
+                                            : (element['vehicle_type_icon'] ==
+                                                    'mcv')
+                                                ? mcv
+                                                : (element['vehicle_type_icon'] ==
+                                                        'luxury')
+                                                    ? luxury
+                                                    : (element['vehicle_type_icon'] ==
+                                                            'premium')
+                                                        ? premium
+                                                        : (element['vehicle_type_icon'] ==
+                                                                'suv')
+                                                            ? suv
+                                                            : carMarker,
               ));
             } else {
               if (markerList
-                  .lastWhere((e) => e.markerId.toString().contains(
-                  'marker#${element['id']}#${element['vehicle_type_icon']}'))
-                  .position
-                  .latitude !=
-                  element['l'][0] ||
+                          .lastWhere((e) => e.markerId.toString().contains(
+                              'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                          .position
+                          .latitude !=
+                      element['l'][0] ||
                   markerList
-                      .lastWhere((e) => e.markerId.toString().contains(
-                      'marker#${element['id']}#${element['vehicle_type_icon']}'))
-                      .position
-                      .longitude !=
+                          .lastWhere((e) => e.markerId.toString().contains(
+                              'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                          .position
+                          .longitude !=
                       element['l'][1]) {
                 var dist = calculateDistance(
                   lat1: markerList
                       .lastWhere((e) => e.markerId.toString().contains(
-                      'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                          'marker#${element['id']}#${element['vehicle_type_icon']}'))
                       .position
                       .latitude,
                   lon1: markerList
                       .lastWhere((e) => e.markerId.toString().contains(
-                      'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                          'marker#${element['id']}#${element['vehicle_type_icon']}'))
                       .position
                       .longitude,
                   lat2: double.parse(element['l'][0].toString()),
@@ -3687,12 +3691,12 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                   animateCar(
                       markerList
                           .lastWhere((e) => e.markerId.toString().contains(
-                          'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                              'marker#${element['id']}#${element['vehicle_type_icon']}'))
                           .position
                           .latitude,
                       markerList
                           .lastWhere((e) => e.markerId.toString().contains(
-                          'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                              'marker#${element['id']}#${element['vehicle_type_icon']}'))
                           .position
                           .longitude,
                       double.parse(element['l'][0].toString()),
@@ -3706,32 +3710,32 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
                       (element['vehicle_type_icon'] == 'truck')
                           ? truckMarker
                           : (element['vehicle_type_icon'] == 'motor_bike')
-                          ? bikeMarker
-                          : (element['vehicle_type_icon'] == 'auto')
-                          ? autoMarker
-                          : (element['vehicle_type_icon'] == 'lcv')
-                          ? lcv
-                          : (element['vehicle_type_icon'] == 'ehcv')
-                          ? ehcv
-                          : (element['vehicle_type_icon'] ==
-                          'hatchback')
-                          ? hatchBack
-                          : (element['vehicle_type_icon'] ==
-                          'hcv')
-                          ? hcv
-                          : (element['vehicle_type_icon'] ==
-                          'mcv')
-                          ? mcv
-                          : (element['vehicle_type_icon'] ==
-                          'luxury')
-                          ? luxury
-                          : (element['vehicle_type_icon'] ==
-                          'premium')
-                          ? premium
-                          : (element['vehicle_type_icon'] ==
-                          'suv')
-                          ? suv
-                          : carMarker,
+                              ? bikeMarker
+                              : (element['vehicle_type_icon'] == 'auto')
+                                  ? autoMarker
+                                  : (element['vehicle_type_icon'] == 'lcv')
+                                      ? lcv
+                                      : (element['vehicle_type_icon'] == 'ehcv')
+                                          ? ehcv
+                                          : (element['vehicle_type_icon'] ==
+                                                  'hatchback')
+                                              ? hatchBack
+                                              : (element['vehicle_type_icon'] ==
+                                                      'hcv')
+                                                  ? hcv
+                                                  : (element['vehicle_type_icon'] ==
+                                                          'mcv')
+                                                      ? mcv
+                                                      : (element['vehicle_type_icon'] ==
+                                                              'luxury')
+                                                          ? luxury
+                                                          : (element['vehicle_type_icon'] ==
+                                                                  'premium')
+                                                              ? premium
+                                                              : (element['vehicle_type_icon'] ==
+                                                                      'suv')
+                                                                  ? suv
+                                                                  : carMarker,
                       mapType);
                 }
               }
@@ -3741,7 +3745,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       } else {
         if (markerList
             .where((e) => e.markerId.toString().contains(
-            'marker#${element['id']}#${element['vehicle_type_icon']}'))
+                'marker#${element['id']}#${element['vehicle_type_icon']}'))
             .isNotEmpty) {
           markerList.removeWhere((e) => e.markerId.toString().contains(
               'marker#${element['id']}#${element['vehicle_type_icon']}'));
@@ -3787,7 +3791,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       //     mapMarkerSink, //Stream build of map to update the UI
 
       TickerProvider
-      provider, //Ticker provider of the widget. This is used for animation
+          provider, //Ticker provider of the widget. This is used for animation
 
       dynamic controller, //Google map controller of our widget
 
@@ -3795,7 +3799,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       icon,
       map) async {
     final double bearing =
-    getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
+        getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
 
     dynamic carMarker;
     carMarker = Marker(
@@ -3848,7 +3852,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           }
         }
         int currentNumber =
-        polyList.indexWhere((element) => element == nearestLat);
+            polyList.indexWhere((element) => element == nearestLat);
         for (var i = 0; i < currentNumber; i++) {
           polyList.removeAt(0);
         }
@@ -3886,9 +3890,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (map == 'google_map') {
         controller.getVisibleRegion().then((value) {
           if (value.contains(markerList
-              .firstWhere(
-                  (element) => element.markerId == MarkerId(markerid))
-              .position) ==
+                  .firstWhere(
+                      (element) => element.markerId == MarkerId(markerid))
+                  .position) ==
               false) {
             debugPrint('Animating correctly');
             controller.animateCamera(CameraUpdate.newLatLng(markerList
@@ -3986,13 +3990,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     final data = await serviceLocator<BookingUsecase>()
         .addTips(requestId: event.requestId, amount: event.amount);
     data.fold(
-          (error) {
+      (error) {
         debugPrint(error.toString());
         if (error.message == 'logout') {
           emit(LogoutState());
         }
       },
-          (success) {
+      (success) {
         if (success['success']) {
           requestBillData = RequestBillData.fromJson(success['data']);
           FirebaseDatabase.instance
@@ -4007,7 +4011,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   Future addDistanceMarker(LatLng position, double distanceMeter,
       {double? time}) async {
     markerList.removeWhere(
-            (element) => element.markerId == const MarkerId('distance'));
+        (element) => element.markerId == const MarkerId('distance'));
     double duration;
     String totalDistance;
     String unitLabel;
@@ -4015,7 +4019,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     bool isMiles = userData?.distanceUnit == 'mi';
 
     double convertedDistance =
-    isMiles ? ((distanceMeter / 1000) * 0.621371) : (distanceMeter / 1000);
+        isMiles ? ((distanceMeter / 1000) * 0.621371) : (distanceMeter / 1000);
 
     unitLabel = isMiles ? 'MI' : 'KM';
 
@@ -4167,7 +4171,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             name: event.requestData!.requestStops.data[i].pocName,
             number: event.requestData!.requestStops.data[i].pocMobile,
             instructions:
-            event.requestData!.requestStops.data[i].pocInstruction,
+                event.requestData!.requestStops.data[i].pocInstruction,
             pickup: false));
       }
     } else if (event.requestData != null &&
@@ -4197,7 +4201,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     polyLine = event.arg.requestData.polyLine;
     distance = event.arg.requestData.unit == 'MILES'
         ? ((double.parse(event.arg.requestData.totalDistance) * 1.60934) * 1000)
-        .toString()
+            .toString()
         : (double.parse(event.arg.requestData.totalDistance) * 1000).toString();
     duration = event.arg.requestData.totalTime;
     for (var i = 0; i < dropAddressList.length; i++) {
@@ -4327,7 +4331,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (contactsList.isEmpty) {
         if (await FlutterContacts.requestPermission()) {
           List<Contact> contacts =
-          await FlutterContacts.getContacts(withProperties: true);
+              await FlutterContacts.getContacts(withProperties: true);
           for (var contact in contacts) {
             for (var phone in contact.phones) {
               contactsList.add(ContactsModel(
@@ -4382,7 +4386,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       AddMarkersEvent event, Emitter<BookingState> emit) async {
     if (event.addressList == null) {
       markerList.removeWhere(
-              (element) => !element.markerId.value.toString().contains('#'));
+          (element) => !element.markerId.value.toString().contains('#'));
       if (event.requestData.requestStops != null &&
           event.requestData.requestStops.data.length > 1) {
         for (var i = 0; i < event.requestData.requestStops.data.length; i++) {
@@ -4418,18 +4422,18 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               double.parse(event.requestData.dropLng)),
           event.requestData.unit == 'MILES'
               ? ((double.parse(event.requestData.totalDistance) * 1.60934) *
-              1000)
+                  1000)
               : (double.parse(event.requestData.totalDistance) * 1000),
           time: double.parse(event.requestData.totalTime));
     } else {
       markerList.removeWhere(
-              (element) => !element.markerId.value.toString().contains('#'));
+          (element) => !element.markerId.value.toString().contains('#'));
       if (event.addressList!.length > 1) {
         for (var i = 0; i < event.addressList!.length; i++) {
           markerList.add(Marker(
             markerId: MarkerId("drop$i"),
             position:
-            LatLng(event.addressList![i].lat, event.addressList![i].lng),
+                LatLng(event.addressList![i].lat, event.addressList![i].lng),
             rotation: 0.0,
             icon: await MarkerWidget(
               isPickup: false,
@@ -4444,7 +4448,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         markerList.add(Marker(
           markerId: const MarkerId("drop"),
           position:
-          LatLng(event.addressList!.last.lat, event.addressList!.last.lng),
+              LatLng(event.addressList!.last.lat, event.addressList!.last.lng),
           rotation: 0.0,
           icon: await MarkerWidget(
             isPickup: false,
@@ -4474,7 +4478,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     if (event.from == '1') {
       printWrapped('text 222111 ---- ');
       paymentUrl =
-      '${event.url}?amount=${event.money}&payment_for=request&currency=${event.currencySymbol}&user_id=${event.userId.toString()}&request_id=${event.requestId.toString()}';
+          '${event.url}?amount=${event.money}&payment_for=request&currency=${event.currencySymbol}&user_id=${event.userId.toString()}&request_id=${event.requestId.toString()}';
     }
     final Uri uri = Uri.parse(paymentUrl);
     if (await canLaunchUrl(uri)) {
@@ -4499,9 +4503,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   }
 
   Future<void> selectPreferenceEvent(
-      SelectedPreferenceEvent event,
-      Emitter<BookingState> emit,
-      ) async {
+    SelectedPreferenceEvent event,
+    Emitter<BookingState> emit,
+  ) async {
     if (event.isSelected) {
       if (!tempSelectPreference.contains(event.prefId)) {
         tempSelectPreference.add(event.prefId);
@@ -4519,9 +4523,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   }
 
   Future<void> confirmPreferenceSelection(
-      ConfirmPreferenceSelectionEvent event,
-      Emitter<BookingState> emit,
-      ) async {
+    ConfirmPreferenceSelectionEvent event,
+    Emitter<BookingState> emit,
+  ) async {
     selectPreference = List<int>.from(tempSelectPreference);
     selectedPreferenceDetailsList = List<int>.from(tempSelectPreference);
     selectedPreferenceIconsList = List<String>.from(tempSelectPreferenceIcons);
@@ -4530,7 +4534,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     // can display its own selection. We key by a stable field: typeId.
     if (!isRentalRide && tempSelectPreference.isNotEmpty) {
       final baseList =
-      isMultiTypeVechiles ? sortedEtaDetailsList : etaDetailsList;
+          isMultiTypeVechiles ? sortedEtaDetailsList : etaDetailsList;
       if (baseList.isNotEmpty &&
           selectedVehicleIndex >= 0 &&
           selectedVehicleIndex < baseList.length) {
@@ -4538,7 +4542,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           final currentTypeId =
               (baseList[selectedVehicleIndex] as dynamic).typeId;
           vehiclePreferenceByTypeId[currentTypeId] =
-          List<int>.from(tempSelectPreference);
+              List<int>.from(tempSelectPreference);
         } catch (_) {
           // If for some reason typeId is not available, skip per-vehicle storage
         }
