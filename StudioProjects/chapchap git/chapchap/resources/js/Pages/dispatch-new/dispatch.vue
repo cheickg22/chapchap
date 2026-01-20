@@ -12,7 +12,7 @@ import FormValidation from "@/Components/FormValidation.vue";
 import debounce from "lodash/debounce";
 import { mapGetters } from "vuex";
 import { useI18n } from "vue-i18n";
-import googleMap from '@/Components/googleMap.vue';
+import googleMap from "@/Components/googleMap.vue";
 
 export default {
     data() {
@@ -91,7 +91,7 @@ export default {
         is_luggage_available: Boolean,
         enable_ride_without_destination: Boolean,
         baseUrl: String,
-        default_location:Object,
+        default_location: Object,
     },
 
     methods: {
@@ -156,7 +156,7 @@ export default {
             if (this.form.ride_type === "regular") {
                 options = this.transport_type_regular;
                 this.form.transport_type = options[0];
-            //    console.log("regular",options);
+                //    console.log("regular",options);
 
                 // Handling 'rental' ride type
             } else if (this.form.ride_type === "rental") {
@@ -167,7 +167,7 @@ export default {
                 } else {
                     options = this.transport_type_rental;
                     this.form.transport_type = options[0];
-                    console.log("rental",options);
+                    console.log("rental", options);
                 }
 
                 // Handling 'outstation' ride type
@@ -178,15 +178,14 @@ export default {
                     options = [];
                 } else {
                     options = this.transport_type_outstation;
-                     this.form.transport_type = options[0];
-                    console.log("outstation",options);
-
+                    this.form.transport_type = options[0];
+                    console.log("outstation", options);
                 }
             }
             // Automatically select the only available option if there's just one
             if (options.length === 1) {
                 this.form.transport_type = options[0]; // Automatically select the single option
-                console.log("transport_type",this.form.transport_type);
+                console.log("transport_type", this.form.transport_type);
             }
 
             return options;
@@ -226,7 +225,7 @@ export default {
             distance: 0,
             duration: 0,
             payment_opt: 1,
-            poly_line: '',
+            poly_line: "",
             goods_type_id: null,
             transport_type: "",
             pickup_poc_name: null,
@@ -261,44 +260,612 @@ export default {
             }
             form.ride_type = type;
         };
-        const unit = ref('-');
+        const unit = ref("-");
         // For Airport
         const showAiportTerminal = ref(false);
         const showTrainStationEnterance = ref(false);
 
         // const recentSearches = ref([]);
+        const calculateDistanceMeters = (lat1, lon1, lat2, lon2) => {
+            const R = 6371000; // Earth's radius in meters
+            const dLat = ((lat2 - lat1) * Math.PI) / 180;
+            const dLon = ((lon2 - lon1) * Math.PI) / 180;
 
-        const reverseGeocodeAndUpdateInput = (position) => {
-            return new Promise((resolve, reject) => {
-                const geocoder = new google.maps.Geocoder();
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos((lat1 * Math.PI) / 180) *
+                    Math.cos((lat2 * Math.PI) / 180) *
+                    Math.sin(dLon / 2) *
+                    Math.sin(dLon / 2);
 
-                geocoder.geocode({ location: position }, (results, status) => {
-                    if (status === "OK") {
-                        if (results[0]) {
-                            resolve(results[0].formatted_address);
-                        } else {
-                            console.error(
-                                t("no_reverse_geocode_results_found")
-                            );
-                            resolve(null);
-                        }
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        };
+
+        // Strip HTML tags (same as Flutter)
+        const stripHtmlTags = (htmlText) => {
+            const regex = /<[^>]*>/g;
+            let strippedText = htmlText.replace(regex, "");
+
+            strippedText = strippedText
+                .replace(/&nbsp;/g, " ")
+                .replace(/&amp;/g, "&")
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&apos;/g, "'");
+
+            return strippedText.trim();
+        };
+
+        // Fetch geocoding data (equivalent to _fetchGeocoding in Flutter)
+        const fetchGeocoding = async (latitude, longitude, mapKey) => {
+            try {
+                const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${mapKey}&language=en&result_type=neighborhood|sublocality|sublocality_level_1`;
+
+                const response = await fetch(apiUrl, {
+                    signal: AbortSignal.timeout(5000),
+                });
+
+                if (response.ok) {
+                    return await response.json();
+                }
+                return null;
+            } catch (e) {
+                return null;
+            }
+        };
+
+        const findNearestPlace = async (latitude, longitude) => {
+            try {
+                if (
+                    !window.google ||
+                    !window.google.maps ||
+                    !window.google.maps.places
+                ) {
+                    console.log("Google Maps Places not loaded");
+                    return null;
+                }
+
+                return new Promise((resolve) => {
+                    // Use the new Places API (Place.searchNearby) - same as your Flutter code
+                    const { Place, SearchNearbyRankPreference } =
+                        window.google.maps.places;
+
+                    if (Place && Place.searchNearby) {
+                        console.log("Using Place.searchNearby");
+
+                        // Create LatLng for center
+                        const center = new google.maps.LatLng(
+                            latitude,
+                            longitude,
+                        );
+
+                        // Create request object (same structure as Flutter)
+                        const request = {
+                            fields: [
+                                "displayName",
+                                "location",
+                                "id",
+                                "formattedAddress",
+                                "types",
+                            ],
+                            locationRestriction: {
+                                center: center,
+                                radius: 50.0,
+                            },
+                            maxResultCount: 10,
+                            rankPreference:
+                                SearchNearbyRankPreference?.DISTANCE ||
+                                "DISTANCE",
+                        };
+
+                        // Call searchNearby
+                        Place.searchNearby(request)
+                            .then(async (result) => {
+                                try {
+                                    console.log("Place.searchNearby succeeded");
+                                    const places = result.places || [];
+
+                                    if (places.length > 0) {
+                                        console.log(
+                                            `Found ${places.length} places`,
+                                        );
+
+                                        // Process places in order (already sorted by distance)
+                                        for (const place of places) {
+                                            // Extract place name
+                                            let placeName = null;
+                                            const displayName =
+                                                place.displayName;
+
+                                            if (displayName) {
+                                                if (
+                                                    typeof displayName ===
+                                                    "string"
+                                                ) {
+                                                    placeName = displayName;
+                                                } else if (displayName.text) {
+                                                    placeName =
+                                                        displayName.text.toString();
+                                                }
+                                            }
+
+                                            // Check if we have a valid name
+                                            if (
+                                                placeName &&
+                                                placeName.trim() !== ""
+                                            ) {
+                                                // Check distance
+                                                const location = place.location;
+
+                                                if (location) {
+                                                    let placeLat = null;
+                                                    let placeLng = null;
+
+                                                    try {
+                                                        // Handle Google Maps LatLng object
+                                                        if (
+                                                            typeof location.lat ===
+                                                                "function" &&
+                                                            typeof location.lng ===
+                                                                "function"
+                                                        ) {
+                                                            placeLat =
+                                                                location.lat();
+                                                            placeLng =
+                                                                location.lng();
+                                                        } else if (
+                                                            location.lat !==
+                                                                undefined &&
+                                                            location.lng !==
+                                                                undefined
+                                                        ) {
+                                                            placeLat =
+                                                                location.lat;
+                                                            placeLng =
+                                                                location.lng;
+                                                        } else if (
+                                                            location.latitude !==
+                                                                undefined &&
+                                                            location.longitude !==
+                                                                undefined
+                                                        ) {
+                                                            placeLat =
+                                                                location.latitude;
+                                                            placeLng =
+                                                                location.longitude;
+                                                        }
+                                                    } catch (e) {
+                                                        console.error(
+                                                            "Error extracting location:",
+                                                            e,
+                                                        );
+                                                    }
+
+                                                    if (
+                                                        placeLat !== null &&
+                                                        placeLng !== null
+                                                    ) {
+                                                        const distance =
+                                                            calculateDistanceMeters(
+                                                                latitude,
+                                                                longitude,
+                                                                placeLat,
+                                                                placeLng,
+                                                            );
+
+                                                        // Only use if within 1km
+                                                        if (distance <= 1000) {
+                                                            console.log(
+                                                                `Found valid place: ${placeName} (${distance.toFixed(0)}m away)`,
+                                                            );
+                                                            resolve(placeName);
+                                                            return;
+                                                        } else {
+                                                            console.log(
+                                                                `Place too far: ${placeName} (${distance.toFixed(0)}m away)`,
+                                                            );
+                                                        }
+                                                    } else {
+                                                        console.log(
+                                                            `No distance data, using place: ${placeName}`,
+                                                        );
+                                                        resolve(placeName);
+                                                        return;
+                                                    }
+                                                } else {
+                                                    console.log(
+                                                        `No location data, using place: ${placeName}`,
+                                                    );
+                                                    resolve(placeName);
+                                                    return;
+                                                }
+                                            }
+                                        }
+
+                                        console.log(
+                                            "No places found within 1km",
+                                        );
+                                        resolve(null);
+                                    } else {
+                                        console.log("No places found");
+                                        resolve(null);
+                                    }
+                                } catch (e) {
+                                    console.error(
+                                        "Error processing searchNearby results:",
+                                        e,
+                                    );
+                                    resolve(null);
+                                }
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    "Error in Place.searchNearby:",
+                                    error,
+                                );
+                                resolve(null);
+                            });
                     } else {
-                        console.error(t("geocoder_failed_due_to") + status);
-                        reject(status);
+                        console.log(
+                            "Place.searchNearby not available, falling back to PlacesService",
+                        );
+                        // Fallback to old PlacesService API
+                        const service = new google.maps.places.PlacesService(
+                            document.createElement("div"),
+                        );
+
+                        const request = {
+                            location: new google.maps.LatLng(
+                                latitude,
+                                longitude,
+                            ),
+                            rankBy: google.maps.places.RankBy.DISTANCE,
+                            type: "establishment",
+                        };
+
+                        service.nearbySearch(request, (results, status) => {
+                            if (
+                                status ===
+                                    google.maps.places.PlacesServiceStatus.OK &&
+                                results &&
+                                results.length > 0
+                            ) {
+                                for (const place of results) {
+                                    if (
+                                        place.name &&
+                                        place.name.trim() !== ""
+                                    ) {
+                                        if (place.geometry?.location) {
+                                            const distance =
+                                                calculateDistanceMeters(
+                                                    latitude,
+                                                    longitude,
+                                                    place.geometry.location.lat(),
+                                                    place.geometry.location.lng(),
+                                                );
+
+                                            if (distance <= 1000) {
+                                                console.log(
+                                                    `Found nearby place: ${place.name}`,
+                                                );
+                                                resolve(place.name);
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            resolve(null);
+                        });
                     }
                 });
-            });
+            } catch (e) {
+                console.error("Error in findNearestPlace:", e);
+                return null;
+            }
+        };
+
+        // Transliterate (same as Flutter)
+        const transliterate = (text) => {
+            const transliterationMap = {
+                a: "ا",
+                b: "ب",
+                c: "ك",
+                d: "د",
+                e: "ي",
+                f: "ف",
+                g: "ج",
+                h: "ه",
+                i: "ي",
+                j: "ج",
+                k: "ك",
+                l: "ل",
+                m: "م",
+                n: "ن",
+                o: "و",
+                p: "ب",
+                q: "ق",
+                r: "ر",
+                s: "س",
+                t: "ت",
+                u: "و",
+                v: "ف",
+                w: "و",
+                x: "كس",
+                y: "ي",
+                z: "ز",
+                " ": " ",
+            };
+
+            return text
+                .toLowerCase()
+                .split("")
+                .map((char) => {
+                    return transliterationMap[char] || char;
+                })
+                .join("");
+        };
+
+        // Try translation (same as Flutter)
+        const tryTranslation = async (text, langPair) => {
+            try {
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
+
+                const response = await fetch(url, {
+                    signal: AbortSignal.timeout(1500), // 1.5 seconds only!
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.responseStatus === 200) {
+                        const translatedText =
+                            data.responseData?.translatedText;
+                        const arabicRegex = /[\u0600-\u06FF]/;
+
+                        if (
+                            translatedText &&
+                            translatedText !== text &&
+                            translatedText.trim() !== "" &&
+                            arabicRegex.test(translatedText)
+                        ) {
+                            return translatedText;
+                        }
+                    }
+                }
+                return null;
+            } catch (e) {
+                return null;
+            }
+        };
+
+        // Translate single part (same as Flutter)
+        const translateSinglePart = async (part) => {
+            try {
+                // Try ONLY English with very short timeout
+                const translatedPart = await tryTranslation(part, "en|ar");
+
+                if (translatedPart) {
+                    return translatedPart;
+                }
+
+                // Skip French entirely - go straight to transliteration
+                return transliterate(part);
+            } catch (e) {
+                return transliterate(part);
+            }
+        };
+
+        // Translate to Arabic (same as Flutter)
+        const translateToArabic = async (text) => {
+            try {
+                // Check if text is already in Arabic
+                const arabicRegex = /[\u0600-\u06FF]/;
+                if (arabicRegex.test(text)) {
+                    return text;
+                }
+
+                // Split the text by separator
+                const parts = text
+                    .split("- ")
+                    .map((e) => e.trim())
+                    .filter((e) => e !== "");
+
+                if (parts.length === 0) return null;
+
+                // Translate ALL parts in PARALLEL with aggressive timeout
+                const translatedParts = await Promise.all(
+                    parts.map((part) => translateSinglePart(part)),
+                );
+
+                return translatedParts.join("- ");
+            } catch (e) {
+                return null;
+            }
+        };
+
+        // Main function - EXACT equivalent of Flutter's _fetchAddressFromLatLng
+        const fetchAddressFromLatLng = async (latitude, longitude) => {
+            try {
+                const mapKey = props.map_key;
+
+                // Execute both API calls in PARALLEL
+                const [geocodingData, nearestPlace] = await Promise.all([
+                    fetchGeocoding(latitude, longitude, mapKey),
+                    findNearestPlace(latitude, longitude),
+                ]);
+
+                console.log("=== Geocoding Debug ===");
+                console.log("Geocoding data:", geocodingData);
+                console.log("Nearest place:", nearestPlace);
+
+                // Check geocoding status
+                if (
+                    !geocodingData ||
+                    (geocodingData.status !== "OK" &&
+                        geocodingData.status !== "ZERO_RESULTS")
+                ) {
+                    const translated = await translateToArabic(
+                        nearestPlace || t("unnamed_street"),
+                    );
+                    return stripHtmlTags(
+                        translated || nearestPlace || t("unnamed_street"),
+                    );
+                }
+
+                const geocodingResults = geocodingData.results;
+
+                if (!geocodingResults || geocodingResults.length === 0) {
+                    const translated = await translateToArabic(
+                        nearestPlace || t("unnamed_street"),
+                    );
+                    return stripHtmlTags(
+                        translated || nearestPlace || t("unnamed_street"),
+                    );
+                }
+
+                console.log(
+                    "Total geocoding results:",
+                    geocodingResults.length,
+                );
+
+                // IMPORTANT: Look through ALL results to find sublocality
+                let sublocalityLevel1 = "";
+                let neighborhood = "";
+                let locality = "";
+
+                // Check ALL results, not just ones with specific types
+                for (const result of geocodingResults) {
+                    console.log("Checking result types:", result.types);
+
+                    if (result.address_components) {
+                        for (const component of result.address_components) {
+                            const types = component.types;
+                            const longName = component.long_name;
+
+                            console.log(
+                                `Component: ${longName}, Types:`,
+                                types,
+                            );
+
+                            // Extract sublocality_level_1
+                            if (
+                                !sublocalityLevel1 &&
+                                (types.includes("sublocality_level_1") ||
+                                    types.includes("sublocality"))
+                            ) {
+                                sublocalityLevel1 = longName;
+                                console.log(
+                                    "Found sublocality_level_1:",
+                                    sublocalityLevel1,
+                                );
+                            }
+
+                            // Extract neighborhood
+                            if (
+                                !neighborhood &&
+                                types.includes("neighborhood")
+                            ) {
+                                neighborhood = longName;
+                                console.log(
+                                    "Found neighborhood:",
+                                    neighborhood,
+                                );
+                            }
+
+                            // Extract locality
+                            if (!locality && types.includes("locality")) {
+                                locality = longName;
+                                console.log("Found locality:", locality);
+                            }
+                        }
+                    }
+
+                    // Stop if we found sublocality
+                    if (sublocalityLevel1) {
+                        break;
+                    }
+                }
+
+                console.log("Extracted values:");
+                console.log("- sublocalityLevel1:", sublocalityLevel1);
+                console.log("- neighborhood:", neighborhood);
+                console.log("- locality:", locality);
+
+                // Build address parts
+                const addressPartsEnglish = [];
+
+                // Add nearest place if available
+                if (nearestPlace && nearestPlace.trim() !== "") {
+                    addressPartsEnglish.push(nearestPlace);
+                    console.log("Added nearest place:", nearestPlace);
+                }
+
+                // Add sublocality if not already included
+                if (
+                    sublocalityLevel1 !== "" &&
+                    !addressPartsEnglish.some((part) =>
+                        part
+                            .toLowerCase()
+                            .includes(sublocalityLevel1.toLowerCase()),
+                    )
+                ) {
+                    addressPartsEnglish.push(sublocalityLevel1);
+                    console.log("Added sublocality:", sublocalityLevel1);
+                }
+
+                // If still empty, try neighborhood
+                if (
+                    addressPartsEnglish.length === 1 &&
+                    neighborhood !== "" &&
+                    !addressPartsEnglish.some((part) =>
+                        part.toLowerCase().includes(neighborhood.toLowerCase()),
+                    )
+                ) {
+                    addressPartsEnglish.push(neighborhood);
+                    console.log("Added neighborhood:", neighborhood);
+                }
+
+                // If still only place name or empty, add locality
+                if (addressPartsEnglish.length <= 1 && locality !== "") {
+                    addressPartsEnglish.push(locality);
+                    console.log("Added locality:", locality);
+                }
+
+                console.log("Final address parts:", addressPartsEnglish);
+
+                if (addressPartsEnglish.length === 0) {
+                    return t("unnamed_street");
+                }
+
+                const englishAddress = addressPartsEnglish.join("- ");
+                console.log("English address:", englishAddress);
+
+                const arabicAddress = await translateToArabic(englishAddress);
+                console.log("Arabic address:", arabicAddress);
+
+                return stripHtmlTags(arabicAddress || englishAddress);
+            } catch (e) {
+                console.error("Error in fetchAddressFromLatLng:", e);
+                return t("unnamed_street");
+            }
+        };
+        const reverseGeocodeAndUpdateInput = (position) => {
+            return fetchAddressFromLatLng(position.lat, position.lng);
         };
         const manageStopMarker = () => {
-
-            stopovers.forEach((stop,index)=>{
-                if(stop.latitude && stop.longitude) {
-                    stopMarkers.value[index] = { lat: stop.latitude, lng:stop.longitude };
-                }else{
+            stopovers.forEach((stop, index) => {
+                if (stop.latitude && stop.longitude) {
+                    stopMarkers.value[index] = {
+                        lat: stop.latitude,
+                        lng: stop.longitude,
+                    };
+                } else {
                     delete stopMarkers.value[index];
                 }
             });
-
         };
 
         const validationRules = {
@@ -331,48 +898,74 @@ export default {
         const formattedDuration = ref("0m");
 
         // Watch for changes in etaParam.duration and update formattedDuration
-        watch(() => etaParam.duration, (newDuration) => {
-            const hours = Math.floor(newDuration / 60);
-            const minutes = newDuration % 60;
-            formattedDuration.value = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-        });
+        watch(
+            () => etaParam.duration,
+            (newDuration) => {
+                const hours = Math.floor(newDuration / 60);
+                const minutes = newDuration % 60;
+                formattedDuration.value =
+                    hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+            },
+        );
 
         const serviceVerify = async () => {
             const address = [];
-            const pick_location = { latitude: etaParam.pick_lat, longitude: etaParam.pick_lng,};
+            const pick_location = {
+                latitude: etaParam.pick_lat,
+                longitude: etaParam.pick_lng,
+            };
             address.push(pick_location);
-            
-           /* const drop_location = {latitude: eteParam.drop_lat, longitude: etaParam.drop_lng};
+
+            /* const drop_location = {latitude: eteParam.drop_lat, longitude: etaParam.drop_lng};
             address.push(drop_location); */
 
             if (Array.isArray(stopovers)) {
                 stopovers.forEach((stop) => {
-                    const stop_location = { latitude: stop.latitude, longitude: stop.longitude, };
+                    const stop_location = {
+                        latitude: stop.latitude,
+                        longitude: stop.longitude,
+                    };
                     address.push(stop_location);
                 });
             }
 
             if (etaParam.drop_lat) {
-                const drop_location = { latitude: etaParam.drop_lat, longitude: etaParam.drop_lng, };
+                const drop_location = {
+                    latitude: etaParam.drop_lat,
+                    longitude: etaParam.drop_lng,
+                };
                 address.push(drop_location);
             }
 
-            const payload = { address: address, ride_type: form.ride_type, };
+            const payload = { address: address, ride_type: form.ride_type };
 
             try {
-                await axios.post("/dispatch/serviceVerify", payload );
+                await axios.post("/dispatch/serviceVerify", payload);
             } catch (error) {
                 if (error.response && error.response.status === 422) {
                     errors.value = error.response.data.errors;
                 } else if (error.response && error.response.status === 500) {
-                    if ( error.response.data.message == "service not available with this location" ) {
+                    if (
+                        error.response.data.message ==
+                        "service not available with this location"
+                    ) {
                         errors.value.pick_address = [t("service_unavailable")];
-                    } else if ( error.response.data.message == "Outstation service not available within this location" ) {
+                    } else if (
+                        error.response.data.message ==
+                        "Outstation service not available within this location"
+                    ) {
                         delete errors.value.pick_address;
-                        errors.value.drop_address = [t("outstation_service_unavailable")];
-                    } else if ( error.response.data.message == "Pick up and Drop should not be in the same zone") {
+                        errors.value.drop_address = [
+                            t("outstation_service_unavailable"),
+                        ];
+                    } else if (
+                        error.response.data.message ==
+                        "Pick up and Drop should not be in the same zone"
+                    ) {
                         delete errors.value.pick_address;
-                        errors.value.drop_address = [t("same_zone_outstation_unavailable")];
+                        errors.value.drop_address = [
+                            t("same_zone_outstation_unavailable"),
+                        ];
                     } else {
                         const data = error.response.data;
                         delete errors.value.pick_address;
@@ -402,16 +995,18 @@ export default {
                             }
                         });
                     }
-                    if(errors.value?.stop && Object.keys(errors.value.stop).length == 0){
+                    if (
+                        errors.value?.stop &&
+                        Object.keys(errors.value.stop).length == 0
+                    ) {
                         delete errors.value.stop;
                     }
 
                     return verifyError(errors);
-                    
                 } else {
                     console.error(t("error_creating_vehicle_price"), error);
                     alertMessage.value = t(
-                        "failed_to_make_booking_contact_admin"
+                        "failed_to_make_booking_contact_admin",
                     );
                 }
             }
@@ -423,7 +1018,6 @@ export default {
                 serviceVerify();
             }
 
-
             if (form.is_later) {
                 if (!form.trip_start_time) {
                     errors.value.trip_start_time = [t("required")];
@@ -432,7 +1026,12 @@ export default {
                 }
             }
             if (!form.is_rental) {
-                if ((!props.enable_ride_without_destination || form.is_out_station) && !form.drop_address && form.drop_address.length == 0) {
+                if (
+                    (!props.enable_ride_without_destination ||
+                        form.is_out_station) &&
+                    !form.drop_address &&
+                    form.drop_address.length == 0
+                ) {
                     errors.value.drop_address = [t("required")];
                 } else {
                     delete errors.value.drop_address;
@@ -446,9 +1045,9 @@ export default {
                 etaParam.duration = 0;
                 form.drop_address = "";
 
-                dropMarker.value=null;
-                form.poly_line='';
-                driverMarkers.value={};
+                dropMarker.value = null;
+                form.poly_line = "";
+                driverMarkers.value = {};
 
                 if (stopovers.length > 0) {
                     stopovers.forEach((item, index) => {
@@ -512,14 +1111,15 @@ export default {
                 updateRoute();
             }
 
-            if(errors.value?.stop && Object.keys(errors.value.stop).length == 0){
+            if (
+                errors.value?.stop &&
+                Object.keys(errors.value.stop).length == 0
+            ) {
                 delete errors.value.stop;
             }
             return verifyError(errors);
         };
-        const verifyError = (errors) =>{
-
-
+        const verifyError = (errors) => {
             if (Object.keys(errors.value).length > 0) {
                 enableBooking.value = false;
                 if (scrollContainer.value) {
@@ -530,9 +1130,10 @@ export default {
 
             delete errors.value.stop;
             enableBooking.value = true;
-            scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+            scrollContainer.value.scrollTop =
+                scrollContainer.value.scrollHeight;
             return true;
-        }
+        };
 
         const modalShow = ref(false);
 
@@ -559,7 +1160,7 @@ export default {
                 Swal.fire(
                     t("maximum_stopovers_reached"),
                     t("you_can_add_up_to_5_stopovers_only"),
-                    "warning"
+                    "warning",
                 );
             }
         };
@@ -582,103 +1183,106 @@ export default {
 
         const drawRoute = async () => {
             if (etaParam.pick_lat && etaParam.pick_lng) {
-            if (form.poly_line.length) {
-                form.poly_line = '';
-            }
-
+                if (form.poly_line.length) {
+                    form.poly_line = "";
+                }
 
                 pickupMarker.value = {
-                  lat:  etaParam.pick_lat,
-                  lng:  etaParam.pick_lng
+                    lat: etaParam.pick_lat,
+                    lng: etaParam.pick_lng,
                 };
 
                 if (form.is_rental) {
                     return;
                 }
             }
-            if (
-                !pickupMarker.value ||
-                !dropMarker.value
-            ) {
+            if (!pickupMarker.value || !dropMarker.value) {
                 return;
             }
 
-            const url = 'https://routes.googleapis.com/directions/v2:computeRoutes';
+            const url =
+                "https://routes.googleapis.com/directions/v2:computeRoutes";
 
             const requestBody = {
                 origin: {
                     location: {
-                    latLng: {
+                        latLng: {
                             latitude: pickupMarker.value.lat,
-                            longitude: pickupMarker.value.lng
-                        }
+                            longitude: pickupMarker.value.lng,
+                        },
                     },
                 },
                 destination: {
                     location: {
-                    latLng:{
+                        latLng: {
                             latitude: dropMarker.value.lat,
-                            longitude: dropMarker.value.lng
-                        }
+                            longitude: dropMarker.value.lng,
+                        },
                     },
                 },
-                travelMode: 'DRIVE',
-                routingPreference: 'TRAFFIC_AWARE',
+                travelMode: "DRIVE",
+                routingPreference: "TRAFFIC_AWARE",
                 computeAlternativeRoutes: false,
                 routeModifiers: {
                     avoidTolls: false,
                     avoidHighways: false,
                     avoidFerries: false,
                 },
-                languageCode: 'en-US',
-                units: 'IMPERIAL',
+                languageCode: "en-US",
+                units: "IMPERIAL",
             };
 
             requestBody.intermediates = stopovers.map((stop) => ({
-                location: {latLng: {latitude: stop.latitude,longitude: stop.longitude}},
+                location: {
+                    latLng: {
+                        latitude: stop.latitude,
+                        longitude: stop.longitude,
+                    },
+                },
             }));
 
             const headers = {
-                'Content-Type': 'application/json',
-                'X-Goog-Api-Key': props.map_key,
-                'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.viewport',
+                "Content-Type": "application/json",
+                "X-Goog-Api-Key": props.map_key,
+                "X-Goog-FieldMask":
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.viewport",
             };
 
-            axios.post(url, requestBody, { headers })
-            .then(response => {
-                const route = response.data.routes?.[0];
-                if(route) {
+            axios
+                .post(url, requestBody, { headers })
+                .then((response) => {
+                    const route = response.data.routes?.[0];
+                    if (route) {
+                        etaParam.distance = route.distanceMeters;
+                        etaParam.duration = Math.round(
+                            parseFloat(route.duration.slice(0, -1)) / 60,
+                        );
 
-                    etaParam.distance = route.distanceMeters;
-                    etaParam.duration = Math.round(parseFloat(route.duration.slice(0,-1)) / 60);
+                        if (form.poly_line.length) {
+                            form.poly_line = "";
+                        }
 
-                    if (form.poly_line.length) {
-                        form.poly_line = '';
+                        if (route.polyline?.encodedPolyline) {
+                            form.poly_line = route.polyline.encodedPolyline;
+                        }
+
+                        if (errors.value.map) {
+                            delete errors.value.map;
+                        }
+                        return verifyError(errors);
                     }
-
-                    if(route.polyline?.encodedPolyline) {
-
-                        form.poly_line = route.polyline.encodedPolyline;
-
-                    }
-
-                    if (errors.value.map) {
-                        delete errors.value.map;
-                    }
-                    return verifyError(errors);
-                }
-            })
-            .catch(error => {
-                errors.value.map = t("service_not_available");
-                console.error('Error:', error);
-            });
+                })
+                .catch((error) => {
+                    errors.value.map = t("service_not_available");
+                    console.error("Error:", error);
+                });
         };
 
         const pickSuggestions = ref([]);
         const dropSuggestions = ref([]);
         const stopSuggestions = ref([]);
 
-        const handleInput = (input,index=null) => {
+        const handleInput = (input, index = null) => {
             if (input == "pickup") {
                 if (form.pick_address.length < 3) {
                     pickSuggestions.value = [];
@@ -700,7 +1304,11 @@ export default {
                     stopSuggestions.value[index] = [];
                 } else {
                     setTimeout(() => {
-                        fetchAutocompleteResults(stopovers[index]?.address, input,index);
+                        fetchAutocompleteResults(
+                            stopovers[index]?.address,
+                            input,
+                            index,
+                        );
                     }, 300);
                 }
             }
@@ -728,29 +1336,32 @@ export default {
                         if (type == "pickup") {
                             pickSuggestions.value = data.suggestions
                                 .filter(
-                                    (suggestion) => suggestion.placePrediction
+                                    (suggestion) => suggestion.placePrediction,
                                 )
                                 .map((suggestion) => ({
                                     placeId: suggestion.placePrediction.placeId,
-                                    formattedAddress: suggestion.placePrediction.text.text,
+                                    formattedAddress:
+                                        suggestion.placePrediction.text.text,
                                 }));
                         } else if (type == "drop") {
                             dropSuggestions.value = data.suggestions
                                 .filter(
-                                    (suggestion) => suggestion.placePrediction
+                                    (suggestion) => suggestion.placePrediction,
                                 )
                                 .map((suggestion) => ({
                                     placeId: suggestion.placePrediction.placeId,
-                                    formattedAddress: suggestion.placePrediction.text.text,
+                                    formattedAddress:
+                                        suggestion.placePrediction.text.text,
                                 }));
                         } else if (type == "stop") {
                             stopSuggestions.value[index] = data.suggestions
                                 .filter(
-                                    (suggestion) => suggestion.placePrediction
+                                    (suggestion) => suggestion.placePrediction,
                                 )
                                 .map((suggestion) => ({
                                     placeId: suggestion.placePrediction.placeId,
-                                    formattedAddress: suggestion.placePrediction.text.text,
+                                    formattedAddress:
+                                        suggestion.placePrediction.text.text,
                                 }));
                         }
                     }
@@ -758,7 +1369,7 @@ export default {
                 .catch((error) => {
                     console.error(
                         "Error fetching autocomplete results:",
-                        error
+                        error,
                     );
                 });
         };
@@ -771,54 +1382,51 @@ export default {
                 `https://places.googleapis.com/v1/places/${suggestion.placeId}?fields=location`,
                 {
                     headers: headers,
-                }
+                },
             )
                 .then((response) => response.json())
                 .then((data) => {
-                    if(input == 'pickup'){
-                      etaParam.pick_lat = data.location.latitude;
-                      etaParam.pick_lng = data.location.longitude;
-                      form.pick_address = suggestion.formattedAddress;
+                    if (input == "pickup") {
+                        etaParam.pick_lat = data.location.latitude;
+                        etaParam.pick_lng = data.location.longitude;
+                        form.pick_address = suggestion.formattedAddress;
 
-                      const position = {lat: data.location.latitude, lng: data.location.longitude };
-                      pickupMarker.value = position;
-                      
+                        const position = {
+                            lat: data.location.latitude,
+                            lng: data.location.longitude,
+                        };
+                        pickupMarker.value = position;
 
-                      pickSuggestions.value  = [];
+                        pickSuggestions.value = [];
+                    } else if (input == "drop") {
+                        etaParam.drop_lat = data.location.latitude;
+                        etaParam.drop_lng = data.location.longitude;
+                        form.drop_address = suggestion.formattedAddress;
 
-                    }else if(input == 'drop') {
-                      etaParam.drop_lat = data.location.latitude;
-                      etaParam.drop_lng = data.location.longitude;
-                      form.drop_address = suggestion.formattedAddress;
-
-                      const position = {lat: data.location.latitude, lng: data.location.longitude };
-                      dropMarker.value = position;
-                      dropSuggestions.value = [];
-
-                    }else if(input == 'stop') {
-
-                      stopSuggestions.value[index] = [];
-                      stopovers[index].address = suggestion.formattedAddress;
-                      stopovers[index].latitude = data.location.latitude;
-                      stopovers[index].longitude = data.location.longitude;
-
+                        const position = {
+                            lat: data.location.latitude,
+                            lng: data.location.longitude,
+                        };
+                        dropMarker.value = position;
+                        dropSuggestions.value = [];
+                    } else if (input == "stop") {
+                        stopSuggestions.value[index] = [];
+                        stopovers[index].address = suggestion.formattedAddress;
+                        stopovers[index].latitude = data.location.latitude;
+                        stopovers[index].longitude = data.location.longitude;
                     }
                     bookValidate();
                 })
                 .catch((error) => {
                     console.error(
                         "Error fetching autocomplete results:",
-                        error
+                        error,
                     );
                 });
         };
 
-
-        
-
         let route_time = true;
         const updateRoute = () => {
-            
             if (route_time) {
                 setTimeout(() => {
                     drawRoute();
@@ -830,21 +1438,24 @@ export default {
         // Initialize Map
         const driverMarkers = ref({});
 
-        watch( stopovers, (newVal) => {
-          var flag = false;
-          newVal.forEach((stop, index) => {
-              if (stop.latitutde) {
-                  flag = true;
-              }
-              manageStopMarker();
-          });
+        watch(
+            stopovers,
+            (newVal) => {
+                var flag = false;
+                newVal.forEach((stop, index) => {
+                    if (stop.latitutde) {
+                        flag = true;
+                    }
+                    manageStopMarker();
+                });
 
-          if (flag) {
-              bookValidate();
-              updateRoute();
-          }
-        }, { deep: true } );
-
+                if (flag) {
+                    bookValidate();
+                    updateRoute();
+                }
+            },
+            { deep: true },
+        );
 
         const loadVehicleTypes = async () => {
             if (bookValidate()) {
@@ -901,57 +1512,53 @@ export default {
                 payload.stops = JSON.stringify(stopovers);
             }
 
-            try{
-              const response = await axios.post(
-                  `/dispatch/request/eta`,
-                  payload
-              );
-              vehicleTypes.value = response.data.data;
-              if(vehicleTypes.value.length>0){
-                  if(vehicleTypes.value[0].unit_in_words == 'MILES'){
-                      etaParam.distance_in_unit = etaParam.distance * 0.621371;
-                      unit.value = t('miles');
-                  }else{
-                      etaParam.distance_in_unit = etaParam.distance;
-                      unit.value = t('km');
-                  }
-              }
+            try {
+                const response = await axios.post(
+                    `/dispatch/request/eta`,
+                    payload,
+                );
+                vehicleTypes.value = response.data.data;
+                if (vehicleTypes.value.length > 0) {
+                    if (vehicleTypes.value[0].unit_in_words == "MILES") {
+                        etaParam.distance_in_unit =
+                            etaParam.distance * 0.621371;
+                        unit.value = t("miles");
+                    } else {
+                        etaParam.distance_in_unit = etaParam.distance;
+                        unit.value = t("km");
+                    }
+                }
 
-              fetchNearbyDrivers(pickupMarker.value);
-            }catch(error){
+                fetchNearbyDrivers(pickupMarker.value);
+            } catch (error) {
                 console.error(errors);
             }
         };
 
-    const handlePickupAddress = (address,type,position,index) => {
-        
-        if(type == 'pickup'){
-        etaParam.pick_lat = position.lat;
-        etaParam.pick_lng = position.lng;
+        const handlePickupAddress = async (address, type, position, index) => {
+            // Get better address using our new logic
+            const betterAddress = await fetchAddressFromLatLng(
+                position.lat,
+                position.lng,
+            );
 
-        form.pick_address = address;
-        pickupMarker.value = position;
-        
-
-        loadVehicleTypes();
-
-        }else if(type == 'drop'){
-        form.drop_address = address;
-        dropMarker.value = position;
-
-        loadVehicleTypes();
-        
-        }else{
-                        
-        stopovers[index].address = address;
-        stopovers[index].latitude = position.lat;
-        stopovers[index].longitude = position.lng;
-
-        loadVehicleTypes();
-
-        }
-
-  };
+            if (type == "pickup") {
+                etaParam.pick_lat = position.lat;
+                etaParam.pick_lng = position.lng;
+                form.pick_address = betterAddress || address;
+                pickupMarker.value = position;
+                loadVehicleTypes();
+            } else if (type == "drop") {
+                form.drop_address = betterAddress || address;
+                dropMarker.value = position;
+                loadVehicleTypes();
+            } else {
+                stopovers[index].address = betterAddress || address;
+                stopovers[index].latitude = position.lat;
+                stopovers[index].longitude = position.lng;
+                loadVehicleTypes();
+            }
+        };
 
         const loadRentalPack = async () => {
             vehicleTypes.value = [];
@@ -966,31 +1573,44 @@ export default {
 
             const response = await axios.post(
                 `/dispatch/request/list_packages`,
-                payload
+                payload,
             );
 
             packageTypes.value = response.data.data;
         };
-        
+
         // Helper to calculate bearing between two lat/lngs
         function calculateBearing(lat1, lng1, lat2, lng2) {
-            const toRad = deg => deg * Math.PI / 180;
-            const toDeg = rad => rad * 180 / Math.PI;
+            const toRad = (deg) => (deg * Math.PI) / 180;
+            const toDeg = (rad) => (rad * 180) / Math.PI;
 
             const dLng = toRad(lng2 - lng1);
             const y = Math.sin(dLng) * Math.cos(toRad(lat2));
-            const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
-                        Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLng);
+            const x =
+                Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+                Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLng);
 
             const angle = Math.atan2(y, x);
             return (toDeg(angle) + 360) % 360; // Normalize to [0, 360)
         }
 
-        function animateMarkerMovement(marker, startLat, startLng, endLat, endLng ,driver , duration = 1000) {
-
+        function animateMarkerMovement(
+            marker,
+            startLat,
+            startLng,
+            endLat,
+            endLng,
+            driver,
+            duration = 1000,
+        ) {
             const startTime = performance.now();
 
-            const bearing = calculateBearing(startLat, startLng, endLat, endLng);
+            const bearing = calculateBearing(
+                startLat,
+                startLng,
+                endLat,
+                endLng,
+            );
 
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
@@ -1004,11 +1624,9 @@ export default {
 
                 marker.rotation = bearing;
 
-
                 if (t < 1) {
                     requestAnimationFrame(animate);
-                }else{
-
+                } else {
                     driverMarkers.value[driver.id] = {
                         lat: endLat,
                         lng: endLng,
@@ -1021,68 +1639,79 @@ export default {
             requestAnimationFrame(animate);
         }
         const fetchNearbyDrivers = (pickupMarker) => {
-          vehicleTypes.value.forEach((vehicleType) => {
-            vehicleType.driver_time = null;
-          });
-
-          const driversRef = firebase.database().ref("drivers");
-
-          driversRef.on("value", (snapshot) => {
-            snapshot.forEach((childSnapshot) => {
-              const driver = childSnapshot.val();
-              const driverGeoHash = driver.g;
-              const driverLocation = decodeGeohash(driverGeoHash);
-
-              if (driverLocation) {
-                const distance = calculateDistance(
-                  pickupMarker.lat,
-                  pickupMarker.lng,
-                  driverLocation.lat,
-                  driverLocation.lon
-                );
-
-                var flag = true;
-                if (form.vehicle_type) {
-                  flag = false;
-                  var type_id = vehicleTypes.value?.find((type) => {
-                    return type.zone_type_id === form.vehicle_type;
-                  })?.type_id;
-                  if (
-                    type_id &&
-                    driver.vehicle_types &&
-                    driver.vehicle_types.includes(type_id)
-                  ) {
-                    flag = true;
-                  }
-                }
-
-                if (distance <= 10 && driver.is_available && driver.is_active && flag) {
-                  setEtaTime(driver, distance);
-                  const prev = driverMarkers.value[driver.id];
-
-                  if (prev) {
-                    if (
-                      prev.lat !== driverLocation.latride_w &&
-                      prev.lng !== driverLocation.lon
-                    ) {
-                      animateMarkerMovement( prev, prev.lat, prev.lng, driverLocation.lat, driverLocation.lon, driver );
-                    }
-                  } else {
-                    driverMarkers.value[driver.id] = {
-                        lat: driverLocation.lat,
-                        lng: driverLocation.lon,
-                        rotation: driver.bearing,
-                        type_icon: driver.vehicle_type_icon,
-                    };
-                  }
-                } else if (driverMarkers.value[driver.id]) {
-                  delete driverMarkers.value[driver.id];
-                }
-              }
+            vehicleTypes.value.forEach((vehicleType) => {
+                vehicleType.driver_time = null;
             });
-          });
-        };
 
+            const driversRef = firebase.database().ref("drivers");
+
+            driversRef.on("value", (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const driver = childSnapshot.val();
+                    const driverGeoHash = driver.g;
+                    const driverLocation = decodeGeohash(driverGeoHash);
+
+                    if (driverLocation) {
+                        const distance = calculateDistance(
+                            pickupMarker.lat,
+                            pickupMarker.lng,
+                            driverLocation.lat,
+                            driverLocation.lon,
+                        );
+
+                        var flag = true;
+                        if (form.vehicle_type) {
+                            flag = false;
+                            var type_id = vehicleTypes.value?.find((type) => {
+                                return type.zone_type_id === form.vehicle_type;
+                            })?.type_id;
+                            if (
+                                type_id &&
+                                driver.vehicle_types &&
+                                driver.vehicle_types.includes(type_id)
+                            ) {
+                                flag = true;
+                            }
+                        }
+
+                        if (
+                            distance <= 10 &&
+                            driver.is_available &&
+                            driver.is_active &&
+                            flag
+                        ) {
+                            setEtaTime(driver, distance);
+                            const prev = driverMarkers.value[driver.id];
+
+                            if (prev) {
+                                if (
+                                    prev.lat !== driverLocation.latride_w &&
+                                    prev.lng !== driverLocation.lon
+                                ) {
+                                    animateMarkerMovement(
+                                        prev,
+                                        prev.lat,
+                                        prev.lng,
+                                        driverLocation.lat,
+                                        driverLocation.lon,
+                                        driver,
+                                    );
+                                }
+                            } else {
+                                driverMarkers.value[driver.id] = {
+                                    lat: driverLocation.lat,
+                                    lng: driverLocation.lon,
+                                    rotation: driver.bearing,
+                                    type_icon: driver.vehicle_type_icon,
+                                };
+                            }
+                        } else if (driverMarkers.value[driver.id]) {
+                            delete driverMarkers.value[driver.id];
+                        }
+                    }
+                });
+            });
+        };
 
         watch(
             () => form.vehicle_type,
@@ -1095,7 +1724,7 @@ export default {
                         enableBooking.value = false;
                     }
                 }
-            }
+            },
         );
         watch(
             () => form.transport_type,
@@ -1111,7 +1740,7 @@ export default {
                         loadVehicleTypes();
                     }
                 }
-            }
+            },
         );
 
         watch(
@@ -1125,20 +1754,20 @@ export default {
 
                     rentalVehicleTypes.value = types;
                 }
-            }
+            },
         );
         watch(
             () => form.is_later,
             async (value) => {
-                if(value == 0 && form.ride_type == 'outstation'){
+                if (value == 0 && form.ride_type == "outstation") {
                     // form.ride_type = 'regular';
-                    changelater('regular');
+                    changelater("regular");
                 }
                 if (form.pick_address) {
                     bookValidate();
                     loadVehicleTypes();
                 }
-            }
+            },
         );
         watch(
             () => form.ride_type,
@@ -1146,7 +1775,7 @@ export default {
                 if (form.pick_address && bookValidate()) {
                     loadVehicleTypes();
                 }
-            }
+            },
         );
         const nameChangeShow = debounce((name) => {
             if (name && form.vehicle_type) {
@@ -1164,7 +1793,7 @@ export default {
                 if (form.pick_address) {
                     bookValidate();
                 }
-            }
+            },
         );
         watch(
             () => form.return_time,
@@ -1172,7 +1801,7 @@ export default {
                 if (value) {
                     await loadVehicleTypes();
                 }
-            }
+            },
         );
         watch(
             () => etaParam.pick_lat,
@@ -1181,7 +1810,7 @@ export default {
                     bookValidate();
                     loadVehicleTypes();
                 }
-            }
+            },
         );
 
         watch(
@@ -1190,22 +1819,27 @@ export default {
                 if (value && etaParam.pick_lat) {
                     bookValidate();
                 }
-            }
+            },
         );
         watch(
             () => etaParam.distance,
             async (value) => {
                 var flag = false;
-                if (form.ride_type == 'rental') {
-                    if(etaParam.pick_lat && etaParam.pick_lng){
-                      await loadVehicleTypes();
+                if (form.ride_type == "rental") {
+                    if (etaParam.pick_lat && etaParam.pick_lng) {
+                        await loadVehicleTypes();
                     }
-                }else{
-                    if (etaParam.pick_lat && etaParam.pick_lng && etaParam.drop_lat && etaParam.drop_lng){
+                } else {
+                    if (
+                        etaParam.pick_lat &&
+                        etaParam.pick_lng &&
+                        etaParam.drop_lat &&
+                        etaParam.drop_lng
+                    ) {
                         await loadVehicleTypes();
                     }
                 }
-            }
+            },
         );
 
         const setEtaTime = (driver, distance) => {
@@ -1297,7 +1931,14 @@ export default {
 
             enableBooking.value = false;
 
-            const { pick_lat, pick_lng, drop_lat, drop_lng, distance, duration, } = etaParam.data();
+            const {
+                pick_lat,
+                pick_lng,
+                drop_lat,
+                drop_lng,
+                distance,
+                duration,
+            } = etaParam.data();
 
             if (pick_lat) {
                 form.pick_lat = pick_lat;
@@ -1324,8 +1965,11 @@ export default {
 
             try {
                 let response;
-                
-                response = await axios.post( `/dispatch/create-request`, form.data() );
+
+                response = await axios.post(
+                    `/dispatch/create-request`,
+                    form.data(),
+                );
                 if (response.data.success === true) {
                     let timerInterval;
                     Swal.fire({
@@ -1337,7 +1981,7 @@ export default {
                             Swal.showLoading();
                             timerInterval = setInterval(() => {
                                 Swal.getContent().querySelector(
-                                    "b"
+                                    "b",
                                 ).textContent = Swal.getTimerLeft();
                             }, 100);
                         },
@@ -1345,7 +1989,7 @@ export default {
                             clearInterval(timerInterval);
                         },
                     }).then((result) => {
-                        if ( result.dismiss === Swal.DismissReason.timer ) {
+                        if (result.dismiss === Swal.DismissReason.timer) {
                             console.log("I was closed by the timer");
                         }
                         enableBooking.value = true;
@@ -1353,7 +1997,7 @@ export default {
 
                     if (form.assign_method == 1) {
                         router.get(
-                            "ongoing_request/assign/" + response.data.data.id
+                            "ongoing_request/assign/" + response.data.data.id,
                         );
                     }
                     form.reset();
@@ -1361,19 +2005,23 @@ export default {
                     vehicleTypes.value = [];
                     rentalVehicleTypes.value = [];
                     stopovers.length = 0;
-                    pickupMarker.value=null;
-                    dropMarker.value=null;
-                    form.poly_line='';
-                    driverMarkers.value={};
+                    pickupMarker.value = null;
+                    dropMarker.value = null;
+                    form.poly_line = "";
+                    driverMarkers.value = {};
                 } else {
-                    alertMessage.value = t( "failed_to_make_booking_contact_admin" );
+                    alertMessage.value = t(
+                        "failed_to_make_booking_contact_admin",
+                    );
                 }
             } catch (error) {
                 if (error.response && error.response.status === 422) {
                     errors.value = error.response.data.errors;
                 } else {
                     console.error(t("error_creating_vehicle_price"), error);
-                    alertMessage.value = t( "failed_to_make_booking_contact_admin" );
+                    alertMessage.value = t(
+                        "failed_to_make_booking_contact_admin",
+                    );
                 }
             }
         };
@@ -1384,8 +2032,10 @@ export default {
                 authDomain: props.firebaseSettings["firebase_auth_domain"],
                 databaseURL: props.firebaseSettings["firebase_database_url"],
                 projectId: props.firebaseSettings["firebase_project_id"],
-                storageBucket: props.firebaseSettings["firebase_storage_bucket"],
-                messagingSenderId: props.firebaseSettings["firebase_messaging_sender_id"],
+                storageBucket:
+                    props.firebaseSettings["firebase_storage_bucket"],
+                messagingSenderId:
+                    props.firebaseSettings["firebase_messaging_sender_id"],
                 appId: props.firebaseSettings["firebase_app_id"],
             };
             if (firebase.apps.length == 0) {
@@ -1404,7 +2054,9 @@ export default {
 
         const filteredCountries = computed(() => {
             return props.countries.filter((country) =>
-                country.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+                country.name
+                    .toLowerCase()
+                    .includes(searchQuery.value.toLowerCase()),
             );
         });
 
@@ -1414,8 +2066,12 @@ export default {
         };
 
         const validateNumber = debounce(async (event) => {
-            event.target.value = event.target.value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
-            const response = await axios.get(`/dispatch/fetch-user-detail`, { params: { mobile: form.mobile } });
+            event.target.value = event.target.value
+                .replace(/[^0-9.]/g, "")
+                .replace(/(\..*?)\..*/g, "$1");
+            const response = await axios.get(`/dispatch/fetch-user-detail`, {
+                params: { mobile: form.mobile },
+            });
 
             if (response.data.data) {
                 if (form.pick_address) {
@@ -1501,35 +2157,71 @@ export default {
                 <BCard no-body id="tasksList">
                     <BCardHeader class="border-0">
                         <BRow>
-                            <BCol lg="6">
-                            </BCol>
-                            <BCol lg="6" v-if="form.ride_type!=='rental'">
+                            <BCol lg="6"> </BCol>
+                            <BCol lg="6" v-if="form.ride_type !== 'rental'">
                                 <div class="row mt-4">
                                     <div class="col-lg-6 col-sm-6">
-                                        <div class="p-0 border border-dashed rounded">
-                                            <div class="d-flex align-items-center">
+                                        <div
+                                            class="p-0 border border-dashed rounded"
+                                        >
+                                            <div
+                                                class="d-flex align-items-center"
+                                            >
                                                 <div class="avatar-sm me-2">
-                                                    <div class="avatar-title rounded bg-transparent text-success fs-24" >
-                                                        <i class="ri-map-pin-time-line" ></i>
+                                                    <div
+                                                        class="avatar-title rounded bg-transparent text-success fs-24"
+                                                    >
+                                                        <i
+                                                            class="ri-map-pin-time-line"
+                                                        ></i>
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                  <p class="text-muted mb-1">{{$t("duration")}} :<span class="fs-16 fw-bold ms-2"> {{ formattedDuration }}</span></p>
+                                                    <p class="text-muted mb-1">
+                                                        {{ $t("duration") }}
+                                                        :<span
+                                                            class="fs-16 fw-bold ms-2"
+                                                        >
+                                                            {{
+                                                                formattedDuration
+                                                            }}</span
+                                                        >
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- end col -->
                                     <div class="col-lg-6 col-sm-6">
-                                        <div class="p-0 border border-dashed rounded">
-                                            <div class="d-flex align-items-center">
+                                        <div
+                                            class="p-0 border border-dashed rounded"
+                                        >
+                                            <div
+                                                class="d-flex align-items-center"
+                                            >
                                                 <div class="avatar-sm me-2">
-                                                    <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                      <i class=" ri-pin-distance-line"></i>
+                                                    <div
+                                                        class="avatar-title rounded bg-transparent text-success fs-24"
+                                                    >
+                                                        <i
+                                                            class="ri-pin-distance-line"
+                                                        ></i>
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <p class="text-muted mb-1">{{$t("distance")}} :<span class="fs-16 fw-bold ms-2">{{(etaParam.distance_in_unit/1000).toFixed(2)}} {{unit}}</span></p>
+                                                    <p class="text-muted mb-1">
+                                                        {{ $t("distance") }}
+                                                        :<span
+                                                            class="fs-16 fw-bold ms-2"
+                                                            >{{
+                                                                (
+                                                                    etaParam.distance_in_unit /
+                                                                    1000
+                                                                ).toFixed(2)
+                                                            }}
+                                                            {{ unit }}</span
+                                                        >
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1539,463 +2231,1579 @@ export default {
                             </BCol>
                         </BRow>
                     </BCardHeader>
-                    <BCardBody class="border border-dashed border-end-0 border-start-0">
-                      <form @submit.prevent="handleSubmit">
-                        <FormValidation :form="form" :rules="validationRules" ref="validationRef">
-                          <div class="row">
-                            <div class="col-12 col-lg-6" ref="scrollContainer" style="max-height:500px;overflow-y: auto;">
-                              <div class="row">
-                                <h4 class="card-title mb-3 flex-grow-1">{{$t("personal_info")}}</h4>
-                                <div class="col-6">
-                                  <div>
-                                      <label class="form-label">{{$t("mobile")}}</label>
-                                      <div class="input-group" data-input-flag="">
-                                          <button class="btn btn-light border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                              <img :src="selectedCountry.flag" alt="flag" height="20" class="country-flagimg rounded">
-                                              <span class="ms-2 country-codeno">{{ selectedCountry.dial_code }}</span>
-                                          </button>
-                                          <input type="text" id="mobile" class="form-control rounded-end flag-input" v-model="form.mobile" @keydown="preventDefault" :placeholder="$t('enter_number')" @input="validateNumber">
-                                          <div class="dropdown-menu w-100">
-                                              <div class="p-2 px-3 pt-1 searchlist-input">
-                                                <input type="text" class="form-control form-control-sm border search-countryList" :placeholder="$t('search_country_name_or_country_code')" v-model="searchQuery">
-                                              </div>
-                                              <ul class="list-unstyled dropdown-menu-list mb-0">
-                                                  <li v-for="country in filteredCountries" :key="country.id">
-                                                      <a href="javascript:void(0);" class="dropdown-item notify-item language py-2" @click="selectCountry(country)">
-                                                          <img :src="country.flag" alt="flag" class="me-2 rounded" height="18">
-                                                          <span class="align-middle">{{ country.name }} {{ country.dial_code }}</span>
-                                                      </a>
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </div>
-                                      <span v-for="(error, index) in errors.mobile" :key="index" class="text-danger">{{ error }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                  <div class="mb-3">
-                                    <label for="name" class="form-label">{{$t("name")}}</label>
-                                    <input type="text" class="form-control" v-model="form.name" :placeholder="$t('enter_name')" id="name" >
-                                    <span v-for="(error, index) in errors.name" :key="index" class="text-danger">{{ error }}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-
-                                <!-- Ride info -->
-                                <div class="d-flex align-items-center mt-4">
-                                  <h4 class="card-title mb-3 flex-grow-1">{{$t("ride_info")}}</h4>
-                                </div>
-                                <div class="col-6">
-                                  <div class="mb-3">
-                                    <label for="type" class="form-label">{{$t("booking_type")}}</label>
-                                    <select id="type" class="form-select" v-model="form.is_later">
-                                      <option disabled value="">{{$t("choose_type")}}</option>
-                                      <option value=0>{{$t("instant_booking")}}</option>
-                                      <option value=1>{{$t("book_later")}}</option>
-                                    </select>
-                                    <span v-for="(error, index) in errors.is_later" :key="index" class="text-danger">{{ error }}</span>
-                                  </div>
-                                </div>
-                                <div class="col-6" :style="{ display: transport_options.length === 0 ? 'none' : 'block' }">
-                                  <div class="col-12">
-                                    <div class="mb-3">
-                                      <label for="type" class="form-label" >{{$t("transport_type")}}</label>
-                                      <select id="type" class="form-select" v-model="form.transport_type">
-                                        <option disabled value="">{{ $t("choose_transport_type") }}</option>
-                                        <option v-for="(type, index) in transport_options"  :key="index" :value="type">
-                                        {{ type.charAt(0).toUpperCase() + type.slice(1) }}
-                                        </option>
-                                      </select>
-                                      <span v-for="(error, index) in errors.transport_type" :key="index" class="text-danger"> {{ error }} </span>
-                                    </div>
-                                  </div>
-                                </div>
-                             </div>
-                             <div class="row">
-                                <div class="mt-4 mb-4">
-                                  <h4 class="card-title mb-3 flex-grow-1">{{$t("schedule_type")}}</h4>
-                                    <div>
-                                        <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="ScheduleType" :checked="form.ride_type == 'regular'"
-                                        @click="changelater('regular')" id="later_ride" value="later">
-                                        <label class="form-check-label" for="later_ride">{{$t("normal")}}</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                        <input class="form-check-input" @click="changelater('rental')" type="radio" name="ScheduleType" :checked="form.ride_type == 'rental'"
-                                        id="rental" value="rental">
-                                        <label class="form-check-label" for="rental">{{$t("rental_pack")}}</label>
-                                        </div>
-                                        <div v-if="form.is_later==1" class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="ScheduleType" @click="changelater('outstation')"
-                                        id="outstation" value='outstation'  :checked="form.ride_type == 'outstation'">
-                                        <label class="form-check-label" for="outstation">{{$t("outstation")}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="mb-3">
-                                  <div class="d-flex align-items-center justify-content-between">
-                                    <label for="pickup" class="form-label">{{ $t("pickup_location") }}</label>
-                                    <a v-if="form.ride_type=='regular' && (stopovers.length < maxStopovers)" class="btn btn-primary mb-3" @click="addStopover">{{$t("add_stops")}}</a>
-                                  </div>
-                                  <div class="autocomplete-container">
-                                        <div class="input-group">
-                                            <input
-                                            type="text"
-                                            class="form-control"
-                                            v-model="form.pick_address"
-                                            :placeholder="$t('enter_pickup')"
-                                            id="pickup"
-                                            autocomplete="off"
-                                            @input="handleInput('pickup')"
-                                            />
-                                        </div>
-                                        <div v-if="pickSuggestions.length > 0" class="autocomplete-results">
-                                            <div
-                                            v-for="suggestion in pickSuggestions"
-                                            :key="suggestion.placeId"
-                                            class="autocomplete-item"
-                                            @click="selectSuggestion(suggestion,'pickup')"
-                                            >
-                                            {{ suggestion.formattedAddress }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                  <span v-for="(error, index) in errors.pick_address" :key="index" class="text-danger">{{ error }}</span>
-                                </div>
-                              </div>
-                            <div class="row">
-                              <div class="col-12" v-if="form.ride_type=='regular'" v-for="(stop, index) in stopovers" :key="index">
-                                <div class="mb-3">
-                                  <label :for="`stop-${index}`" class="form-label">{{$t("stop_location")}}</label>
-                                  <div class="d-flex align-items-center">
-                                  <div class="autocomplete-container col-8">
-                                        <div class="input-group">
-                                            <input
-                                            type="text"
-                                            class="form-control"
-                                            v-model="stop.address"
-                                            :placeholder="'Enter stop ' + (index + 1)"
-                                            id="`stop-${index}`"
-                                            autocomplete="off"
-                                            @input="handleInput('stop',index)"
-                                            />
-                                        </div>
-                                        <div v-if="stopSuggestions?.[index]?.length > 0" class="autocomplete-results">
-                                            <div
-                                            v-for="suggestion in stopSuggestions?.[index]"
-                                            :key="suggestion.placeId"
-                                            class="autocomplete-item"
-                                            @click="selectSuggestion(suggestion,'stop',index)"
-                                            >
-                                            {{ suggestion.formattedAddress }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <i class="bx bx-trash text-danger fs-22 btn" @click="removeStopover(index)"></i>
-                                  </div>
-                                  <span v-for="(error, index) in errors.stop?.[index]" :key="index" class="text-danger">{{ error }}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="row">
-                              <div class="col-12" v-if="showAiportTerminal">
-                                <div class="mb-3">
-                                  <label for="terminal" class="form-label">{{$t("aiport_terminal_info")}}</label>
-                                  <input type="text" class="form-control" v-model="form.terminal" placeholder="$t('enter_terminal_info')" id="terminal" >
-                                </div>
-                              </div>
-                            </div>
-                            <div class="row">
-                              <div class="col-12" v-if="showTrainStationEnterance">
-                                <div class="mb-3">
-                                  <label for="enterance" class="form-label">{{$t("station_enterance_info")}}</label>
-                                  <input type="text" class="form-control" v-model="form.enterance" placeholder="$t('enter_enterance_info')" id="enterance" >
-                                </div>
-                              </div>
-
-                            </div>
-                            <div class="row">
-                              <div class="col-12" v-if="form.ride_type!=='rental'">
-                                <div class="mb-3">
-                                  <label for="drop" class="form-label">{{$t("drop_location")}}</label>
-                                    <div class="autocomplete-container">
-                                        <div class="input-group">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            v-model="form.drop_address"
-                                            :placeholder="$t('enter_drop')"
-                                            id="drop"
-                                            autocomplete="off"
-                                            @input="handleInput('drop')"
-                                        />
-                                        </div>
-                                        <div v-if="dropSuggestions.length > 0" class="autocomplete-results">
-                                        <div
-                                            v-for="suggestion in dropSuggestions"
-                                            :key="suggestion.placeId"
-                                            class="autocomplete-item"
-                                            @click="selectSuggestion(suggestion,'drop')"
-                                        >
-                                            {{ suggestion.formattedAddress }}
-                                        </div>
-                                        </div>
-                                    </div>
-                                  <span v-for="(error, index) in errors.drop_address" :key="index" class="text-danger">{{ error }}</span>
-                                  <div class="col-12" v-if="errors.map">
-                                    <div class="mb-3">
-                                    <span v-for="(error, index) in errors.map" :key="index" class="text-danger">{{ error }}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-
-
-                                <!-- POC info -->
-                                <h4 v-if="form.transport_type=='delivery'" class="card-title mb-2 flex-grow-1 mt-4">{{$t("poc_info")}}</h4>
-                                <div v-if="form.transport_type=='delivery'" class="px-2 mb-2">
-                                  <span class="badge bg-dark-subtle text-dark p-1 fs-12 text-center">
-                                    <div class="form-check m-2 mx-3">
-                                      <input class="form-check-input" type="checkbox" id="poc" v-model="isPocSame">
-                                      <label class="form-check-label mt-1" for="poc">
-                                        {{$t("check_if_poc_info_as_same_as_personal_info")}}
-                                      </label>
-                                    </div>
-                                  </span>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div v-if="form.transport_type=='delivery'" class="col-6">
-                                  <div class="mb-3">
-                                    <label for="poc_name" class="form-label">{{$t("drop_poc_name")}}</label>
-                                    <input type="text" class="form-control" v-model="form.drop_poc_name" :placeholder="$t('enter_poc_name')" id="poc_name" :disabled="isPocSame" >
-                                    <span v-for="(error, index) in errors.drop_poc_name" :key="index" class="text-danger">{{ error }}</span>
-                                  </div>
-                                </div>
-                                <div v-if="form.transport_type=='delivery'" class="col-6">
-                                  <div class="mb-3">
-                                    <label for="poc_mobile" class="form-label">{{$t("drop_poc_mobile")}}</label>
-                                    <input type="text" class="form-control" v-model="form.drop_poc_mobile" :placeholder="$t('enter_poc_mobile')" id="poc_mobile" :disabled="isPocSame" >
-                                    <span v-for="(error, index) in errors.drop_poc_mobile" :key="index" class="text-danger">{{ error }}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <h4 v-if="form.transport_type=='delivery'" class="card-title mb-2 flex-grow-1 mt-4">{{$t("select_goods")}}</h4>
-                                <div v-if="form.transport_type=='delivery'" class="col-6">
-                                  <div class="mb-3">
-                                    <label for="goods_type" class="form-label">{{$t("goods_type")}}</label>
-                                    <select id="goods_type" class="form-select" v-model="form.goods_type_id">
-                                    <option disabled value="">{{$t("choose_type")}}</option>
-                                    <option v-for="goodsType in goodsTypes" :key="goodsType.id" :value="goodsType.id">{{ goodsType.goods_type_name }}</option>
-                                    </select>
-                                    <span v-for="(error, index) in errors.goods_type_id" :key="index" class="text-danger">{{ error }}</span>
-                                  </div>
-                                </div>
-                                <div v-if="form.transport_type=='delivery'" class="col-6">
-                                  <div class="mb-3">
-                                    <label for="goods_type_quantity" class="form-label">{{$t("goods_quantity")}}</label>
-                                    <input type="text" class="form-control" v-model="form.goods_type_quantity" :placeholder="$t('enter_quantity')" id="goods_type_quantity" >
-                                    <span v-for="(error, index) in errors.goods_type_quantity" :key="index" class="text-danger">{{ error }}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-
-                                <!-- rental package -->
-                                <h4 v-if="form.is_rental == 1" class="card-title mb-3 flex-grow-1 mt-4">{{$t("select_pack")}}</h4>
-                                <div v-if="form.is_rental == 1" style="max-width:600px; overflow-x: auto;" class="col-12">
-                                  <div class="mb-3">
-                                    <label for="rental_package_id" class="form-label">{{$t("rental_package_id")}}</label>
-                                    <select id="rental_package_id" class="form-select" v-model="form.rental_package_id">
-                                      <option disabled value="">{{$t("choose_type")}}</option>
-                                      <option v-for="pack in packageTypes" :key="pack.id" :value="pack.id">{{ pack.package_name }}</option>
-                                    </select>
-                                    <span v-for="(error, index) in errors.rental_package_id" :key="index" class="text-danger">{{ error }}</span>
-                                  </div>
-                                </div>
-
-                              </div>
-                            </div>
-                            <div class="row">
-                              <div class="col-12" v-if="form.is_later === '1'">
-                                <div class="mb-3">
-                                  <label for="dispatch-datepicker" class="form-label">{{$t("date")}}</label>
-                                  <flat-pickr :placeholder="$t('select_date')" v-model="form.trip_start_time" :config="dateTimeConfig"
-                                  class="form-control flatpickr-input" id="dispatch-datepicker"></flat-pickr>
-                                  <span v-for="(error, index) in errors.trip_start_time" :key="index" class="text-danger">{{ error }}</span>
-                                </div>
-                              </div>
-
-
-                            </div>
-                            <div class="row">
-                              <div v-if="form.is_out_station == 1" class="mt-4 mb-4">
-                                <h4 class="card-title mb-3 flex-grow-1">{{$t("outstation")}}</h4>
-                                <div>
-                                  <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="is_round_trip"
-                                    id="oneway" :value=0 v-model="form.is_round_trip">
-                                    <label class="form-check-label" for="oneway">{{$t("one_way_outstation_trip")}}</label>
-                                  </div>
-                                  <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="is_round_trip"
-                                    id="roundtrip" :value=1 v-model="form.is_round_trip">
-                                    <label class="form-check-label" for="roundtrip">{{$t("round_trip_outstation_trip")}}</label>
-                                  </div>
-                                </div>
-                              </div>
-
-                            </div>
-                            <div class="row">
-                              <div class="col-12" v-if="form.is_round_trip == 1 && form.is_out_station == 1">
-                                <div class="mb-3">
-                                  <label for="dispatch-datepicker" class="form-label">{{$t("return_time")}}</label>
-                                  <flat-pickr :placeholder="$t('return_time')" v-model="form.return_time" :config="dateTimeConfigReturnTime"
-                                  class="form-control flatpickr-input" id="dispatch-datepicker"></flat-pickr>
-                                </div>
-                                <span v-for="(error, index) in errors.return_time" :key="index" class="text-danger">{{ error }}</span>
-                              </div>
-
-                            </div>
-                            <div class="row">
-                              <!-- Vehicle Select -->
-                              <h4 v-if="vehicleTypes.length > 0" class="card-title mb-3 flex-grow-1 mt-4">{{$t("select_vehicle")}}</h4>
-                              <div v-if="vehicleTypes.length > 0" style="max-width:600px; overflow-x: auto;" class="col-12">
-                                <div class="mb-3">
-                                  <div class="d-flex mt-5">
-                                    <div v-for="(vehicleType, index) in vehicleTypes" :key="index" class="select-checkbox-btn text-center">
-                                      <label :for="'vehicle_' + vehicleType.zone_type_id" class="select-checkbox-btn-wrapper">
-                                        <input
-                                        :id="'vehicle_' + vehicleType.zone_type_id"
-                                        name="types"
-                                        type="radio"
-                                        :value="vehicleType.zone_type_id"
-                                        v-model="form.vehicle_type"
-                                        class="select-checkbox-btn-input"
-                                        />
-                                        <span class="select-checkbox-btn-content">
-                                          <a class="w-32 me-4 cursor-pointer">
-                                            <div class="text-center mt-2 ms-4 text-dark"><i class="bx bx-time-five mx-1"></i>{{ vehicleType.driver_time || '--' }}</div>
-                                            <div class="w-32 h-32 flex-none image-fit rounded-circle">
-                                            <img alt="" class="rounded-circle img-fluid" :src="vehicleType.vehicle_icon" />
-                                            </div>
-                                            <div class="text-center mt-2 amount text-dark">{{ vehicleType.currency }} {{ vehicleType.total }}</div>
-                                            <div class="text-center mt-2 text-dark">{{ vehicleType.name }}</div>
-                                          </a>
-                                        </span>
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                            </div>
-                            <div class="row">
-                              <!-- Vehicle Select -->
-                              <h4 v-if="rentalVehicleTypes.length > 0" class="card-title mb-3 flex-grow-1 mt-4">{{$t("select_vehicle")}}</h4>
-                              <div v-if="rentalVehicleTypes.length > 0" style="max-width:600px; overflow-x: auto;" class="col-12">
-                                <div class="mb-3">
-                                  <div class="d-flex mt-5">
-                                  <div v-for="(vehicleType, index) in rentalVehicleTypes" :key="index" class="select-checkbox-btn text-center">
-                                    <label :for="'vehicle_' + vehicleType.zone_type_id" class="select-checkbox-btn-wrapper">
-                                      <input
-                                      :id="'vehicle_' + vehicleType.zone_type_id"
-                                      name="types"
-                                      type="radio"
-                                      :value="vehicleType.zone_type_id"
-                                      v-model="form.vehicle_type"
-                                      class="select-checkbox-btn-input"
-                                      />
-                                      <span class="select-checkbox-btn-content">
-                                        <a class="w-32 me-4 cursor-pointer">
-                                          <div class="text-center mt-2 ms-4 text-dark"><i class="bx bx-time-five mx-1"></i>{{ vehicleType.driver_time || '--' }}</div>
-                                          <div class="w-32 h-32 flex-none image-fit rounded-circle">
-                                          <img alt="" class="rounded-circle img-fluid" :src="vehicleType.icon" />
-                                          </div>
-                                          <div class="text-center mt-2 amount text-dark">{{ vehicleType.fare_amount }}</div>
-                                          <div class="text-center mt-2 text-dark">{{ vehicleType.name }}</div>
-                                        </a>
-                                      </span>
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                        </div>
-                        <div v-if="is_pet_available == 1 || is_luggage_available == 1" class="row">
-                              <!-- preference -->
-                              <div class="mt-4 mb-4">
-                                <h4 class="card-title mb-3 flex-grow-1">{{$t("preference_for_user")}}</h4>
-                                <div>
-                                  <div class="form-check form-check-inline" v-if="is_pet_available == 1">
-                                    <input class="form-check-input" type="checkbox" name="is_pet_available" :checked="form.is_pet_available"
-                                    id="is_pet_available" :value=1 v-model="form.is_pet_available">
-                                    <label class="form-check-label" for="is_pet_available">{{$t("pet_preference")}}</label>
-                                  </div>
-                                  <div class="form-check form-check-inline" v-if="is_luggage_available == 1">
-                                    <input class="form-check-input" type="checkbox" name="is_luggage_available"
-                                    id="is_luggage_available" :value=1 v-model="form.is_luggage_available" :checked="form.is_luggage_available">
-                                    <label class="form-check-label" for="is_luggage_available">{{$t("luggage_preference")}}</label>
-                                  </div>
-                                </div>
-                              </div>
-
-                            </div>
-                            <div class="row">
-                              <!-- Asiign Driver -->
-                              <div class="mt-4 mb-4">
-                                <h4 class="card-title mb-3 flex-grow-1">{{$t("assign")}}</h4>
-                                <div>
-                                  <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" :checked="form.assign_method == 1"
-                                    id="WithoutinlineRadio1" :value="1" v-model="form.assign_method">
-                                    <label class="form-check-label" for="WithoutinlineRadio1">{{$t("manual_assign")}}</label>
-                                  </div>
-                                  <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                    id="WithoutinlineRadio2" value=0 v-model="form.assign_method" :checked="form.assign_method == 0">
-                                    <label class="form-check-label" for="WithoutinlineRadio2">{{$t("automatic_assign")}}</label>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-lg-12">
-                                <div class="text-center">
-                                  <button type="submit" :disabled="!enableBooking"   @click="makeBooking" class="btn btn-primary">{{$t("make_booking")}}</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                            <!-- map  -->
-                          <div class="col-12 col-lg-6">
-                            <div class="mb-3 text-center m-auto">
-                                <div id="map" style="height: 500px;">
-                                    <googleMap
-                                        :baseUrl="baseUrl"
-                                        :default_location="default_location"
-                                        :pick_location="pickupMarker"
-                                        :drop_location="dropMarker"
-                                        :nearbyDrivers="driverMarkers"
-                                        :stops="stopMarkers"
-                                        :draggable="true"
-                                        :polyline="form.poly_line"
-                                        :map_key="map_key"
-                                        :libraries="['marker','geometry','geocoding']"
-                                        @update-pickup-address="handlePickupAddress"
+                    <BCardBody
+                        class="border border-dashed border-end-0 border-start-0"
+                    >
+                        <form @submit.prevent="handleSubmit">
+                            <FormValidation
+                                :form="form"
+                                :rules="validationRules"
+                                ref="validationRef"
+                            >
+                                <div class="row">
+                                    <div
+                                        class="col-12 col-lg-6"
+                                        ref="scrollContainer"
+                                        style="
+                                            max-height: 500px;
+                                            overflow-y: auto;
+                                        "
                                     >
-                                    {{$t("map_loading")}}
-                                    </googleMap>
+                                        <div class="row">
+                                            <h4
+                                                class="card-title mb-3 flex-grow-1"
+                                            >
+                                                {{ $t("personal_info") }}
+                                            </h4>
+                                            <div class="col-6">
+                                                <div>
+                                                    <label class="form-label">{{
+                                                        $t("mobile")
+                                                    }}</label>
+                                                    <div
+                                                        class="input-group"
+                                                        data-input-flag=""
+                                                    >
+                                                        <button
+                                                            class="btn btn-light border"
+                                                            type="button"
+                                                            data-bs-toggle="dropdown"
+                                                            aria-expanded="false"
+                                                        >
+                                                            <img
+                                                                :src="
+                                                                    selectedCountry.flag
+                                                                "
+                                                                alt="flag"
+                                                                height="20"
+                                                                class="country-flagimg rounded"
+                                                            />
+                                                            <span
+                                                                class="ms-2 country-codeno"
+                                                                >{{
+                                                                    selectedCountry.dial_code
+                                                                }}</span
+                                                            >
+                                                        </button>
+                                                        <input
+                                                            type="text"
+                                                            id="mobile"
+                                                            class="form-control rounded-end flag-input"
+                                                            v-model="
+                                                                form.mobile
+                                                            "
+                                                            @keydown="
+                                                                preventDefault
+                                                            "
+                                                            :placeholder="
+                                                                $t(
+                                                                    'enter_number',
+                                                                )
+                                                            "
+                                                            @input="
+                                                                validateNumber
+                                                            "
+                                                        />
+                                                        <div
+                                                            class="dropdown-menu w-100"
+                                                        >
+                                                            <div
+                                                                class="p-2 px-3 pt-1 searchlist-input"
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    class="form-control form-control-sm border search-countryList"
+                                                                    :placeholder="
+                                                                        $t(
+                                                                            'search_country_name_or_country_code',
+                                                                        )
+                                                                    "
+                                                                    v-model="
+                                                                        searchQuery
+                                                                    "
+                                                                />
+                                                            </div>
+                                                            <ul
+                                                                class="list-unstyled dropdown-menu-list mb-0"
+                                                            >
+                                                                <li
+                                                                    v-for="country in filteredCountries"
+                                                                    :key="
+                                                                        country.id
+                                                                    "
+                                                                >
+                                                                    <a
+                                                                        href="javascript:void(0);"
+                                                                        class="dropdown-item notify-item language py-2"
+                                                                        @click="
+                                                                            selectCountry(
+                                                                                country,
+                                                                            )
+                                                                        "
+                                                                    >
+                                                                        <img
+                                                                            :src="
+                                                                                country.flag
+                                                                            "
+                                                                            alt="flag"
+                                                                            class="me-2 rounded"
+                                                                            height="18"
+                                                                        />
+                                                                        <span
+                                                                            class="align-middle"
+                                                                            >{{
+                                                                                country.name
+                                                                            }}
+                                                                            {{
+                                                                                country.dial_code
+                                                                            }}</span
+                                                                        >
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <span
+                                                        v-for="(
+                                                            error, index
+                                                        ) in errors.mobile"
+                                                        :key="index"
+                                                        class="text-danger"
+                                                        >{{ error }}</span
+                                                    >
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label
+                                                        for="name"
+                                                        class="form-label"
+                                                        >{{ $t("name") }}</label
+                                                    >
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        v-model="form.name"
+                                                        :placeholder="
+                                                            $t('enter_name')
+                                                        "
+                                                        id="name"
+                                                    />
+                                                    <span
+                                                        v-for="(
+                                                            error, index
+                                                        ) in errors.name"
+                                                        :key="index"
+                                                        class="text-danger"
+                                                        >{{ error }}</span
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <!-- Ride info -->
+                                            <div
+                                                class="d-flex align-items-center mt-4"
+                                            >
+                                                <h4
+                                                    class="card-title mb-3 flex-grow-1"
+                                                >
+                                                    {{ $t("ride_info") }}
+                                                </h4>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label
+                                                        for="type"
+                                                        class="form-label"
+                                                        >{{
+                                                            $t("booking_type")
+                                                        }}</label
+                                                    >
+                                                    <select
+                                                        id="type"
+                                                        class="form-select"
+                                                        v-model="form.is_later"
+                                                    >
+                                                        <option
+                                                            disabled
+                                                            value=""
+                                                        >
+                                                            {{
+                                                                $t(
+                                                                    "choose_type",
+                                                                )
+                                                            }}
+                                                        </option>
+                                                        <option value="0">
+                                                            {{
+                                                                $t(
+                                                                    "instant_booking",
+                                                                )
+                                                            }}
+                                                        </option>
+                                                        <option value="1">
+                                                            {{
+                                                                $t("book_later")
+                                                            }}
+                                                        </option>
+                                                    </select>
+                                                    <span
+                                                        v-for="(
+                                                            error, index
+                                                        ) in errors.is_later"
+                                                        :key="index"
+                                                        class="text-danger"
+                                                        >{{ error }}</span
+                                                    >
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="col-6"
+                                                :style="{
+                                                    display:
+                                                        transport_options.length ===
+                                                        0
+                                                            ? 'none'
+                                                            : 'block',
+                                                }"
+                                            >
+                                                <div class="col-12">
+                                                    <div class="mb-3">
+                                                        <label
+                                                            for="type"
+                                                            class="form-label"
+                                                            >{{
+                                                                $t(
+                                                                    "transport_type",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                        <select
+                                                            id="type"
+                                                            class="form-select"
+                                                            v-model="
+                                                                form.transport_type
+                                                            "
+                                                        >
+                                                            <option
+                                                                disabled
+                                                                value=""
+                                                            >
+                                                                {{
+                                                                    $t(
+                                                                        "choose_transport_type",
+                                                                    )
+                                                                }}
+                                                            </option>
+                                                            <option
+                                                                v-for="(
+                                                                    type, index
+                                                                ) in transport_options"
+                                                                :key="index"
+                                                                :value="type"
+                                                            >
+                                                                {{
+                                                                    type
+                                                                        .charAt(
+                                                                            0,
+                                                                        )
+                                                                        .toUpperCase() +
+                                                                    type.slice(
+                                                                        1,
+                                                                    )
+                                                                }}
+                                                            </option>
+                                                        </select>
+                                                        <span
+                                                            v-for="(
+                                                                error, index
+                                                            ) in errors.transport_type"
+                                                            :key="index"
+                                                            class="text-danger"
+                                                        >
+                                                            {{ error }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="mt-4 mb-4">
+                                                <h4
+                                                    class="card-title mb-3 flex-grow-1"
+                                                >
+                                                    {{ $t("schedule_type") }}
+                                                </h4>
+                                                <div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            name="ScheduleType"
+                                                            :checked="
+                                                                form.ride_type ==
+                                                                'regular'
+                                                            "
+                                                            @click="
+                                                                changelater(
+                                                                    'regular',
+                                                                )
+                                                            "
+                                                            id="later_ride"
+                                                            value="later"
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="later_ride"
+                                                            >{{
+                                                                $t("normal")
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            @click="
+                                                                changelater(
+                                                                    'rental',
+                                                                )
+                                                            "
+                                                            type="radio"
+                                                            name="ScheduleType"
+                                                            :checked="
+                                                                form.ride_type ==
+                                                                'rental'
+                                                            "
+                                                            id="rental"
+                                                            value="rental"
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="rental"
+                                                            >{{
+                                                                $t(
+                                                                    "rental_pack",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        v-if="
+                                                            form.is_later == 1
+                                                        "
+                                                        class="form-check form-check-inline"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            name="ScheduleType"
+                                                            @click="
+                                                                changelater(
+                                                                    'outstation',
+                                                                )
+                                                            "
+                                                            id="outstation"
+                                                            value="outstation"
+                                                            :checked="
+                                                                form.ride_type ==
+                                                                'outstation'
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="outstation"
+                                                            >{{
+                                                                $t("outstation")
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="mb-3">
+                                                <div
+                                                    class="d-flex align-items-center justify-content-between"
+                                                >
+                                                    <label
+                                                        for="pickup"
+                                                        class="form-label"
+                                                        >{{
+                                                            $t(
+                                                                "pickup_location",
+                                                            )
+                                                        }}</label
+                                                    >
+                                                    <a
+                                                        v-if="
+                                                            form.ride_type ==
+                                                                'regular' &&
+                                                            stopovers.length <
+                                                                maxStopovers
+                                                        "
+                                                        class="btn btn-primary mb-3"
+                                                        @click="addStopover"
+                                                        >{{
+                                                            $t("add_stops")
+                                                        }}</a
+                                                    >
+                                                </div>
+                                                <div
+                                                    class="autocomplete-container"
+                                                >
+                                                    <div class="input-group">
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            v-model="
+                                                                form.pick_address
+                                                            "
+                                                            :placeholder="
+                                                                $t(
+                                                                    'enter_pickup',
+                                                                )
+                                                            "
+                                                            id="pickup"
+                                                            autocomplete="off"
+                                                            @input="
+                                                                handleInput(
+                                                                    'pickup',
+                                                                )
+                                                            "
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        v-if="
+                                                            pickSuggestions.length >
+                                                            0
+                                                        "
+                                                        class="autocomplete-results"
+                                                    >
+                                                        <div
+                                                            v-for="suggestion in pickSuggestions"
+                                                            :key="
+                                                                suggestion.placeId
+                                                            "
+                                                            class="autocomplete-item"
+                                                            @click="
+                                                                selectSuggestion(
+                                                                    suggestion,
+                                                                    'pickup',
+                                                                )
+                                                            "
+                                                        >
+                                                            {{
+                                                                suggestion.formattedAddress
+                                                            }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span
+                                                    v-for="(
+                                                        error, index
+                                                    ) in errors.pick_address"
+                                                    :key="index"
+                                                    class="text-danger"
+                                                    >{{ error }}</span
+                                                >
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="col-12"
+                                                v-if="
+                                                    form.ride_type == 'regular'
+                                                "
+                                                v-for="(
+                                                    stop, index
+                                                ) in stopovers"
+                                                :key="index"
+                                            >
+                                                <div class="mb-3">
+                                                    <label
+                                                        :for="`stop-${index}`"
+                                                        class="form-label"
+                                                        >{{
+                                                            $t("stop_location")
+                                                        }}</label
+                                                    >
+                                                    <div
+                                                        class="d-flex align-items-center"
+                                                    >
+                                                        <div
+                                                            class="autocomplete-container col-8"
+                                                        >
+                                                            <div
+                                                                class="input-group"
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    class="form-control"
+                                                                    v-model="
+                                                                        stop.address
+                                                                    "
+                                                                    :placeholder="
+                                                                        'Enter stop ' +
+                                                                        (index +
+                                                                            1)
+                                                                    "
+                                                                    id="`stop-${index}`"
+                                                                    autocomplete="off"
+                                                                    @input="
+                                                                        handleInput(
+                                                                            'stop',
+                                                                            index,
+                                                                        )
+                                                                    "
+                                                                />
+                                                            </div>
+                                                            <div
+                                                                v-if="
+                                                                    stopSuggestions?.[
+                                                                        index
+                                                                    ]?.length >
+                                                                    0
+                                                                "
+                                                                class="autocomplete-results"
+                                                            >
+                                                                <div
+                                                                    v-for="suggestion in stopSuggestions?.[
+                                                                        index
+                                                                    ]"
+                                                                    :key="
+                                                                        suggestion.placeId
+                                                                    "
+                                                                    class="autocomplete-item"
+                                                                    @click="
+                                                                        selectSuggestion(
+                                                                            suggestion,
+                                                                            'stop',
+                                                                            index,
+                                                                        )
+                                                                    "
+                                                                >
+                                                                    {{
+                                                                        suggestion.formattedAddress
+                                                                    }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <i
+                                                            class="bx bx-trash text-danger fs-22 btn"
+                                                            @click="
+                                                                removeStopover(
+                                                                    index,
+                                                                )
+                                                            "
+                                                        ></i>
+                                                    </div>
+                                                    <span
+                                                        v-for="(
+                                                            error, index
+                                                        ) in errors.stop?.[
+                                                            index
+                                                        ]"
+                                                        :key="index"
+                                                        class="text-danger"
+                                                        >{{ error }}</span
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="col-12"
+                                                v-if="showAiportTerminal"
+                                            >
+                                                <div class="mb-3">
+                                                    <label
+                                                        for="terminal"
+                                                        class="form-label"
+                                                        >{{
+                                                            $t(
+                                                                "aiport_terminal_info",
+                                                            )
+                                                        }}</label
+                                                    >
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        v-model="form.terminal"
+                                                        placeholder="$t('enter_terminal_info')"
+                                                        id="terminal"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="col-12"
+                                                v-if="showTrainStationEnterance"
+                                            >
+                                                <div class="mb-3">
+                                                    <label
+                                                        for="enterance"
+                                                        class="form-label"
+                                                        >{{
+                                                            $t(
+                                                                "station_enterance_info",
+                                                            )
+                                                        }}</label
+                                                    >
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        v-model="form.enterance"
+                                                        placeholder="$t('enter_enterance_info')"
+                                                        id="enterance"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="col-12"
+                                                v-if="
+                                                    form.ride_type !== 'rental'
+                                                "
+                                            >
+                                                <div class="mb-3">
+                                                    <label
+                                                        for="drop"
+                                                        class="form-label"
+                                                        >{{
+                                                            $t("drop_location")
+                                                        }}</label
+                                                    >
+                                                    <div
+                                                        class="autocomplete-container"
+                                                    >
+                                                        <div
+                                                            class="input-group"
+                                                        >
+                                                            <input
+                                                                type="text"
+                                                                class="form-control"
+                                                                v-model="
+                                                                    form.drop_address
+                                                                "
+                                                                :placeholder="
+                                                                    $t(
+                                                                        'enter_drop',
+                                                                    )
+                                                                "
+                                                                id="drop"
+                                                                autocomplete="off"
+                                                                @input="
+                                                                    handleInput(
+                                                                        'drop',
+                                                                    )
+                                                                "
+                                                            />
+                                                        </div>
+                                                        <div
+                                                            v-if="
+                                                                dropSuggestions.length >
+                                                                0
+                                                            "
+                                                            class="autocomplete-results"
+                                                        >
+                                                            <div
+                                                                v-for="suggestion in dropSuggestions"
+                                                                :key="
+                                                                    suggestion.placeId
+                                                                "
+                                                                class="autocomplete-item"
+                                                                @click="
+                                                                    selectSuggestion(
+                                                                        suggestion,
+                                                                        'drop',
+                                                                    )
+                                                                "
+                                                            >
+                                                                {{
+                                                                    suggestion.formattedAddress
+                                                                }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <span
+                                                        v-for="(
+                                                            error, index
+                                                        ) in errors.drop_address"
+                                                        :key="index"
+                                                        class="text-danger"
+                                                        >{{ error }}</span
+                                                    >
+                                                    <div
+                                                        class="col-12"
+                                                        v-if="errors.map"
+                                                    >
+                                                        <div class="mb-3">
+                                                            <span
+                                                                v-for="(
+                                                                    error, index
+                                                                ) in errors.map"
+                                                                :key="index"
+                                                                class="text-danger"
+                                                                >{{
+                                                                    error
+                                                                }}</span
+                                                            >
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <!-- POC info -->
+                                                <h4
+                                                    v-if="
+                                                        form.transport_type ==
+                                                        'delivery'
+                                                    "
+                                                    class="card-title mb-2 flex-grow-1 mt-4"
+                                                >
+                                                    {{ $t("poc_info") }}
+                                                </h4>
+                                                <div
+                                                    v-if="
+                                                        form.transport_type ==
+                                                        'delivery'
+                                                    "
+                                                    class="px-2 mb-2"
+                                                >
+                                                    <span
+                                                        class="badge bg-dark-subtle text-dark p-1 fs-12 text-center"
+                                                    >
+                                                        <div
+                                                            class="form-check m-2 mx-3"
+                                                        >
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                id="poc"
+                                                                v-model="
+                                                                    isPocSame
+                                                                "
+                                                            />
+                                                            <label
+                                                                class="form-check-label mt-1"
+                                                                for="poc"
+                                                            >
+                                                                {{
+                                                                    $t(
+                                                                        "check_if_poc_info_as_same_as_personal_info",
+                                                                    )
+                                                                }}
+                                                            </label>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div
+                                                    v-if="
+                                                        form.transport_type ==
+                                                        'delivery'
+                                                    "
+                                                    class="col-6"
+                                                >
+                                                    <div class="mb-3">
+                                                        <label
+                                                            for="poc_name"
+                                                            class="form-label"
+                                                            >{{
+                                                                $t(
+                                                                    "drop_poc_name",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            v-model="
+                                                                form.drop_poc_name
+                                                            "
+                                                            :placeholder="
+                                                                $t(
+                                                                    'enter_poc_name',
+                                                                )
+                                                            "
+                                                            id="poc_name"
+                                                            :disabled="
+                                                                isPocSame
+                                                            "
+                                                        />
+                                                        <span
+                                                            v-for="(
+                                                                error, index
+                                                            ) in errors.drop_poc_name"
+                                                            :key="index"
+                                                            class="text-danger"
+                                                            >{{ error }}</span
+                                                        >
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    v-if="
+                                                        form.transport_type ==
+                                                        'delivery'
+                                                    "
+                                                    class="col-6"
+                                                >
+                                                    <div class="mb-3">
+                                                        <label
+                                                            for="poc_mobile"
+                                                            class="form-label"
+                                                            >{{
+                                                                $t(
+                                                                    "drop_poc_mobile",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            v-model="
+                                                                form.drop_poc_mobile
+                                                            "
+                                                            :placeholder="
+                                                                $t(
+                                                                    'enter_poc_mobile',
+                                                                )
+                                                            "
+                                                            id="poc_mobile"
+                                                            :disabled="
+                                                                isPocSame
+                                                            "
+                                                        />
+                                                        <span
+                                                            v-for="(
+                                                                error, index
+                                                            ) in errors.drop_poc_mobile"
+                                                            :key="index"
+                                                            class="text-danger"
+                                                            >{{ error }}</span
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <h4
+                                                    v-if="
+                                                        form.transport_type ==
+                                                        'delivery'
+                                                    "
+                                                    class="card-title mb-2 flex-grow-1 mt-4"
+                                                >
+                                                    {{ $t("select_goods") }}
+                                                </h4>
+                                                <div
+                                                    v-if="
+                                                        form.transport_type ==
+                                                        'delivery'
+                                                    "
+                                                    class="col-6"
+                                                >
+                                                    <div class="mb-3">
+                                                        <label
+                                                            for="goods_type"
+                                                            class="form-label"
+                                                            >{{
+                                                                $t("goods_type")
+                                                            }}</label
+                                                        >
+                                                        <select
+                                                            id="goods_type"
+                                                            class="form-select"
+                                                            v-model="
+                                                                form.goods_type_id
+                                                            "
+                                                        >
+                                                            <option
+                                                                disabled
+                                                                value=""
+                                                            >
+                                                                {{
+                                                                    $t(
+                                                                        "choose_type",
+                                                                    )
+                                                                }}
+                                                            </option>
+                                                            <option
+                                                                v-for="goodsType in goodsTypes"
+                                                                :key="
+                                                                    goodsType.id
+                                                                "
+                                                                :value="
+                                                                    goodsType.id
+                                                                "
+                                                            >
+                                                                {{
+                                                                    goodsType.goods_type_name
+                                                                }}
+                                                            </option>
+                                                        </select>
+                                                        <span
+                                                            v-for="(
+                                                                error, index
+                                                            ) in errors.goods_type_id"
+                                                            :key="index"
+                                                            class="text-danger"
+                                                            >{{ error }}</span
+                                                        >
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    v-if="
+                                                        form.transport_type ==
+                                                        'delivery'
+                                                    "
+                                                    class="col-6"
+                                                >
+                                                    <div class="mb-3">
+                                                        <label
+                                                            for="goods_type_quantity"
+                                                            class="form-label"
+                                                            >{{
+                                                                $t(
+                                                                    "goods_quantity",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                        <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            v-model="
+                                                                form.goods_type_quantity
+                                                            "
+                                                            :placeholder="
+                                                                $t(
+                                                                    'enter_quantity',
+                                                                )
+                                                            "
+                                                            id="goods_type_quantity"
+                                                        />
+                                                        <span
+                                                            v-for="(
+                                                                error, index
+                                                            ) in errors.goods_type_quantity"
+                                                            :key="index"
+                                                            class="text-danger"
+                                                            >{{ error }}</span
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <!-- rental package -->
+                                                <h4
+                                                    v-if="form.is_rental == 1"
+                                                    class="card-title mb-3 flex-grow-1 mt-4"
+                                                >
+                                                    {{ $t("select_pack") }}
+                                                </h4>
+                                                <div
+                                                    v-if="form.is_rental == 1"
+                                                    style="
+                                                        max-width: 600px;
+                                                        overflow-x: auto;
+                                                    "
+                                                    class="col-12"
+                                                >
+                                                    <div class="mb-3">
+                                                        <label
+                                                            for="rental_package_id"
+                                                            class="form-label"
+                                                            >{{
+                                                                $t(
+                                                                    "rental_package_id",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                        <select
+                                                            id="rental_package_id"
+                                                            class="form-select"
+                                                            v-model="
+                                                                form.rental_package_id
+                                                            "
+                                                        >
+                                                            <option
+                                                                disabled
+                                                                value=""
+                                                            >
+                                                                {{
+                                                                    $t(
+                                                                        "choose_type",
+                                                                    )
+                                                                }}
+                                                            </option>
+                                                            <option
+                                                                v-for="pack in packageTypes"
+                                                                :key="pack.id"
+                                                                :value="pack.id"
+                                                            >
+                                                                {{
+                                                                    pack.package_name
+                                                                }}
+                                                            </option>
+                                                        </select>
+                                                        <span
+                                                            v-for="(
+                                                                error, index
+                                                            ) in errors.rental_package_id"
+                                                            :key="index"
+                                                            class="text-danger"
+                                                            >{{ error }}</span
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="col-12"
+                                                v-if="form.is_later === '1'"
+                                            >
+                                                <div class="mb-3">
+                                                    <label
+                                                        for="dispatch-datepicker"
+                                                        class="form-label"
+                                                        >{{ $t("date") }}</label
+                                                    >
+                                                    <flat-pickr
+                                                        :placeholder="
+                                                            $t('select_date')
+                                                        "
+                                                        v-model="
+                                                            form.trip_start_time
+                                                        "
+                                                        :config="dateTimeConfig"
+                                                        class="form-control flatpickr-input"
+                                                        id="dispatch-datepicker"
+                                                    ></flat-pickr>
+                                                    <span
+                                                        v-for="(
+                                                            error, index
+                                                        ) in errors.trip_start_time"
+                                                        :key="index"
+                                                        class="text-danger"
+                                                        >{{ error }}</span
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                v-if="form.is_out_station == 1"
+                                                class="mt-4 mb-4"
+                                            >
+                                                <h4
+                                                    class="card-title mb-3 flex-grow-1"
+                                                >
+                                                    {{ $t("outstation") }}
+                                                </h4>
+                                                <div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            name="is_round_trip"
+                                                            id="oneway"
+                                                            :value="0"
+                                                            v-model="
+                                                                form.is_round_trip
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="oneway"
+                                                            >{{
+                                                                $t(
+                                                                    "one_way_outstation_trip",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            name="is_round_trip"
+                                                            id="roundtrip"
+                                                            :value="1"
+                                                            v-model="
+                                                                form.is_round_trip
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="roundtrip"
+                                                            >{{
+                                                                $t(
+                                                                    "round_trip_outstation_trip",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div
+                                                class="col-12"
+                                                v-if="
+                                                    form.is_round_trip == 1 &&
+                                                    form.is_out_station == 1
+                                                "
+                                            >
+                                                <div class="mb-3">
+                                                    <label
+                                                        for="dispatch-datepicker"
+                                                        class="form-label"
+                                                        >{{
+                                                            $t("return_time")
+                                                        }}</label
+                                                    >
+                                                    <flat-pickr
+                                                        :placeholder="
+                                                            $t('return_time')
+                                                        "
+                                                        v-model="
+                                                            form.return_time
+                                                        "
+                                                        :config="
+                                                            dateTimeConfigReturnTime
+                                                        "
+                                                        class="form-control flatpickr-input"
+                                                        id="dispatch-datepicker"
+                                                    ></flat-pickr>
+                                                </div>
+                                                <span
+                                                    v-for="(
+                                                        error, index
+                                                    ) in errors.return_time"
+                                                    :key="index"
+                                                    class="text-danger"
+                                                    >{{ error }}</span
+                                                >
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <!-- Vehicle Select -->
+                                            <h4
+                                                v-if="vehicleTypes.length > 0"
+                                                class="card-title mb-3 flex-grow-1 mt-4"
+                                            >
+                                                {{ $t("select_vehicle") }}
+                                            </h4>
+                                            <div
+                                                v-if="vehicleTypes.length > 0"
+                                                style="
+                                                    max-width: 600px;
+                                                    overflow-x: auto;
+                                                "
+                                                class="col-12"
+                                            >
+                                                <div class="mb-3">
+                                                    <div class="d-flex mt-5">
+                                                        <div
+                                                            v-for="(
+                                                                vehicleType,
+                                                                index
+                                                            ) in vehicleTypes"
+                                                            :key="index"
+                                                            class="select-checkbox-btn text-center"
+                                                        >
+                                                            <label
+                                                                :for="
+                                                                    'vehicle_' +
+                                                                    vehicleType.zone_type_id
+                                                                "
+                                                                class="select-checkbox-btn-wrapper"
+                                                            >
+                                                                <input
+                                                                    :id="
+                                                                        'vehicle_' +
+                                                                        vehicleType.zone_type_id
+                                                                    "
+                                                                    name="types"
+                                                                    type="radio"
+                                                                    :value="
+                                                                        vehicleType.zone_type_id
+                                                                    "
+                                                                    v-model="
+                                                                        form.vehicle_type
+                                                                    "
+                                                                    class="select-checkbox-btn-input"
+                                                                />
+                                                                <span
+                                                                    class="select-checkbox-btn-content"
+                                                                >
+                                                                    <a
+                                                                        class="w-32 me-4 cursor-pointer"
+                                                                    >
+                                                                        <div
+                                                                            class="text-center mt-2 ms-4 text-dark"
+                                                                        >
+                                                                            <i
+                                                                                class="bx bx-time-five mx-1"
+                                                                            ></i
+                                                                            >{{
+                                                                                vehicleType.driver_time ||
+                                                                                "--"
+                                                                            }}
+                                                                        </div>
+                                                                        <div
+                                                                            class="w-32 h-32 flex-none image-fit rounded-circle"
+                                                                        >
+                                                                            <img
+                                                                                alt=""
+                                                                                class="rounded-circle img-fluid"
+                                                                                :src="
+                                                                                    vehicleType.vehicle_icon
+                                                                                "
+                                                                            />
+                                                                        </div>
+                                                                        <div
+                                                                            class="text-center mt-2 amount text-dark"
+                                                                        >
+                                                                            {{
+                                                                                vehicleType.currency
+                                                                            }}
+                                                                            {{
+                                                                                vehicleType.total
+                                                                            }}
+                                                                        </div>
+                                                                        <div
+                                                                            class="text-center mt-2 text-dark"
+                                                                        >
+                                                                            {{
+                                                                                vehicleType.name
+                                                                            }}
+                                                                        </div>
+                                                                    </a>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <!-- Vehicle Select -->
+                                            <h4
+                                                v-if="
+                                                    rentalVehicleTypes.length >
+                                                    0
+                                                "
+                                                class="card-title mb-3 flex-grow-1 mt-4"
+                                            >
+                                                {{ $t("select_vehicle") }}
+                                            </h4>
+                                            <div
+                                                v-if="
+                                                    rentalVehicleTypes.length >
+                                                    0
+                                                "
+                                                style="
+                                                    max-width: 600px;
+                                                    overflow-x: auto;
+                                                "
+                                                class="col-12"
+                                            >
+                                                <div class="mb-3">
+                                                    <div class="d-flex mt-5">
+                                                        <div
+                                                            v-for="(
+                                                                vehicleType,
+                                                                index
+                                                            ) in rentalVehicleTypes"
+                                                            :key="index"
+                                                            class="select-checkbox-btn text-center"
+                                                        >
+                                                            <label
+                                                                :for="
+                                                                    'vehicle_' +
+                                                                    vehicleType.zone_type_id
+                                                                "
+                                                                class="select-checkbox-btn-wrapper"
+                                                            >
+                                                                <input
+                                                                    :id="
+                                                                        'vehicle_' +
+                                                                        vehicleType.zone_type_id
+                                                                    "
+                                                                    name="types"
+                                                                    type="radio"
+                                                                    :value="
+                                                                        vehicleType.zone_type_id
+                                                                    "
+                                                                    v-model="
+                                                                        form.vehicle_type
+                                                                    "
+                                                                    class="select-checkbox-btn-input"
+                                                                />
+                                                                <span
+                                                                    class="select-checkbox-btn-content"
+                                                                >
+                                                                    <a
+                                                                        class="w-32 me-4 cursor-pointer"
+                                                                    >
+                                                                        <div
+                                                                            class="text-center mt-2 ms-4 text-dark"
+                                                                        >
+                                                                            <i
+                                                                                class="bx bx-time-five mx-1"
+                                                                            ></i
+                                                                            >{{
+                                                                                vehicleType.driver_time ||
+                                                                                "--"
+                                                                            }}
+                                                                        </div>
+                                                                        <div
+                                                                            class="w-32 h-32 flex-none image-fit rounded-circle"
+                                                                        >
+                                                                            <img
+                                                                                alt=""
+                                                                                class="rounded-circle img-fluid"
+                                                                                :src="
+                                                                                    vehicleType.icon
+                                                                                "
+                                                                            />
+                                                                        </div>
+                                                                        <div
+                                                                            class="text-center mt-2 amount text-dark"
+                                                                        >
+                                                                            {{
+                                                                                vehicleType.fare_amount
+                                                                            }}
+                                                                        </div>
+                                                                        <div
+                                                                            class="text-center mt-2 text-dark"
+                                                                        >
+                                                                            {{
+                                                                                vehicleType.name
+                                                                            }}
+                                                                        </div>
+                                                                    </a>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            v-if="
+                                                is_pet_available == 1 ||
+                                                is_luggage_available == 1
+                                            "
+                                            class="row"
+                                        >
+                                            <!-- preference -->
+                                            <div class="mt-4 mb-4">
+                                                <h4
+                                                    class="card-title mb-3 flex-grow-1"
+                                                >
+                                                    {{
+                                                        $t(
+                                                            "preference_for_user",
+                                                        )
+                                                    }}
+                                                </h4>
+                                                <div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                        v-if="
+                                                            is_pet_available ==
+                                                            1
+                                                        "
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="checkbox"
+                                                            name="is_pet_available"
+                                                            :checked="
+                                                                form.is_pet_available
+                                                            "
+                                                            id="is_pet_available"
+                                                            :value="1"
+                                                            v-model="
+                                                                form.is_pet_available
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="is_pet_available"
+                                                            >{{
+                                                                $t(
+                                                                    "pet_preference",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                        v-if="
+                                                            is_luggage_available ==
+                                                            1
+                                                        "
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="checkbox"
+                                                            name="is_luggage_available"
+                                                            id="is_luggage_available"
+                                                            :value="1"
+                                                            v-model="
+                                                                form.is_luggage_available
+                                                            "
+                                                            :checked="
+                                                                form.is_luggage_available
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="is_luggage_available"
+                                                            >{{
+                                                                $t(
+                                                                    "luggage_preference",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <!-- Asiign Driver -->
+                                            <div class="mt-4 mb-4">
+                                                <h4
+                                                    class="card-title mb-3 flex-grow-1"
+                                                >
+                                                    {{ $t("assign") }}
+                                                </h4>
+                                                <div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            name="inlineRadioOptions"
+                                                            :checked="
+                                                                form.assign_method ==
+                                                                1
+                                                            "
+                                                            id="WithoutinlineRadio1"
+                                                            :value="1"
+                                                            v-model="
+                                                                form.assign_method
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="WithoutinlineRadio1"
+                                                            >{{
+                                                                $t(
+                                                                    "manual_assign",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="form-check form-check-inline"
+                                                    >
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            name="inlineRadioOptions"
+                                                            id="WithoutinlineRadio2"
+                                                            value="0"
+                                                            v-model="
+                                                                form.assign_method
+                                                            "
+                                                            :checked="
+                                                                form.assign_method ==
+                                                                0
+                                                            "
+                                                        />
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="WithoutinlineRadio2"
+                                                            >{{
+                                                                $t(
+                                                                    "automatic_assign",
+                                                                )
+                                                            }}</label
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="text-center">
+                                                    <button
+                                                        type="submit"
+                                                        :disabled="
+                                                            !enableBooking
+                                                        "
+                                                        @click="makeBooking"
+                                                        class="btn btn-primary"
+                                                    >
+                                                        {{ $t("make_booking") }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- map  -->
+                                    <div class="col-12 col-lg-6">
+                                        <div class="mb-3 text-center m-auto">
+                                            <div id="map" style="height: 500px">
+                                                <googleMap
+                                                    :baseUrl="baseUrl"
+                                                    :default_location="
+                                                        default_location
+                                                    "
+                                                    :pick_location="
+                                                        pickupMarker
+                                                    "
+                                                    :drop_location="dropMarker"
+                                                    :nearbyDrivers="
+                                                        driverMarkers
+                                                    "
+                                                    :stops="stopMarkers"
+                                                    :draggable="true"
+                                                    :polyline="form.poly_line"
+                                                    :map_key="map_key"
+                                                    :libraries="[
+                                                        'marker',
+                                                        'geometry',
+                                                        'geocoding',
+                                                        'places',
+                                                    ]"
+                                                    @update-pickup-address="
+                                                        handlePickupAddress
+                                                    "
+                                                >
+                                                    {{ $t("map_loading") }}
+                                                </googleMap>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                          </div>
-                        </div>
-                        </FormValidation>
-                      </form>
+                            </FormValidation>
+                        </form>
                     </BCardBody>
                 </BCard>
             </BCol>
@@ -2175,23 +3983,22 @@ letter-spacing: 0.1em; /* Adjust spacing if needed */
 /* end */
 </style>
 <style scoped>
-
 .autocomplete-container {
-  position: relative;
+    position: relative;
 }
 
 .autocomplete-results {
-  border: 1px solid #ccc;
-  max-height: 200px;
-  overflow-y: auto;
-  position: absolute;
-  width: 100%;
-  background-color: white;
-  z-index: 1000;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    background-color: white;
+    z-index: 1000;
 }
 
 .autocomplete-item {
-  padding: 5px;
-  cursor: pointer;
+    padding: 5px;
+    cursor: pointer;
 }
 </style>
