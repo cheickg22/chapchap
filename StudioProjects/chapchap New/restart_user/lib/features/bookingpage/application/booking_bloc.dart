@@ -1276,6 +1276,34 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     return strippedText.trim();
   }
 
+  Future<List<AddressModel>> _updateAddressesWithGeocodedNames({
+    required List<AddressModel> addressList,
+    required BuildContext context,
+  }) async {
+    // Process ALL addresses in parallel
+    final futures = addressList
+        .map((address) => _fetchAddressFromLatLng(
+      latitude: address.lat,
+      longitude: address.lng,
+      context: context,
+    ).then((geocodedAddress) => AddressModel(
+      orderId: address.orderId,
+      shortAddress: geocodedAddress.split(',').first.trim(),
+      address: geocodedAddress,
+      lat: address.lat,
+      lng: address.lng,
+      pickup: address.pickup,
+      isAirportLocation: address.isAirportLocation,
+      type: address.type,
+      name: address.name,
+      number: address.number,
+      instructions: address.instructions,
+    )))
+        .toList();
+
+    return await Future.wait(futures);
+  }
+
   Future<String> _fetchAddressFromLatLng({
     required double latitude,
     required double longitude,
@@ -1284,26 +1312,23 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     try {
       final mapKey = AppConstants.mapKey;
 
-      final nearestPlace = await _findNearestPlace(
-        latitude: latitude,
-        longitude: longitude,
-        apiKey: mapKey,
-        languageCode: "en",
-      );
+      // Execute both API calls in PARALLEL
+      final results = await Future.wait([
+        _fetchGeocoding(latitude, longitude, mapKey),
+        _findNearestPlace(
+          latitude: latitude,
+          longitude: longitude,
+          apiKey: mapKey,
+          languageCode: "en",
+        ),
+      ]);
 
-      final quartier = await _getQuartierFromPlaces(
-        latitude: latitude,
-        longitude: longitude,
-        apiKey: mapKey,
-      );
+      final geocodingData = results[0] as Map<String, dynamic>?;
+      final nearestPlace = results[1] as String?;
 
-      final apiUrl =
-          "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$mapKey&language=en&result_type=neighborhood|sublocality|sublocality_level_1|sublocality_level_2|locality|administrative_area_level_1|administrative_area_level_2|country";
-
-      final dio = Dio();
-      final response = await dio.get(apiUrl);
-
-      if (response.statusCode != 200) {
+      if (geocodingData == null ||
+          (geocodingData['status'] != 'OK' &&
+              geocodingData['status'] != 'ZERO_RESULTS')) {
         final translated = await _translateToArabic(
             nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
         return _stripHtmlTags(translated ??
@@ -1311,20 +1336,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             AppLocalizations.of(context)!.unnamed_street);
       }
 
-      final data = response.data;
-      final status = data["status"] as String?;
+      final geocodingResults = geocodingData['results'] as List?;
 
-      if (status != "OK" && status != "ZERO_RESULTS") {
-        final translated = await _translateToArabic(
-            nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
-        return _stripHtmlTags(translated ??
-            nearestPlace ??
-            AppLocalizations.of(context)!.unnamed_street);
-      }
-
-      final results = data["results"] as List?;
-
-      if (results == null || results.isEmpty) {
+      if (geocodingResults == null || geocodingResults.isEmpty) {
         final translated = await _translateToArabic(
             nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
         return _stripHtmlTags(translated ??
@@ -1333,7 +1347,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       }
 
       List? addressComponents;
-      for (final component in results) {
+      for (final component in geocodingResults) {
         final types = List<String>.from(component["types"]);
         if (types.contains("neighborhood") ||
             types.contains("sublocality") ||
@@ -1343,38 +1357,19 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         }
       }
 
-      addressComponents ??= results[0]["address_components"] as List;
+      addressComponents ??=
+      geocodingResults.first["address_components"] as List;
 
-      String locality = '';
-      String administrativeAreaLevel1 = '';
-      String administrativeAreaLevel2 = '';
-      String country = '';
-      String postalCode = '';
-      String neighborhood = '';
-      String sublocality = '';
       String sublocalityLevel1 = '';
 
       for (final component in addressComponents) {
         final types = List<String>.from(component["types"]);
         final longName = component["long_name"] as String;
 
-        if (types.contains("locality")) {
-          locality = longName;
-        } else if (types.contains("administrative_area_level_1")) {
-          administrativeAreaLevel1 = longName;
-        } else if (types.contains("administrative_area_level_2")) {
-          administrativeAreaLevel2 = longName;
-        } else if (types.contains("country")) {
-          country = longName;
-        } else if (types.contains("postal_code")) {
-          postalCode = longName;
-        } else if (types.contains("neighborhood")) {
-          neighborhood = longName;
-        } else if (types.contains("sublocality") ||
+        if (types.contains("sublocality") ||
             types.contains("sublocality_level_1")) {
           sublocalityLevel1 = longName;
-        } else if (types.contains("sublocality_level_2")) {
-          sublocality = longName;
+          break; // Early exit once found
         }
       }
 
@@ -1390,78 +1385,34 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         addressPartsEnglish.add(sublocalityLevel1);
       }
 
-      // Join English parts
       final englishAddress = addressPartsEnglish.join('- ');
-
       final arabicAddress = await _translateToArabic(englishAddress);
 
-      if (arabicAddress != null && arabicAddress.isNotEmpty) {
-        return _stripHtmlTags(arabicAddress);
-      } else {
-        return _stripHtmlTags(englishAddress);
-      }
+      return _stripHtmlTags(arabicAddress ?? englishAddress);
     } catch (e) {
       return AppLocalizations.of(context)!.unnamed_street;
     }
   }
 
-  Future<String?> _getQuartierFromPlaces({
-    required double latitude,
-    required double longitude,
-    required String apiKey,
-  }) async {
+  Future<Map<String, dynamic>?> _fetchGeocoding(
+      double latitude,
+      double longitude,
+      String mapKey,
+      ) async {
     try {
+      final apiUrl =
+          "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$mapKey&language=en&result_type=neighborhood|sublocality|sublocality_level_1";
+
       final dio = Dio();
+      final response = await dio.get(
+        apiUrl,
+        options: Options(
+          sendTimeout: Duration(seconds: 5),
+          receiveTimeout: Duration(seconds: 5),
+        ),
+      );
 
-      final placesUrl =
-          "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-          "?location=$latitude,$longitude"
-          "&radius=500"
-          "&language=en"
-          "&key=$apiKey";
-
-      final response = await dio.get(placesUrl);
-
-      if (response.statusCode != 200) {
-        return null;
-      }
-
-      final data = response.data;
-      final results = data["results"] as List?;
-
-      if (results == null || results.isEmpty) {
-        return null;
-      }
-
-      // Look for neighborhood/locality type places
-      for (final place in results) {
-        final types = List<String>.from(place["types"] ?? []);
-        final name = place["name"] as String?;
-        final vicinity = place["vicinity"] as String?;
-
-        if (types.contains("neighborhood") ||
-            types.contains("sublocality") ||
-            types.contains("sublocality_level_1") ||
-            types.contains("locality")) {
-          if (name != null && name.isNotEmpty) {
-            return name;
-          }
-        }
-      }
-
-      if (results.isNotEmpty) {
-        final firstPlace = results[0];
-        final vicinity = firstPlace["vicinity"] as String?;
-
-        if (vicinity != null && vicinity.isNotEmpty) {
-          final parts = vicinity.split(',').map((e) => e.trim()).toList();
-          if (parts.isNotEmpty) {
-            final possibleQuartier = parts[0];
-            return possibleQuartier;
-          }
-        }
-      }
-      return null;
+      return response.statusCode == 200 ? response.data : null;
     } catch (e) {
       return null;
     }
@@ -1483,7 +1434,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           "&key=$apiKey";
 
       final dio = Dio();
-      final response = await dio.get(placesUrl);
+      final response = await dio.get(
+        placesUrl,
+        options: Options(
+          sendTimeout: Duration(seconds: 5),
+          receiveTimeout: Duration(seconds: 5),
+        ),
+      );
 
       if (response.statusCode != 200) {
         return null;
@@ -1524,178 +1481,119 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     }
   }
 
-  Future<List<AddressModel>> _updateAddressesWithGeocodedNames({
-    required List<AddressModel> addressList,
-    required BuildContext context,
-  }) async {
-    List<AddressModel> updatedAddresses = [];
-
-    for (var address in addressList) {
-      final geocodedAddress = await _fetchAddressFromLatLng(
-        latitude: address.lat,
-        longitude: address.lng,
-        context: context,
-      );
-
-      final updatedAddress = AddressModel(
-        orderId: address.orderId,
-        shortAddress: geocodedAddress.split(',').first.trim(),
-        address: geocodedAddress,
-        lat: address.lat,
-        lng: address.lng,
-        pickup: address.pickup,
-        isAirportLocation: address.isAirportLocation,
-        type: address.type,
-        name: address.name,
-        number: address.number,
-        instructions: address.instructions,
-      );
-
-      updatedAddresses.add(updatedAddress);
-    }
-
-    return updatedAddresses;
-  }
-
   Future<String?> _translateToArabic(String text) async {
     try {
-      final dio = Dio();
-
-      final parts = text.split('-').map((e) => e.trim()).toList();
-
-      final translatedParts = <String>[];
-
-      for (int i = 0; i < parts.length; i++) {
-        final part = parts[i];
-
-        if (part.isEmpty) {
-          continue;
-        }
-
-        String? translatedPart;
-
-        // Try MyMemory with explicit language codes (most reliable for free usage)
-        final languageCodes = ['fr', 'en']; // Try French first, then English
-
-        for (final sourceLang in languageCodes) {
-          if (translatedPart != null) break;
-
-          try {
-            final encodedPart = Uri.encodeComponent(part);
-            final myMemoryUrl =
-                'https://api.mymemory.translated.net/get?q=$encodedPart&langpair=$sourceLang|ar';
-
-            final myMemoryResponse = await dio.get(
-              myMemoryUrl,
-              options: Options(
-                sendTimeout: Duration(seconds: 10),
-                receiveTimeout: Duration(seconds: 10),
-                validateStatus: (status) => true,
-              ),
-            );
-
-            if (myMemoryResponse.statusCode == 200) {
-              final data = myMemoryResponse.data;
-              if (data is Map && data['responseStatus'] == 200) {
-                final translated =
-                    data['responseData']?['translatedText']?.toString();
-                if (translated != null &&
-                    translated.isNotEmpty &&
-                    translated != part && // Not same as original
-                    !translated.toUpperCase().contains('INVALID')) {
-                  // Not an error message
-                  translatedPart = translated;
-                  break;
-                }
-              }
-            }
-          } catch (e) {}
-        }
-
-        // Try Lingva (if MyMemory failed)
-        if (translatedPart == null) {
-          try {
-            final encodedPart = Uri.encodeComponent(part);
-            final lingvaUrl = 'https://lingva.ml/api/v1/auto/ar/$encodedPart';
-
-            final lingvaResponse = await dio.get(
-              lingvaUrl,
-              options: Options(
-                sendTimeout: Duration(seconds: 10),
-                receiveTimeout: Duration(seconds: 10),
-                validateStatus: (status) => true,
-              ),
-            );
-
-            if (lingvaResponse.statusCode == 200) {
-              final data = lingvaResponse.data;
-              if (data is Map && data.containsKey('translation')) {
-                translatedPart = data['translation']?.toString();
-                if (translatedPart != null && translatedPart.isNotEmpty) {
-                  print("✓ Lingva SUCCESS: '$translatedPart'");
-                } else {
-                  translatedPart = null;
-                }
-              }
-            }
-          } catch (e) {
-            print("✗ Lingva error: $e");
-          }
-        }
-
-        // Try Google Translate (via translate.googleapis.com - free quota)
-        if (translatedPart == null) {
-          try {
-            final encodedPart = Uri.encodeComponent(part);
-            // This is a free endpoint with daily limits
-            final googleUrl =
-                'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=$encodedPart';
-
-            final googleResponse = await dio.get(
-              googleUrl,
-              options: Options(
-                sendTimeout: Duration(seconds: 10),
-                receiveTimeout: Duration(seconds: 10),
-                validateStatus: (status) => true,
-              ),
-            );
-
-            if (googleResponse.statusCode == 200) {
-              final data = googleResponse.data;
-              if (data is List && data.isNotEmpty && data[0] is List) {
-                final translations = <String>[];
-                for (final item in data[0]) {
-                  if (item is List && item.isNotEmpty) {
-                    translations.add(item[0].toString());
-                  }
-                }
-                if (translations.isNotEmpty) {
-                  translatedPart = translations.join('');
-                }
-              }
-            }
-          } catch (e) {}
-        }
-
-        // Add result
-        if (translatedPart == null || translatedPart.isEmpty) {
-          translatedParts.add(part);
-        } else {
-          translatedParts.add(translatedPart);
-        }
+      // Check if text is already in Arabic
+      final arabicRegex = RegExp(r'[\u0600-\u06FF]');
+      if (arabicRegex.hasMatch(text)) {
+        return text;
       }
 
-      if (translatedParts.isEmpty) {
-        return null;
-      }
+      // Split the text by separator
+      final parts = text
+          .split('- ')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
 
-      final result = translatedParts.join('- ');
-      return result;
-    } catch (e, stackTrace) {
+      if (parts.isEmpty) return null;
+
+      // Translate ALL parts in PARALLEL with aggressive timeout
+      final translatedParts =
+      await Future.wait(parts.map((part) => _translateSinglePart(part)));
+
+      return translatedParts.join('- ');
+    } catch (e) {
       return null;
     }
   }
 
+  Future<String> _translateSinglePart(String part) async {
+    try {
+      // Try ONLY English with very short timeout
+      final translatedPart = await _tryTranslation(part, 'en|ar');
+
+      if (translatedPart != null) {
+        return translatedPart;
+      }
+
+      // Skip French entirely - go straight to transliteration
+      return _transliterate(part);
+    } catch (e) {
+      return _transliterate(part);
+    }
+  }
+
+  String _transliterate(String part) {
+    final transliterationMap = {
+      'a': 'ا',
+      'b': 'ب',
+      'c': 'ك',
+      'd': 'د',
+      'e': 'ي',
+      'f': 'ف',
+      'g': 'ج',
+      'h': 'ه',
+      'i': 'ي',
+      'j': 'ج',
+      'k': 'ك',
+      'l': 'ل',
+      'm': 'م',
+      'n': 'ن',
+      'o': 'و',
+      'p': 'ب',
+      'q': 'ق',
+      'r': 'ر',
+      's': 'س',
+      't': 'ت',
+      'u': 'و',
+      'v': 'ف',
+      'w': 'و',
+      'x': 'كس',
+      'y': 'ي',
+      'z': 'ز',
+      ' ': ' ',
+    };
+
+    return part.toLowerCase().split('').map((char) {
+      return transliterationMap[char] ?? char;
+    }).join('');
+  }
+
+  Future<String?> _tryTranslation(String text, String langPair) async {
+    try {
+      final url =
+          'https://api.mymemory.translated.net/get?q=${Uri.encodeComponent(text)}&langpair=$langPair';
+
+      final dio = Dio();
+      final response = await dio.get(
+        url,
+        options: Options(
+          sendTimeout: Duration(milliseconds: 1500), // 1.5 seconds only!
+          receiveTimeout: Duration(milliseconds: 1500),
+          validateStatus: (status) => status != null && status < 500,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map && data['responseStatus'] == 200) {
+          final translatedText = data['responseData']?['translatedText'];
+          final arabicRegex = RegExp(r'[\u0600-\u06FF]');
+
+          if (translatedText != null &&
+              translatedText != text &&
+              translatedText.isNotEmpty &&
+              arabicRegex.hasMatch(translatedText)) {
+            return translatedText;
+          }
+        }
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
   Future<void> createRequestEvent(
       BookingCreateRequestEvent event, Emitter<BookingState> emit) async {
     isLoading = true;
