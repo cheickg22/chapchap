@@ -18,7 +18,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:restart_tagxi/common/tobitmap.dart';
 import 'package:restart_tagxi/core/utils/custom_text.dart';
 import 'package:restart_tagxi/core/utils/payment_received_stream.dart';
-import 'package:restart_tagxi/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 
@@ -1278,27 +1277,25 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
   Future<List<AddressModel>> _updateAddressesWithGeocodedNames({
     required List<AddressModel> addressList,
-    required BuildContext context,
   }) async {
     // Process ALL addresses in parallel
     final futures = addressList
         .map((address) => _fetchAddressFromLatLng(
-      latitude: address.lat,
-      longitude: address.lng,
-      context: context,
-    ).then((geocodedAddress) => AddressModel(
-      orderId: address.orderId,
-      shortAddress: geocodedAddress.split(',').first.trim(),
-      address: geocodedAddress,
-      lat: address.lat,
-      lng: address.lng,
-      pickup: address.pickup,
-      isAirportLocation: address.isAirportLocation,
-      type: address.type,
-      name: address.name,
-      number: address.number,
-      instructions: address.instructions,
-    )))
+              latitude: address.lat,
+              longitude: address.lng,
+            ).then((geocodedAddress) => AddressModel(
+                  orderId: address.orderId,
+                  shortAddress: geocodedAddress.split(',').first.trim(),
+                  address: geocodedAddress,
+                  lat: address.lat,
+                  lng: address.lng,
+                  pickup: address.pickup,
+                  isAirportLocation: address.isAirportLocation,
+                  type: address.type,
+                  name: address.name,
+                  number: address.number,
+                  instructions: address.instructions,
+                )))
         .toList();
 
     return await Future.wait(futures);
@@ -1307,7 +1304,6 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   Future<String> _fetchAddressFromLatLng({
     required double latitude,
     required double longitude,
-    required BuildContext context,
   }) async {
     try {
       final mapKey = AppConstants.mapKey;
@@ -1329,21 +1325,17 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (geocodingData == null ||
           (geocodingData['status'] != 'OK' &&
               geocodingData['status'] != 'ZERO_RESULTS')) {
-        final translated = await _translateToArabic(
-            nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
-        return _stripHtmlTags(translated ??
-            nearestPlace ??
-            AppLocalizations.of(context)!.unnamed_street);
+        final translated =
+            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
+        return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
       }
 
       final geocodingResults = geocodingData['results'] as List?;
 
       if (geocodingResults == null || geocodingResults.isEmpty) {
-        final translated = await _translateToArabic(
-            nearestPlace ?? AppLocalizations.of(context)!.unnamed_street);
-        return _stripHtmlTags(translated ??
-            nearestPlace ??
-            AppLocalizations.of(context)!.unnamed_street);
+        final translated =
+            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
+        return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
       }
 
       List? addressComponents;
@@ -1358,7 +1350,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       }
 
       addressComponents ??=
-      geocodingResults.first["address_components"] as List;
+          geocodingResults.first["address_components"] as List;
 
       String sublocalityLevel1 = '';
 
@@ -1390,15 +1382,15 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
       return _stripHtmlTags(arabicAddress ?? englishAddress);
     } catch (e) {
-      return AppLocalizations.of(context)!.unnamed_street;
+      return "شارع بدون اسم";
     }
   }
 
   Future<Map<String, dynamic>?> _fetchGeocoding(
-      double latitude,
-      double longitude,
-      String mapKey,
-      ) async {
+    double latitude,
+    double longitude,
+    String mapKey,
+  ) async {
     try {
       final apiUrl =
           "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$mapKey&language=en&result_type=neighborhood|sublocality|sublocality_level_1";
@@ -1500,7 +1492,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
       // Translate ALL parts in PARALLEL with aggressive timeout
       final translatedParts =
-      await Future.wait(parts.map((part) => _translateSinglePart(part)));
+          await Future.wait(parts.map((part) => _translateSinglePart(part)));
 
       return translatedParts.join('- ');
     } catch (e) {
@@ -1594,6 +1586,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       return null;
     }
   }
+
   Future<void> createRequestEvent(
       BookingCreateRequestEvent event, Emitter<BookingState> emit) async {
     isLoading = true;
@@ -1601,12 +1594,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
     final updatedPickupAddresses = await _updateAddressesWithGeocodedNames(
       addressList: event.pickupAddressList,
-      context: event.context, // You'll need to pass context to the bloc
     );
 
     final updatedDropAddresses = await _updateAddressesWithGeocodedNames(
       addressList: event.dropAddressList,
-      context: event.context,
     );
     pickUpAddressList = updatedPickupAddresses;
     dropAddressList = updatedDropAddresses;
@@ -2655,11 +2646,22 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   Future<void> biddingCreateRequest(
       BiddingCreateRequestEvent event, Emitter<BookingState> emit) async {
     isLoading = true;
+    final updatedPickupAddresses = await _updateAddressesWithGeocodedNames(
+      addressList: event.pickupAddressList,
+    );
+
+    final updatedDropAddresses = await _updateAddressesWithGeocodedNames(
+      addressList: event.dropAddressList,
+    );
+
+    pickUpAddressList = updatedPickupAddresses;
+    dropAddressList = updatedDropAddresses;
+
     final data = await serviceLocator<BookingUsecase>().createRequest(
         userData: event.userData,
         vehicleData: event.vehicleData,
-        pickupAddressList: event.pickupAddressList,
-        dropAddressList: event.dropAddressList,
+        pickupAddressList: pickUpAddressList,
+        dropAddressList: dropAddressList,
         selectedTransportType: event.selectedTransportType,
         paidAt: event.paidAt,
         parcelType: event.parcelType,
@@ -2723,8 +2725,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
             'request_no': requestData!.requestNumber,
             'pick_address': requestData!.pickAddress,
             'drop_address': requestData!.dropAddress,
-            'trip_stops': (event.dropAddressList.length > 1)
-                ? jsonEncode(event.dropAddressList)
+            'trip_stops': (dropAddressList.length > 1)
+                ? jsonEncode(dropAddressList)
                 : 'null',
             'goods': (requestData!.transportType != 'taxi' &&
                     requestData!.goodsType != '-')
