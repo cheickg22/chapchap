@@ -282,7 +282,6 @@ export default {
             return R * c;
         };
 
-        // Strip HTML tags (same as Flutter)
         const stripHtmlTags = (htmlText) => {
             const regex = /<[^>]*>/g;
             let strippedText = htmlText.replace(regex, "");
@@ -299,7 +298,6 @@ export default {
             return strippedText.trim();
         };
 
-        // Fetch geocoding data (equivalent to _fetchGeocoding in Flutter)
         const fetchGeocoding = async (latitude, longitude, mapKey) => {
             try {
                 const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${mapKey}&language=en&result_type=neighborhood|sublocality|sublocality_level_1`;
@@ -329,7 +327,6 @@ export default {
                 }
 
                 return new Promise((resolve) => {
-                    // Use the new Places API (Place.searchNearby) - same as your Flutter code
                     const { Place, SearchNearbyRankPreference } =
                         window.google.maps.places;
 
@@ -342,7 +339,6 @@ export default {
                             longitude,
                         );
 
-                        // Create request object (same structure as Flutter)
                         const request = {
                             fields: [
                                 "displayName",
@@ -568,7 +564,6 @@ export default {
             }
         };
 
-        // Transliterate (same as Flutter)
         const transliterate = (text) => {
             const transliterationMap = {
                 a: "ا",
@@ -609,7 +604,6 @@ export default {
                 .join("");
         };
 
-        // Try translation (same as Flutter)
         const tryTranslation = async (text, langPair) => {
             try {
                 const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
@@ -641,7 +635,6 @@ export default {
             }
         };
 
-        // Translate single part (same as Flutter)
         const translateSinglePart = async (part) => {
             try {
                 // Try ONLY English with very short timeout
@@ -658,7 +651,6 @@ export default {
             }
         };
 
-        // Translate to Arabic (same as Flutter)
         const translateToArabic = async (text) => {
             try {
                 // Check if text is already in Arabic
@@ -686,7 +678,6 @@ export default {
             }
         };
 
-        // Main function - EXACT equivalent of Flutter's _fetchAddressFromLatLng
         const fetchAddressFromLatLng = async (latitude, longitude) => {
             try {
                 const mapKey = props.map_key;
@@ -802,21 +793,6 @@ export default {
                     addressPartsEnglish.push(nearestPlace);
                     console.log("Added nearest place:", nearestPlace);
                 }
-
-                // Add sublocality if not already included
-                if (
-                    sublocalityLevel1 !== "" &&
-                    !addressPartsEnglish.some((part) =>
-                        part
-                            .toLowerCase()
-                            .includes(sublocalityLevel1.toLowerCase()),
-                    )
-                ) {
-                    addressPartsEnglish.push(sublocalityLevel1);
-                    console.log("Added sublocality:", sublocalityLevel1);
-                }
-
-                // If still empty, try neighborhood
                 if (
                     addressPartsEnglish.length === 1 &&
                     neighborhood !== "" &&
@@ -827,6 +803,20 @@ export default {
                     addressPartsEnglish.push(neighborhood);
                     console.log("Added neighborhood:", neighborhood);
                 }
+                // Add sublocality if not already included
+                /*if (
+                    sublocalityLevel1 !== "" &&
+                    !addressPartsEnglish.some((part) =>
+                        part
+                            .toLowerCase()
+                            .includes(sublocalityLevel1.toLowerCase()),
+                    )
+                ) {
+                    addressPartsEnglish.push(sublocalityLevel1);
+                    console.log("Added sublocality:", sublocalityLevel1);
+                }*/
+
+                // If still empty, try neighborhood
 
                 // If still only place name or empty, add locality
                 if (addressPartsEnglish.length <= 1 && locality !== "") {
