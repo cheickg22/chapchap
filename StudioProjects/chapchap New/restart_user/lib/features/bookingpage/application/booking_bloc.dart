@@ -1326,7 +1326,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           (geocodingData['status'] != 'OK' &&
               geocodingData['status'] != 'ZERO_RESULTS')) {
         final translated =
-            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
+        await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
         return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
       }
 
@@ -1334,7 +1334,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
       if (geocodingResults == null || geocodingResults.isEmpty) {
         final translated =
-            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
+        await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
         return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
       }
 
@@ -1350,9 +1350,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       }
 
       addressComponents ??=
-          geocodingResults.first["address_components"] as List;
+      geocodingResults.first["address_components"] as List;
 
       String sublocalityLevel1 = '';
+      String neighborhood = '';
 
       for (final component in addressComponents) {
         final types = List<String>.from(component["types"]);
@@ -1363,6 +1364,10 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           sublocalityLevel1 = longName;
           break; // Early exit once found
         }
+        if (types.contains("neighborhood")) {
+          neighborhood = longName;
+          break; // Early exit once found
+        }
       }
 
       List<String> addressPartsEnglish = [];
@@ -1370,8 +1375,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       if (nearestPlace != null && nearestPlace.isNotEmpty) {
         addressPartsEnglish.add(nearestPlace);
       }
-
+      if (neighborhood.isNotEmpty &&
+          !addressPartsEnglish.any((part) =>
+              part.toLowerCase().contains(neighborhood.toLowerCase()))) {
+        addressPartsEnglish.add(neighborhood);
+      }
       if (sublocalityLevel1.isNotEmpty &&
+          addressPartsEnglish.length < 2 &&
           !addressPartsEnglish.any((part) =>
               part.toLowerCase().contains(sublocalityLevel1.toLowerCase()))) {
         addressPartsEnglish.add(sublocalityLevel1);
