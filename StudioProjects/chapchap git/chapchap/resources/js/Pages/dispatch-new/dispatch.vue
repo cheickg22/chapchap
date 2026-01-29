@@ -804,7 +804,7 @@ export default {
                     console.log("Added neighborhood:", neighborhood);
                 }
                 // Add sublocality if not already included
-                /*if (
+                if (
                     sublocalityLevel1 !== "" &&
                     !addressPartsEnglish.some((part) =>
                         part
@@ -814,15 +814,15 @@ export default {
                 ) {
                     addressPartsEnglish.push(sublocalityLevel1);
                     console.log("Added sublocality:", sublocalityLevel1);
-                }*/
+                }
 
                 // If still empty, try neighborhood
 
                 // If still only place name or empty, add locality
-                if (addressPartsEnglish.length <= 1 && locality !== "") {
+                /* if (addressPartsEnglish.length <= 1 && locality !== "") {
                     addressPartsEnglish.push(locality);
                     console.log("Added locality:", locality);
-                }
+                }*/
 
                 console.log("Final address parts:", addressPartsEnglish);
 
