@@ -300,7 +300,7 @@ export default {
 
         const fetchGeocoding = async (latitude, longitude, mapKey) => {
             try {
-                const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${mapKey}&language=en&result_type=neighborhood|sublocality|sublocality_level_1`;
+                const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${mapKey}&language=ar`;
 
                 const response = await fetch(apiUrl, {
                     signal: AbortSignal.timeout(5000),
@@ -667,12 +667,23 @@ export default {
 
                 if (parts.length === 0) return null;
 
-                // Translate ALL parts in PARALLEL with aggressive timeout
-                const translatedParts = await Promise.all(
-                    parts.map((part) => translateSinglePart(part)),
-                );
+                // Translate ONLY the first part
+                const translatedFirstPart = await translateSinglePart(parts[0]);
 
-                return translatedParts.join("- ");
+                // Wrap remaining non-Arabic parts in LTR span
+                const remainingParts = parts.slice(1).map((part) => {
+                    // Check if part contains Arabic
+                    if (arabicRegex.test(part)) {
+                        return part;
+                    }
+                    // Wrap non-Arabic text in LTR span
+                    return `<span dir="ltr">${part}</span>`;
+                });
+
+                // Combine translated first part with remaining parts
+                const allParts = [translatedFirstPart, ...remainingParts];
+
+                return allParts.join("- ");
             } catch (e) {
                 return null;
             }
@@ -726,6 +737,7 @@ export default {
                 let sublocalityLevel1 = "";
                 let neighborhood = "";
                 let locality = "";
+                let administrative_area_level_1 = "";
 
                 // Check ALL results, not just ones with specific types
                 for (const result of geocodingResults) {
@@ -751,6 +763,22 @@ export default {
                                 console.log(
                                     "Found sublocality_level_1:",
                                     sublocalityLevel1,
+                                );
+                            }
+                            // Extract administrative_area_level_1
+                            if (
+                                !administrative_area_level_1 &&
+                                (types.includes(
+                                    "administrative_area_level_1",
+                                ) ||
+                                    types.includes(
+                                        "administrative_area_level_1",
+                                    ))
+                            ) {
+                                administrative_area_level_1 = longName;
+                                console.log(
+                                    "Found administrative_area_level_1:",
+                                    administrative_area_level_1,
                                 );
                             }
 
@@ -823,6 +851,18 @@ export default {
                     addressPartsEnglish.push(locality);
                     console.log("Added locality:", locality);
                 }*/
+
+                // If still only place name or empty, add locality
+                if (
+                    addressPartsEnglish.length <= 1 &&
+                    administrative_area_level_1 !== ""
+                ) {
+                    addressPartsEnglish.push(administrative_area_level_1);
+                    console.log(
+                        "Added administrative_area_level_1:",
+                        administrative_area_level_1,
+                    );
+                }
 
                 console.log("Final address parts:", addressPartsEnglish);
 
