@@ -1326,7 +1326,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           (geocodingData['status'] != 'OK' &&
               geocodingData['status'] != 'ZERO_RESULTS')) {
         final translated =
-        await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
+            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
         return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
       }
 
@@ -1334,7 +1334,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
       if (geocodingResults == null || geocodingResults.isEmpty) {
         final translated =
-        await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
+            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
         return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
       }
 
@@ -1350,10 +1350,11 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       }
 
       addressComponents ??=
-      geocodingResults.first["address_components"] as List;
+          geocodingResults.first["address_components"] as List;
 
       String sublocalityLevel1 = '';
       String neighborhood = '';
+      String administrative_area_level_1 = '';
 
       for (final component in addressComponents) {
         final types = List<String>.from(component["types"]);
@@ -1368,13 +1369,21 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           neighborhood = longName;
           break; // Early exit once found
         }
+        if (types.contains("administrative_area_level_1")) {
+          administrative_area_level_1 = longName;
+          break; // Early exit once found
+        }
       }
 
       List<String> addressPartsEnglish = [];
+      String? translatedNearestPlace;
 
+      // Translate only nearestPlace
       if (nearestPlace != null && nearestPlace.isNotEmpty) {
         addressPartsEnglish.add(nearestPlace);
+        translatedNearestPlace = await _translateToArabic(nearestPlace);
       }
+
       if (neighborhood.isNotEmpty &&
           !addressPartsEnglish.any((part) =>
               part.toLowerCase().contains(neighborhood.toLowerCase()))) {
@@ -1386,11 +1395,31 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
               part.toLowerCase().contains(sublocalityLevel1.toLowerCase()))) {
         addressPartsEnglish.add(sublocalityLevel1);
       }
+      if (administrative_area_level_1.isNotEmpty &&
+          addressPartsEnglish.length < 2 &&
+          !addressPartsEnglish.any((part) => part
+              .toLowerCase()
+              .contains(administrative_area_level_1.toLowerCase()))) {
+        addressPartsEnglish.add(administrative_area_level_1);
+      }
 
       final englishAddress = addressPartsEnglish.join('- ');
-      final arabicAddress = await _translateToArabic(englishAddress);
 
-      return _stripHtmlTags(arabicAddress ?? englishAddress);
+      // Build Arabic address: translated nearestPlace + other parts in English
+      List<String> addressPartsArabic = [];
+      if (translatedNearestPlace != null && translatedNearestPlace.isNotEmpty) {
+        addressPartsArabic.add(translatedNearestPlace);
+        // Add the rest of the English parts
+        for (int i = 1; i < addressPartsEnglish.length; i++) {
+          addressPartsArabic.add(addressPartsEnglish[i]);
+        }
+      }
+
+      final arabicAddress = addressPartsArabic.isNotEmpty
+          ? addressPartsArabic.join('- ')
+          : englishAddress;
+
+      return _stripHtmlTags(arabicAddress);
     } catch (e) {
       return "شارع بدون اسم";
     }
@@ -1403,7 +1432,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   ) async {
     try {
       final apiUrl =
-          "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$mapKey&language=en&result_type=neighborhood|sublocality|sublocality_level_1";
+          "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$mapKey&language=ar&result_type=neighborhood|sublocality|sublocality_level_1|administrative_area_level_1";
 
       final dio = Dio();
       final response = await dio.get(
@@ -1432,7 +1461,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           "?location=$latitude,$longitude"
           "&rankby=distance"
           "&type=establishment"
-          "&language=en"
+          "&language=ar"
           "&key=$apiKey";
 
       final dio = Dio();
@@ -1491,20 +1520,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         return text;
       }
 
-      // Split the text by separator
-      final parts = text
-          .split('- ')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList();
-
-      if (parts.isEmpty) return null;
-
-      // Translate ALL parts in PARALLEL with aggressive timeout
-      final translatedParts =
-          await Future.wait(parts.map((part) => _translateSinglePart(part)));
-
-      return translatedParts.join('- ');
+      // Translate single part
+      return await _translateSinglePart(text);
     } catch (e) {
       return null;
     }
