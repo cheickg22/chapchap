@@ -475,7 +475,7 @@ class MoovMoneyDriverController extends Controller
                 $this->updateFirebaseStatus($serviceRequest, 'completed');
                 
                 // Notifier le client
-                $this->notifyCustomerTransactionCompleted($serviceRequest);
+                $this->notifyTransactionCompleted($serviceRequest);
                 
                 Log::info('Moov Money withdrawal completed with PIN validation', [
                     'request_id' => $requestId,
@@ -674,7 +674,7 @@ class MoovMoneyDriverController extends Controller
             $this->updateFirebaseStatus($serviceRequest, 'completed');
             
             // Notifier le client que la transaction est complétée
-            $this->notifyCustomerTransactionCompleted($serviceRequest);
+            $this->notifyTransactionCompleted($serviceRequest);
             
             Log::info('Moov Money withdrawal completed - trip ended and payment confirmed', [
                 'request_id' => $requestId,
