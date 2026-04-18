@@ -18,6 +18,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:restart_tagxi/common/tobitmap.dart';
 import 'package:restart_tagxi/core/utils/custom_text.dart';
 import 'package:restart_tagxi/core/utils/payment_received_stream.dart';
+import 'package:restart_tagxi/features/bookingpage/data/repository/area_detection_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 
@@ -1308,34 +1309,56 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     try {
       final mapKey = AppConstants.mapKey;
 
-      // Execute both API calls in PARALLEL
       final results = await Future.wait([
-        _fetchGeocoding(latitude, longitude, mapKey),
+        Future.value(
+            AreaDetectionService.instance.getAreaName(latitude, longitude)),
         _findNearestPlace(
           latitude: latitude,
           longitude: longitude,
           apiKey: mapKey,
-          languageCode: "en",
+          languageCode: "ar",
         ),
       ]);
 
-      final geocodingData = results[0] as Map<String, dynamic>?;
+      final areaName = results[0] as String?;
       final nearestPlace = results[1] as String?;
+
+      if (nearestPlace != null &&
+          nearestPlace.isNotEmpty &&
+          areaName != null &&
+          areaName.isNotEmpty) {
+        final translatedPlace = await _translateToArabic(nearestPlace);
+        final place = _stripHtmlTags(translatedPlace ?? nearestPlace);
+        return '$place، $areaName';
+      }
+
+      return await _fetchAddressFromGeocodingApi(
+        latitude: latitude,
+        longitude: longitude,
+        mapKey: mapKey,
+      );
+    } catch (e) {
+      return "شارع بدون اسم";
+    }
+  }
+
+  Future<String> _fetchAddressFromGeocodingApi({
+    required double latitude,
+    required double longitude,
+    required String mapKey,
+  }) async {
+    try {
+      final geocodingData = await _fetchGeocoding(latitude, longitude, mapKey);
 
       if (geocodingData == null ||
           (geocodingData['status'] != 'OK' &&
               geocodingData['status'] != 'ZERO_RESULTS')) {
-        final translated =
-            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
-        return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
+        return "شارع بدون اسم";
       }
 
       final geocodingResults = geocodingData['results'] as List?;
-
       if (geocodingResults == null || geocodingResults.isEmpty) {
-        final translated =
-            await _translateToArabic(nearestPlace ?? "شارع بدون اسم");
-        return _stripHtmlTags(translated ?? nearestPlace ?? "شارع بدون اسم");
+        return "شارع بدون اسم";
       }
 
       List? addressComponents;
@@ -1348,79 +1371,41 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           break;
         }
       }
-
       addressComponents ??=
           geocodingResults.first["address_components"] as List;
 
       String sublocalityLevel1 = '';
       String neighborhood = '';
-      String administrative_area_level_1 = '';
+      String administrativeArea = '';
 
       for (final component in addressComponents) {
         final types = List<String>.from(component["types"]);
         final longName = component["long_name"] as String;
-
         if (types.contains("sublocality") ||
             types.contains("sublocality_level_1")) {
           sublocalityLevel1 = longName;
-          break; // Early exit once found
+          break;
         }
         if (types.contains("neighborhood")) {
           neighborhood = longName;
-          break; // Early exit once found
+          break;
         }
         if (types.contains("administrative_area_level_1")) {
-          administrative_area_level_1 = longName;
-          break; // Early exit once found
+          administrativeArea = longName;
+          break;
         }
       }
 
-      List<String> addressPartsEnglish = [];
-      String? translatedNearestPlace;
+      final best = sublocalityLevel1.isNotEmpty
+          ? sublocalityLevel1
+          : neighborhood.isNotEmpty
+              ? neighborhood
+              : administrativeArea.isNotEmpty
+                  ? administrativeArea
+                  : "شارع بدون اسم";
 
-      // Translate only nearestPlace
-      if (nearestPlace != null && nearestPlace.isNotEmpty) {
-        addressPartsEnglish.add(nearestPlace);
-        translatedNearestPlace = await _translateToArabic(nearestPlace);
-      }
-
-      if (neighborhood.isNotEmpty &&
-          !addressPartsEnglish.any((part) =>
-              part.toLowerCase().contains(neighborhood.toLowerCase()))) {
-        addressPartsEnglish.add(neighborhood);
-      }
-      if (sublocalityLevel1.isNotEmpty &&
-          addressPartsEnglish.length < 2 &&
-          !addressPartsEnglish.any((part) =>
-              part.toLowerCase().contains(sublocalityLevel1.toLowerCase()))) {
-        addressPartsEnglish.add(sublocalityLevel1);
-      }
-      if (administrative_area_level_1.isNotEmpty &&
-          addressPartsEnglish.length < 2 &&
-          !addressPartsEnglish.any((part) => part
-              .toLowerCase()
-              .contains(administrative_area_level_1.toLowerCase()))) {
-        addressPartsEnglish.add(administrative_area_level_1);
-      }
-
-      final englishAddress = addressPartsEnglish.join('- ');
-
-      // Build Arabic address: translated nearestPlace + other parts in English
-      List<String> addressPartsArabic = [];
-      if (translatedNearestPlace != null && translatedNearestPlace.isNotEmpty) {
-        addressPartsArabic.add(translatedNearestPlace);
-        // Add the rest of the English parts
-        for (int i = 1; i < addressPartsEnglish.length; i++) {
-          addressPartsArabic.add(addressPartsEnglish[i]);
-        }
-      }
-
-      final arabicAddress = addressPartsArabic.isNotEmpty
-          ? addressPartsArabic.join('- ')
-          : englishAddress;
-
-      return _stripHtmlTags(arabicAddress);
-    } catch (e) {
+      return _stripHtmlTags(best);
+    } catch (_) {
       return "شارع بدون اسم";
     }
   }
