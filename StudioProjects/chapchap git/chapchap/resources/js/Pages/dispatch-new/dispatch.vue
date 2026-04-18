@@ -14,6 +14,48 @@ import { mapGetters } from "vuex";
 import { useI18n } from "vue-i18n";
 import googleMap from "@/Components/googleMap.vue";
 
+let _areasCache = null;
+const loadAreas = async () => {
+    if (_areasCache) return _areasCache;
+    const res = await fetch("/data/nouakchott_areas.json");
+    _areasCache = await res.json();
+    return _areasCache;
+};
+
+const pointInPolygon = (lng, lat, coordinates) => {
+    const n = coordinates.length;
+    if (n < 3) return false;
+    let inside = false;
+    let j = n - 1;
+    for (let i = 0; i < n; i++) {
+        const xi = coordinates[i][0],
+            yi = coordinates[i][1];
+        const xj = coordinates[j][0],
+            yj = coordinates[j][1];
+        if (
+            yi > lat !== yj > lat &&
+            lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi
+        ) {
+            inside = !inside;
+        }
+        j = i;
+    }
+    return inside;
+};
+
+const getAreaName = async (latitude, longitude) => {
+    try {
+        const areas = await loadAreas();
+        for (const area of areas) {
+            if (pointInPolygon(longitude, latitude, area.coordinates)) {
+                return area.name;
+            }
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+};
 export default {
     data() {
         return {
@@ -693,190 +735,61 @@ export default {
             try {
                 const mapKey = props.map_key;
 
-                // Execute both API calls in PARALLEL
-                const [geocodingData, nearestPlace] = await Promise.all([
-                    fetchGeocoding(latitude, longitude, mapKey),
-                    findNearestPlace(latitude, longitude),
-                ]);
+                const [geocodingData, nearestPlace, areaName] =
+                    await Promise.all([
+                        fetchGeocoding(latitude, longitude, mapKey),
+                        findNearestPlace(latitude, longitude),
+                        getAreaName(latitude, longitude),
+                    ]);
 
-                console.log("=== Geocoding Debug ===");
-                console.log("Geocoding data:", geocodingData);
-                console.log("Nearest place:", nearestPlace);
+                if (nearestPlace?.trim() && areaName) {
+                    const translatedPlace =
+                        await translateToArabic(nearestPlace);
+                    return stripHtmlTags(
+                        `${translatedPlace || nearestPlace}، ${areaName}`,
+                    );
+                }
 
-                // Check geocoding status
+                // Full geocoding fallback
                 if (
                     !geocodingData ||
                     (geocodingData.status !== "OK" &&
                         geocodingData.status !== "ZERO_RESULTS")
                 ) {
-                    const translated = await translateToArabic(
-                        nearestPlace || t("unnamed_street"),
-                    );
-                    return stripHtmlTags(
-                        translated || nearestPlace || t("unnamed_street"),
-                    );
-                }
-
-                const geocodingResults = geocodingData.results;
-
-                if (!geocodingResults || geocodingResults.length === 0) {
-                    const translated = await translateToArabic(
-                        nearestPlace || t("unnamed_street"),
-                    );
-                    return stripHtmlTags(
-                        translated || nearestPlace || t("unnamed_street"),
-                    );
-                }
-
-                console.log(
-                    "Total geocoding results:",
-                    geocodingResults.length,
-                );
-
-                // IMPORTANT: Look through ALL results to find sublocality
-                let sublocalityLevel1 = "";
-                let neighborhood = "";
-                let locality = "";
-                let administrative_area_level_1 = "";
-
-                // Check ALL results, not just ones with specific types
-                for (const result of geocodingResults) {
-                    console.log("Checking result types:", result.types);
-
-                    if (result.address_components) {
-                        for (const component of result.address_components) {
-                            const types = component.types;
-                            const longName = component.long_name;
-
-                            console.log(
-                                `Component: ${longName}, Types:`,
-                                types,
-                            );
-
-                            // Extract sublocality_level_1
-                            if (
-                                !sublocalityLevel1 &&
-                                (types.includes("sublocality_level_1") ||
-                                    types.includes("sublocality"))
-                            ) {
-                                sublocalityLevel1 = longName;
-                                console.log(
-                                    "Found sublocality_level_1:",
-                                    sublocalityLevel1,
-                                );
-                            }
-                            // Extract administrative_area_level_1
-                            if (
-                                !administrative_area_level_1 &&
-                                (types.includes(
-                                    "administrative_area_level_1",
-                                ) ||
-                                    types.includes(
-                                        "administrative_area_level_1",
-                                    ))
-                            ) {
-                                administrative_area_level_1 = longName;
-                                console.log(
-                                    "Found administrative_area_level_1:",
-                                    administrative_area_level_1,
-                                );
-                            }
-
-                            // Extract neighborhood
-                            if (
-                                !neighborhood &&
-                                types.includes("neighborhood")
-                            ) {
-                                neighborhood = longName;
-                                console.log(
-                                    "Found neighborhood:",
-                                    neighborhood,
-                                );
-                            }
-
-                            // Extract locality
-                            if (!locality && types.includes("locality")) {
-                                locality = longName;
-                                console.log("Found locality:", locality);
-                            }
-                        }
-                    }
-
-                    // Stop if we found sublocality
-                    if (sublocalityLevel1) {
-                        break;
-                    }
-                }
-
-                console.log("Extracted values:");
-                console.log("- sublocalityLevel1:", sublocalityLevel1);
-                console.log("- neighborhood:", neighborhood);
-                console.log("- locality:", locality);
-
-                // Build address parts
-                const addressPartsEnglish = [];
-
-                // Add nearest place if available
-                if (nearestPlace && nearestPlace.trim() !== "") {
-                    addressPartsEnglish.push(nearestPlace);
-                    console.log("Added nearest place:", nearestPlace);
-                }
-                if (
-                    addressPartsEnglish.length === 1 &&
-                    neighborhood !== "" &&
-                    !addressPartsEnglish.some((part) =>
-                        part.toLowerCase().includes(neighborhood.toLowerCase()),
-                    )
-                ) {
-                    addressPartsEnglish.push(neighborhood);
-                    console.log("Added neighborhood:", neighborhood);
-                }
-                // Add sublocality if not already included
-                if (
-                    sublocalityLevel1 !== "" &&
-                    !addressPartsEnglish.some((part) =>
-                        part
-                            .toLowerCase()
-                            .includes(sublocalityLevel1.toLowerCase()),
-                    )
-                ) {
-                    addressPartsEnglish.push(sublocalityLevel1);
-                    console.log("Added sublocality:", sublocalityLevel1);
-                }
-
-                // If still empty, try neighborhood
-
-                // If still only place name or empty, add locality
-                /* if (addressPartsEnglish.length <= 1 && locality !== "") {
-                    addressPartsEnglish.push(locality);
-                    console.log("Added locality:", locality);
-                }*/
-
-                // If still only place name or empty, add locality
-                if (
-                    addressPartsEnglish.length <= 1 &&
-                    administrative_area_level_1 !== ""
-                ) {
-                    addressPartsEnglish.push(administrative_area_level_1);
-                    console.log(
-                        "Added administrative_area_level_1:",
-                        administrative_area_level_1,
-                    );
-                }
-
-                console.log("Final address parts:", addressPartsEnglish);
-
-                if (addressPartsEnglish.length === 0) {
                     return t("unnamed_street");
                 }
 
-                const englishAddress = addressPartsEnglish.join("- ");
-                console.log("English address:", englishAddress);
+                const geocodingResults = geocodingData.results;
+                if (!geocodingResults?.length) return t("unnamed_street");
 
-                const arabicAddress = await translateToArabic(englishAddress);
-                console.log("Arabic address:", arabicAddress);
+                let sublocalityLevel1 = "",
+                    neighborhood = "",
+                    administrativeArea = "";
 
-                return stripHtmlTags(arabicAddress || englishAddress);
+                for (const result of geocodingResults) {
+                    for (const component of result.address_components || []) {
+                        const types = component.types;
+                        const name = component.long_name;
+                        if (
+                            !sublocalityLevel1 &&
+                            (types.includes("sublocality_level_1") ||
+                                types.includes("sublocality"))
+                        )
+                            sublocalityLevel1 = name;
+                        if (!neighborhood && types.includes("neighborhood"))
+                            neighborhood = name;
+                        if (
+                            !administrativeArea &&
+                            types.includes("administrative_area_level_1")
+                        )
+                            administrativeArea = name;
+                    }
+                    if (sublocalityLevel1) break;
+                }
+
+                const best =
+                    sublocalityLevel1 || neighborhood || administrativeArea;
+                return best ? stripHtmlTags(best) : t("unnamed_street");
             } catch (e) {
                 console.error("Error in fetchAddressFromLatLng:", e);
                 return t("unnamed_street");
